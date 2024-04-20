@@ -1,4 +1,4 @@
-import { vi, describe, it, expect } from "vitest";
+import { vi, it, expect } from "vitest";
 import { createTestSubscriber } from "./subscriber";
 import { context, createContext } from "../context";
 import { span } from "../span";

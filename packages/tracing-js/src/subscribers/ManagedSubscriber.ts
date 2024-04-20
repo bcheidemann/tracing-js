@@ -1,11 +1,11 @@
 import { Event } from "../event";
 import { Level } from "../level";
-import { Span, SpanAttributes } from "../span";
+import { SpanAttributes } from "../span";
 import { ISubscriber } from "../subscriber";
 
 type SpanNode = {
   id: symbol;
-  attributes: SpanAttributes<symbol>;
+  attributes: SpanAttributes;
 };
 
 type PendingSpanNode = SpanNode & {
@@ -19,7 +19,7 @@ type EnteredSpanNode = SpanNode & {
 export abstract class ManagedSubscriber implements ISubscriber<symbol> {
   protected constructor(
     private readonly level: Level = Level.INFO,
-    private currentSpan?: EnteredSpanNode,
+    private currentSpan: EnteredSpanNode | undefined = undefined,
     private readonly pendingSpans = new Map<symbol, PendingSpanNode>(),
   ) {}
 
@@ -27,11 +27,11 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
     return level >= this.level;
   }
 
-  enabled(_metadata: Event | SpanAttributes<symbol>): boolean {
+  enabled(_metadata: Event | SpanAttributes): boolean {
     return true;
   }
 
-  newSpan(attributes: SpanAttributes<symbol>): symbol {
+  newSpan(attributes: SpanAttributes): symbol {
     const span: PendingSpanNode = {
       id: Symbol(),
       parent: undefined,
@@ -49,7 +49,7 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
     while ((next = spans.at(-1)?.parent)) {
       spans.push(next);
     }
-    this.onEvent(event, spans);
+    this.onEvent(event, spans.map((span) => span.attributes));
   }
 
   enter(span: symbol): void {
@@ -99,7 +99,7 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
 
   // Abstract methods
 
-  protected abstract onEvent(event: Event, spans: SpanNode[]): void;
+  protected abstract onEvent(event: Event, spans: SpanAttributes[]): void;
 }
 
 class ClonedManagedSubscriber extends ManagedSubscriber {
@@ -107,7 +107,7 @@ class ClonedManagedSubscriber extends ManagedSubscriber {
     level: Level,
     currentSpan: EnteredSpanNode | undefined,
     pendingSpans = new Map<symbol, PendingSpanNode>(),
-    protected readonly onEvent: (event: Event, spans: SpanNode[]) => void,
+    protected readonly onEvent: (event: Event, spans: SpanAttributes[]) => void,
   ) {
     super(level, currentSpan, pendingSpans);
   }

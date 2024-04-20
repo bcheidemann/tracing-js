@@ -5,7 +5,7 @@ export type AnonymousSpanId = {
   __anonymousSpanId?: true;
 };
 
-export type SpanAttributes<TSpanId> = {
+export type SpanAttributes = {
   isSpan: true;
   level: Level;
   message: string;
@@ -57,7 +57,7 @@ export function span(
       return { enter };
     }
 
-    const attributes: SpanAttributes<unknown> = {
+    const attributes: SpanAttributes = {
       isSpan: true,
       level,
       message,
