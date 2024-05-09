@@ -1,7 +1,7 @@
 import { vi, describe, it, expect } from "vitest";
 import { ManagedSubscriber } from "../../subscribers/ManagedSubscriber";
-import { Event, event } from "../../event";
-import { SpanAttributes, span } from "../../span";
+import { event } from "../../event";
+import { span } from "../../span";
 import { context, createContext } from "../../context";
 import { Level } from "../../level";
 import { instrumentCallback, level } from "../../instrument";
