@@ -1,12 +1,12 @@
-import { AsyncLocalStorage } from "async_hooks";
-import { ISubscriber } from "./subscriber";
+import { AsyncLocalStorage } from "node:async_hooks";
+import { ISubscriber } from "./subscriber.ts";
 
 export type Context = {
   subscriber: ISubscriber<unknown>;
   clone(): Context;
 };
 
-export const context = new AsyncLocalStorage<Context>();
+export const context: AsyncLocalStorage<Context> = new AsyncLocalStorage<Context>();
 
 export function createContext(subscriber: ISubscriber<unknown>): Context {
   return {

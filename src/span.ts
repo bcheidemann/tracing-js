@@ -1,5 +1,5 @@
-import { getContext } from "./context";
-import { Level } from "./level";
+import { getContext } from "./context.ts";
+import { Level } from "./level.ts";
 
 export type AnonymousSpanId = {
   __anonymousSpanId?: true;

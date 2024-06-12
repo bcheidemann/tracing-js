@@ -1,6 +1,6 @@
-import { Span, SpanAttributes } from "./span";
-import { Event } from "./event";
-import { Level } from "./level";
+import { SpanAttributes } from "./span.ts";
+import { Event } from "./event.ts";
+import { Level } from "./level.ts";
 
 export interface ISubscriber<TSpanId> {
   /**
@@ -13,11 +13,11 @@ export interface ISubscriber<TSpanId> {
    * If possible, use `enabledForLevel` instead, as this is called before
    * creating a new span or event.
    */
-  enabled?(metadata: SpanAttributes<TSpanId> | Event): boolean;
+  enabled?(metadata: SpanAttributes | Event): boolean;
   /**
    * Called when a new span is created if the subscriber is enabled.
    */
-  newSpan(attributes: SpanAttributes<TSpanId>): TSpanId;
+  newSpan(attributes: SpanAttributes): TSpanId;
   /**
    * Called when a new event is created if the subscriber is enabled.
    */

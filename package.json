@@ -1,27 +1,15 @@
 {
-  "name": "tracing-js",
-  "version": "1.0.0",
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
-  "workspaces": [
-    "./packages/*"
-  ],
+  "private": true,
+  "name": "@bcheidemann/tracing",
   "scripts": {
-    "test": "npm run -ws test",
-    "format": "npm run -ws format"
+    "test": "vitest",
+    "format": "prettier . --write",
+    "check": "tsc --noEmit"
   },
-  "author": "Ben Hediemann <ben@heidemann.dev>",
   "license": "ISC",
-  "dependencies": {
-    "typescript": "^5.4.4"
-  },
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^20.12.6",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.2.0",
-    "prettier": "3.2.5"
+    "@tsconfig/deno": "^1.0.11",
+    "prettier": "3.2.5",
+    "typescript": "^5.4.4"
   }
 }

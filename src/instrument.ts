@@ -1,5 +1,5 @@
-import { Context, context, getContext } from "./context";
-import { Level } from "./level";
+import { Context, context, getContext } from "./context.ts";
+import { Level } from "./level.ts";
 
 type NameAttribute = {
   kind: 0;
