@@ -34,9 +34,86 @@ Spans and events both have levels. Levels are used by subscribers to decide whet
 
 ### Recording Spans
 
+Spans can be created and entered like this:
+
+```ts
+const guard = span(Level.INFO, "an example span").enter();
+```
+
+Note the guard being returned. This allows us to exit the span, either implicitly or explicitly.
+
+To explicitly exit the span, you can simply call `guard.exit()`. However, if you are using TypeScript, with a bundler which supports [TC39 `using` declarations](https://github.com/tc39/proposal-explicit-resource-management), then you can automatically exit the span at the end of the scope.
+
+```ts
+{
+  using guard = span(Level.INFO, "an example span").enter();
+  // Do stuff
+
+} // <-- span automatically exits here
+```
+
+The following shorthands are available:
+
+```ts
+traceSpan("a trace span");
+debugSpan("a debug span");
+infoSpan("an info span");
+warnSpan("a warn span");
+errorSpan("an error span");
+criticalSpan("a critical span");
+```
+
+Additional context can be recorded against a span using span fields. These fields will be made available to subscribers when an event is emitted, along with the spans message and level.
+
+```ts
+span(Level.INFO, "info span with fields", {
+  key: 'value',
+});
+```
+
+This can be used to capture arbitrary context about the span, for example, a web server may use this to capture the request ID.
+
 ### Recording Events
 
-## The Instrument Decorator
+Events can be emitted like this:
+
+```ts
+event(Level.INFO, "an example event");
+```
+
+The following shorthands are available:
+
+```ts
+trace("a trace event");
+debug("a debug event");
+info("an info event");
+warn("a warn event");
+error("an error event");
+critical("a critical event");
+```
+
+Additional context can be recorded against an event using event fields. These fields will be made available to subscribers when the event is emitted, along with the events message and level.
+
+```ts
+event(Level.INFO, "info event with fields", {
+  key: 'value',
+});
+```
+
+### Instrumenting Methods
+
+When using classes, you can instument methods as follows:
+
+```ts
+class Application {
+  @instrument()
+  async example() {
+    // Do stuff
+  }
+}
+```
+
+A span is automatically entered when the function is called, and exited when the function ends. Note you must be using TypeScript with a bundler that supports [TC39 decorators](https://github.com/tc39/proposal-decorators).
 
 ## Usage Considerations
 
