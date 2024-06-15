@@ -5,46 +5,44 @@ import { SpanAttributes } from "../span";
 import { ManagedSubscriber } from "./ManagedSubscriber";
 
 const levelToString: Record<Level, string> = {
-  [Level.DISABLED]: 'DISABLED',
-  [Level.TRACE]: 'TRACE',
-  [Level.DEBUG]: 'DEBUG',
-  [Level.INFO]: 'INFO',
-  [Level.WARN]: 'WARN',
-  [Level.ERROR]: 'ERROR',
-  [Level.CRITICAL]: 'CRITICAL',
+  [Level.DISABLED]: "DISABLED",
+  [Level.TRACE]: "TRACE",
+  [Level.DEBUG]: "DEBUG",
+  [Level.INFO]: "INFO",
+  [Level.WARN]: "WARN",
+  [Level.ERROR]: "ERROR",
+  [Level.CRITICAL]: "CRITICAL",
 };
 
 export type FmtSubscriberOptions = {
   /**
    * The minimum level of logs to display.
-   * 
+   *
    * @default Level.INFO
    */
   level?: Level;
   /**
    * Include a timestamp in the message.
-   * 
+   *
    * @default true
    */
   timestamp?: boolean;
   /**
    * Log messages in color.
-   * 
+   *
    * @default true
    */
   color?: boolean;
   /**
    * Spreads logs over multiple lines for better readability.
-   * 
+   *
    * @default false
    */
   pretty?: boolean;
-}
+};
 
 export class FmtSubscriber extends ManagedSubscriber {
-  constructor(
-    private readonly options: FmtSubscriberOptions = {},
-  ) {
+  constructor(private readonly options: FmtSubscriberOptions = {}) {
     super(options.level ?? Level.INFO);
   }
 
@@ -77,7 +75,7 @@ export class FmtSubscriber extends ManagedSubscriber {
     let message = `${this.displayTimestamp()} ${this.displayLevel(event.level)}`;
 
     let formattedSpans: string | undefined;
-    if (formattedSpans = this.displaySpans(spans)) {
+    if ((formattedSpans = this.displaySpans(spans))) {
       message += ` ${formattedSpans}`;
     }
 
@@ -105,7 +103,9 @@ export class FmtSubscriber extends ManagedSubscriber {
 
   private displayFields(event: Event, spans: SpanAttributes[]) {
     const eventFields = Object.entries(event.fields ?? {});
-    const spanFields = spans.flatMap(span => Object.entries(span.fields ?? {}));
+    const spanFields = spans.flatMap((span) =>
+      Object.entries(span.fields ?? {}),
+    );
     const fields = [...eventFields, ...spanFields];
 
     if (!fields.length) return;
@@ -131,18 +131,18 @@ export class FmtSubscriber extends ManagedSubscriber {
 
   private displayValue(value: unknown): string {
     switch (typeof value) {
-      case 'bigint':
-      case 'boolean':
-      case 'function':
-      case 'symbol':
+      case "bigint":
+      case "boolean":
+      case "function":
+      case "symbol":
         return value.toString();
-      case 'number':
-      case 'string':
-        return value;
-      case 'object':
+      case "number":
+      case "string":
+        return value.toString();
+      case "object":
         return JSON.stringify(value);
-      case 'undefined':
-        return 'undefined';
+      case "undefined":
+        return "undefined";
     }
   }
 
@@ -151,6 +151,9 @@ export class FmtSubscriber extends ManagedSubscriber {
       return;
     }
 
-    return `${spans.map(span => span.message).reverse().join(' > ')} :`;
+    return `${spans
+      .map((span) => span.message)
+      .reverse()
+      .join(" > ")} :`;
   }
 }
