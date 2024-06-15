@@ -1,6 +1,12 @@
 import { getContext } from "./context.ts";
 import { Level } from "./level.ts";
 
+declare global {
+  interface SymbolConstructor {
+    readonly dispose: unique symbol;
+  }
+}
+
 export type AnonymousSpanId = {
   __anonymousSpanId?: true;
 };
