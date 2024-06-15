@@ -75,11 +75,13 @@ describe("ManagedSubscriber", () => {
         message: "test",
         fields: undefined,
       }),
-      [expect.objectContaining({
-        level: Level.INFO,
-        message: "test span",
-        fields: undefined,
-      })],
+      [
+        expect.objectContaining({
+          level: Level.INFO,
+          message: "test span",
+          fields: undefined,
+        }),
+      ],
     );
   });
 
@@ -101,13 +103,15 @@ describe("ManagedSubscriber", () => {
         message: "test",
         fields: undefined,
       }),
-      [expect.objectContaining({
-        level: Level.INFO,
-        message: "test span",
-        fields: {
-          test: "test",
-        },
-      })],
+      [
+        expect.objectContaining({
+          level: Level.INFO,
+          message: "test span",
+          fields: {
+            test: "test",
+          },
+        }),
+      ],
     );
   });
 
