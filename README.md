@@ -16,9 +16,19 @@ This package was heavily inspired by the [`tracing` crate](https://crates.io/cra
 
 ### Spans
 
+Spans represent a discrete unit of work. For example, in a web server, they may be used to represent the lifetime of a request. Spans can be entered and exited. When an event is logged, the context of any entered spans will be included with the event automatically.
+
 ### Events
 
+Unlike spans, which represent a period of time during the execution of the program, events represent a single point of time. When an event is logged, any subscribers will be notified of the event, and all spans which are entered at that point it time.
+
 ### Subscribers
+
+Subscribers are responsible for handling events. Typically, these are used for logging.
+
+### Levels
+
+Spans and events both have levels. Levels are used by subscribers to decide whether or not they are interested in a particular span or event. Note that spans and events are discrete from one another, meaning even if an entered span is below the minimum level for a subscriber, the subscriber is still notified of events which happen during that span if they are above the minimum level.
 
 ## Usage
 
