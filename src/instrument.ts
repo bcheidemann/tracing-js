@@ -9,12 +9,15 @@ type MessageAttribute = {
 
 type TargetAttribute = {
   kind: 1;
-} & ({
-  class: string;
-  method: string;
-} | {
-  function: string;
-});
+} & (
+  | {
+      class: string;
+      method: string;
+    }
+  | {
+      function: string;
+    }
+);
 
 type LevelAttribute = {
   kind: 2;
@@ -62,7 +65,10 @@ export function message(message: string): MessageAttribute {
 
 export function target(className: string, method: string): TargetAttribute;
 export function target(functionName: string): TargetAttribute;
-export function target(classOrFunctionName: string, method?: string): TargetAttribute {
+export function target(
+  classOrFunctionName: string,
+  method?: string,
+): TargetAttribute {
   if (method !== undefined) {
     return { kind: 1, class: classOrFunctionName, method };
   }
@@ -73,7 +79,9 @@ export function level(level: Level): LevelAttribute {
   return { kind: 2, level };
 }
 
-export function skip<TArgs extends any[]>(...skip: SkipAttribute<TArgs>['skip']): SkipAttribute<TArgs> {
+export function skip<TArgs extends any[]>(
+  ...skip: SkipAttribute<TArgs>["skip"]
+): SkipAttribute<TArgs> {
   return { kind: 3, skip };
 }
 
@@ -105,17 +113,18 @@ export function instrument<TMethod extends (this: any, ...args: any[]) => any>(
   };
 }
 
-export function instrumentCallback<TCallback extends (this: any, ...args: any[]) => any>(
+export function instrumentCallback<
+  TCallback extends (this: any, ...args: any[]) => any,
+>(
   fn: TCallback,
   ...attributes: Attributes<Parameters<TCallback>>[]
 ): TCallback {
   return instrumentCallbackImpl(fn, attributes);
 }
 
-function instrumentCallbackImpl<TCallback extends (this: any, ...args: any[]) => any>(
-  fn: TCallback,
-  attributes: Attributes<Parameters<TCallback>>[],
-): TCallback {
+function instrumentCallbackImpl<
+  TCallback extends (this: any, ...args: any[]) => any,
+>(fn: TCallback, attributes: Attributes<Parameters<TCallback>>[]): TCallback {
   return function instrumentedCallback(
     this: ThisParameterType<TCallback>,
     ...args: Parameters<TCallback>
@@ -137,8 +146,7 @@ function instrumentCallbackImpl<TCallback extends (this: any, ...args: any[]) =>
         // Handle sync success
         guard.exit();
         return result;
-      }
-      catch (err) {
+      } catch (err) {
         // Handle sync errors
         guard.exit();
         throw err;
