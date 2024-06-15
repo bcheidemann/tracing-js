@@ -202,11 +202,17 @@ describe("ManagedSubscriber", () => {
       }),
       [
         expect.objectContaining({
+          isSpan: true,
           level: Level.INFO,
           message: "first",
           fields: undefined,
         }),
+        // Instrumented span
         expect.objectContaining({
+          isSpan: true,
+        }),
+        expect.objectContaining({
+          isSpan: true,
           level: Level.INFO,
           message: "outer",
           fields: undefined,
@@ -225,6 +231,10 @@ describe("ManagedSubscriber", () => {
           level: Level.INFO,
           message: "second",
           fields: undefined,
+        }),
+        // Instrumented span
+        expect.objectContaining({
+          isSpan: true,
         }),
         expect.objectContaining({
           level: Level.INFO,

@@ -1,9 +1,10 @@
-import { Context, context, getContext } from "./context.ts";
+import { context, getContext } from "./context.ts";
 import { Level } from "./level.ts";
+import { span } from "./span.ts";
 
-type NameAttribute = {
+type MessageAttribute = {
   kind: 0;
-  name: string;
+  message: string;
 };
 
 type TargetAttribute = {
@@ -20,9 +21,11 @@ type LevelAttribute = {
   level: Level;
 };
 
-type SkipAttribute = {
+type SkipAttribute<TArgs extends any[]> = {
   kind: 3;
-  skip: number[];
+  skip: {
+    [index in keyof TArgs]: boolean;
+  };
 };
 
 type SkipAllAttribute = {
@@ -40,10 +43,10 @@ type FieldAttribute<TArgs extends any[]> = {
 };
 
 type Attributes<TArgs extends any[]> =
-  | NameAttribute
+  | MessageAttribute
   | TargetAttribute
   | LevelAttribute
-  | SkipAttribute
+  | SkipAttribute<TArgs>
   | SkipAllAttribute
   | SkipThisAttribute
   | FieldAttribute<TArgs>;
@@ -53,8 +56,8 @@ type InstrumentDecorator<TMethod extends (this: any, ...args: any[]) => any> = (
   context: ClassMethodDecoratorContext<ThisParameterType<TMethod>, TMethod>,
 ) => TMethod;
 
-export function name(name: string): NameAttribute {
-  return { kind: 0, name };
+export function message(message: string): MessageAttribute {
+  return { kind: 0, message };
 }
 
 export function target(className: string, method: string): TargetAttribute;
@@ -70,7 +73,7 @@ export function level(level: Level): LevelAttribute {
   return { kind: 2, level };
 }
 
-export function skip(...skip: number[]): SkipAttribute {
+export function skip<TArgs extends any[]>(...skip: SkipAttribute<TArgs>['skip']): SkipAttribute<TArgs> {
   return { kind: 3, skip };
 }
 
@@ -90,28 +93,28 @@ export function field<TArgs extends any[]>(
 }
 
 export function instrument<TMethod extends (this: any, ...args: any[]) => any>(
+  // TODO: Add support for attributes
   ...attributes: Attributes<Parameters<TMethod>>[]
 ): InstrumentDecorator<TMethod> {
   return function instrumentDecorator(
     target: TMethod,
     ctx: ClassMethodDecoratorContext<ThisParameterType<TMethod>, TMethod>,
   ) {
-    return function instrumentedMethod(
-      this: ThisParameterType<TMethod>,
-      ...args: Parameters<TMethod>
-    ): ReturnType<TMethod> {
-      const self = this;
-      const ctx = getContext().clone();
-      return context.run(ctx, function () {
-        return target.apply(self, args);
-      }) 
-    };
-  } as InstrumentDecorator<TMethod>;
+    const isPrivate = ctx.private;
+    return instrumentCallbackImpl(target, attributes);
+  };
 }
 
 export function instrumentCallback<TCallback extends (this: any, ...args: any[]) => any>(
   fn: TCallback,
   ...attributes: Attributes<Parameters<TCallback>>[]
+): TCallback {
+  return instrumentCallbackImpl(fn, attributes);
+}
+
+function instrumentCallbackImpl<TCallback extends (this: any, ...args: any[]) => any>(
+  fn: TCallback,
+  attributes: Attributes<Parameters<TCallback>>[],
 ): TCallback {
   return function instrumentedCallback(
     this: ThisParameterType<TCallback>,
@@ -120,7 +123,26 @@ export function instrumentCallback<TCallback extends (this: any, ...args: any[])
     const self = this;
     const ctx = getContext().clone();
     return context.run(ctx, function () {
-      return fn.apply(self, args);
+      const guard = span(Level.INFO, "temp").enter();
+      try {
+        const result = fn.apply(self, args);
+
+        // Handle async error / success
+        if (result instanceof Promise) {
+          return result.finally(() => {
+            guard.exit();
+          });
+        }
+
+        // Handle sync success
+        guard.exit();
+        return result;
+      }
+      catch (err) {
+        // Handle sync errors
+        guard.exit();
+        throw err;
+      }
     });
   } as TCallback;
 }
