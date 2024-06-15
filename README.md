@@ -2,7 +2,15 @@
 
 ## Overview
 
+`@bcheidemann/tracing` is a framework for collecting event based tracing, logging, and diagnostic information from JavaScript applications at runtime.
+
+## Motivation
+
+Implementing good logging is hard - especially in asynchronous applications! To get a view of what happened during a particular asynchronous task (e.g. an API request) we often need to pass around contextual information, such as request IDs, so that we can reconcile all of the logs for that task after the fact. Doing this properly is a lot of work, and can add excessive boilerplate to your application.
+
 ## Prior Art
+
+This package was heavily inspired by the [`tracing` crate](https://crates.io/crates/tracing) in the Rust ecosystem.
 
 ## Core Concepts
 
