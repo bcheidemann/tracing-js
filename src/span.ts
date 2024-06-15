@@ -22,77 +22,56 @@ export type Span<TSpanId> = {
   enter(): EnteredSpan;
 };
 
-export function span<TSpanId>(
-  parent: AnonymousSpanId, level: Level, message: string, fields?: Record<string, unknown>
-): Span<TSpanId>;
 export function span(
   level: Level, message: string, fields?: Record<string, unknown>
-): Span<AnonymousSpanId>;
-export function span(
-  parentOrLevel: AnonymousSpanId | Level,
-  levelOrMessage: Level | string,
-  messageOrFields?: string | Record<string, unknown>,
-  fields?: Record<string, unknown>
 ): Span<AnonymousSpanId> {
-  if (typeof messageOrFields === "string") {
-    return spanImpl(parentOrLevel as AnonymousSpanId, levelOrMessage as Level, messageOrFields, fields);
+  const ctx = getContext();
+
+  let enabled = true;
+
+  if (ctx.subscriber.enabledForLevel) {
+    enabled = ctx.subscriber.enabledForLevel(level);
   }
-  return spanImpl(undefined, parentOrLevel as Level, levelOrMessage as string, messageOrFields);
 
-  function spanImpl(
-    parent: AnonymousSpanId | undefined,
-    level: Level,
-    message: string,
-    fields: Record<string, unknown> | undefined
-  ): Span<AnonymousSpanId> {
-    const ctx = getContext();
+  if (!enabled) {
+    return { enter };
+  }
 
-    let enabled = true;
+  const attributes: SpanAttributes = {
+    isSpan: true,
+    level,
+    message,
+    fields,
+  };
 
-    if (ctx.subscriber.enabledForLevel) {
-      enabled = ctx.subscriber.enabledForLevel(level);
+  if (ctx.subscriber.enabled) {
+    enabled = ctx.subscriber.enabled(attributes);
+  }
+
+  if (!enabled) {
+    return { enter };
+  }
+
+  const spanId = ctx.subscriber.newSpan(attributes);
+
+  return {
+    id: spanId as AnonymousSpanId,
+    enter,
+  };
+
+  function enter() {
+    if (enabled) {
+      ctx.subscriber.enter(spanId);
     }
-
-    if (!enabled) {
-      return { enter };
-    }
-
-    const attributes: SpanAttributes = {
-      isSpan: true,
-      level,
-      message,
-      fields,
-    };
-
-    if (ctx.subscriber.enabled) {
-      enabled = ctx.subscriber.enabled(attributes);
-    }
-
-    if (!enabled) {
-      return { enter };
-    }
-
-    const spanId = ctx.subscriber.newSpan(attributes);
 
     return {
-      id: spanId as AnonymousSpanId,
-      enter,
+      exit,
+      [Symbol.dispose]: exit,
     };
 
-    function enter() {
+    function exit() {
       if (enabled) {
-        ctx.subscriber.enter(spanId);
-      }
-
-      return {
-        exit,
-        [Symbol.dispose]: exit,
-      };
-
-      function exit() {
-        if (enabled) {
-          ctx.subscriber.exit(spanId);
-        }
+        ctx.subscriber.exit(spanId);
       }
     }
   }
