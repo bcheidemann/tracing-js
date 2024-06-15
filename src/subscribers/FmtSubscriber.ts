@@ -110,11 +110,26 @@ export class FmtSubscriber extends ManagedSubscriber {
 
     if (!fields.length) return;
 
-    const fieldsFmt = fields.map(([key, value]) => `${key}=${this.displayValue(value)}`)
-    return `(${fieldsFmt.join(', ')})`;
+    const fieldsFmt = this.flattenFields(fields).map(
+      ([key, value]) => `${key}=${this.displayValue(value)}`,
+    );
+    return `(${fieldsFmt.join(", ")})`;
   }
 
-  private displayValue(value: unknown) {
+  private flattenFields(fields: [unknown, unknown][]): [string, unknown][] {
+    return fields.flatMap(([outerKey, value]) => {
+      if (typeof value === "object" && value !== null) {
+        const entries: [string, unknown][] = Object.entries(value).map(
+          ([innerKey, value]) => [`${outerKey}.${innerKey}`, value],
+        );
+        return this.flattenFields(entries);
+      } else {
+        return [[this.displayValue(outerKey), value]];
+      }
+    });
+  }
+
+  private displayValue(value: unknown): string {
     switch (typeof value) {
       case 'bigint':
       case 'boolean':

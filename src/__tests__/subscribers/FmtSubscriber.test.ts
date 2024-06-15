@@ -67,6 +67,32 @@ describe("FmtSubscriber", () => {
     expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] test (key=value)");
   });
 
+  it("should log the message to the console with object fields", () => {
+    // Arrange
+    vi.setSystemTime(new Date(0));
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    FmtSubscriber.init();
+
+    // Act
+    event(Level.INFO, "test", {
+      target: {
+        class: "Example",
+        method: "test",
+      },
+      args: ["arg0"],
+      objArray: [
+        {
+          key: "value",
+          key2: { value: "innerValue" }
+        },
+      ],
+    });
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] test (target.class=Example, target.method=test, args.0=arg0, objArray.0.key=value, objArray.0.key2.value=innerValue)");
+  });
+
   it("should log the message to the console with fields", () => {
     // Arrange
     vi.setSystemTime(new Date(0));
@@ -135,5 +161,34 @@ describe("FmtSubscriber", () => {
     // Assert
     expect(log).toHaveBeenCalled();
     expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] outer span > inner span : test (eventKey=event, innerSpanKey=inner, outerSpanKey=outer)");
+  });
+
+  it("should log object fields from spans", () => {
+    // Arrange
+    vi.setSystemTime(new Date(0));
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    FmtSubscriber.init();
+
+    // Act
+    span(Level.INFO, "Example.test", {
+      target: {
+        class: "Example",
+        method: "test",
+      },
+      args: ["arg0"],
+      objArray: [
+        {
+          key: "value",
+          key2: { value: "innerValue" }
+        },
+      ],
+    }).enter();
+    event(Level.INFO, "test", {
+      eventKey: "event",
+    });
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] Example.test : test (eventKey=event, target.class=Example, target.method=test, args.0=arg0, objArray.0.key=value, objArray.0.key2.value=innerValue)");
   });
 });
