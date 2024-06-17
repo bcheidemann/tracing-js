@@ -12,13 +12,13 @@ export function createTestSubscriber({
   exit = fn(),
   clone = undefined,
 }: {
-  enabledForLevel?: Mock,
-  enabled?: Mock,
-  newSpan?: Mock,
-  event?: Mock,
-  enter?: Mock,
-  exit?: Mock,
-  clone?: Mock,
+  enabledForLevel?: Mock;
+  enabled?: Mock;
+  newSpan?: Mock;
+  event?: Mock;
+  enter?: Mock;
+  exit?: Mock;
+  clone?: Mock;
 } = {}) {
   const subscriber = {
     enabledForLevel,

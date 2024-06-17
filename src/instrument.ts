@@ -26,18 +26,20 @@ type MessageAttribute = {
   message: string;
 };
 
-type TargetAttribute = {
-  kind: AttributeKind["Target"];
-} & (
-  | {
+type TargetAttribute =
+  & {
+    kind: AttributeKind["Target"];
+  }
+  & (
+    | {
       class: string;
       method: string;
       private?: boolean;
     }
-  | {
+    | {
       function: string;
     }
-);
+  );
 
 type LevelAttribute = {
   kind: AttributeKind["Level"];
@@ -294,13 +296,13 @@ function collectAttributes<TArgs extends any[]>(
 
 type Context =
   | {
-      kind: "function";
-    }
+    kind: "function";
+  }
   | {
-      kind: "method";
-      isPrivate: boolean;
-      methodName: string;
-    };
+    kind: "method";
+    isPrivate: boolean;
+    methodName: string;
+  };
 
 const ParsedFunctionParams = new WeakMap<Function, string[]>();
 
@@ -323,20 +325,18 @@ function instrumentCallbackImpl<
 
     const fnName = fn.name || "[unknown function]";
     const defaults: Defaults = {
-      [AttributeKind.Message]:
-        instrumentCtx.kind === "function"
-          ? message(fn.name)
-          : message(
-              `${this?.constructor?.name ?? "[unknown class]"}.${fnName}`,
-            ),
-      [AttributeKind.Target]:
-        instrumentCtx.kind === "function"
-          ? target(fnName)
-          : target(
-              this?.constructor?.name ?? "[unknown class]",
-              instrumentCtx.methodName,
-              instrumentCtx.isPrivate,
-            ),
+      [AttributeKind.Message]: instrumentCtx.kind === "function"
+        ? message(fn.name)
+        : message(
+          `${this?.constructor?.name ?? "[unknown class]"}.${fnName}`,
+        ),
+      [AttributeKind.Target]: instrumentCtx.kind === "function"
+        ? target(fnName)
+        : target(
+          this?.constructor?.name ?? "[unknown class]",
+          instrumentCtx.methodName,
+          instrumentCtx.isPrivate,
+        ),
       [AttributeKind.Level]: level(Level.INFO),
     };
     const attributesByKind = collectAttributes(attributes, defaults);
@@ -371,8 +371,7 @@ function instrumentCallbackImpl<
           skipAttribute.skip.forEach((skip, index) => {
             switch (typeof skip) {
               case "string":
-                const paramNames =
-                  ParsedFunctionParams.get(fn) ??
+                const paramNames = ParsedFunctionParams.get(fn) ??
                   parseParamNamesFromFunction(fn);
                 ParsedFunctionParams.set(fn, paramNames);
                 const skipIndex = paramNames.indexOf(skip);
@@ -403,8 +402,9 @@ function instrumentCallbackImpl<
       const logError = log || Boolean(attributesByKind[AttributeKind.LogError]);
       const fields = attributesByKind[AttributeKind.Field].reduce(
         (acc, field) => {
-          acc[field.name] =
-            typeof field.value === "function" ? field.value(args) : field.value;
+          acc[field.name] = typeof field.value === "function"
+            ? field.value(args)
+            : field.value;
           return acc;
         },
         {} as Record<string, unknown>,

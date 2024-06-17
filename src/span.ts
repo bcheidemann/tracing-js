@@ -29,7 +29,9 @@ export type Span<TSpanId> = {
 };
 
 export function span(
-  level: Level, message: string, fields?: Record<string, unknown>
+  level: Level,
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId> {
   const ctx = getContext();
 
@@ -92,85 +94,133 @@ export function span(
 }
 
 export function traceSpan<TSpanId>(
-  parent: AnonymousSpanId, message: string, fields?: Record<string, unknown>
+  parent: AnonymousSpanId,
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<TSpanId>;
 export function traceSpan(
-  message: string, fields?: Record<string, unknown>
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId>;
 export function traceSpan(
   parentOrMessage: AnonymousSpanId | string,
   messageOrFields?: string | Record<string, unknown>,
-  fields?: Record<string, unknown>
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId> {
-  return (span as any)(parentOrMessage, Level.TRACE, messageOrFields as string, fields);
+  return (span as any)(
+    parentOrMessage,
+    Level.TRACE,
+    messageOrFields as string,
+    fields,
+  );
 }
 
 export function debugSpan<TSpanId>(
-  parent: AnonymousSpanId, message: string, fields?: Record<string, unknown>
+  parent: AnonymousSpanId,
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<TSpanId>;
 export function debugSpan(
-  message: string, fields?: Record<string, unknown>
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId>;
 export function debugSpan(
   parentOrMessage: AnonymousSpanId | string,
   messageOrFields?: string | Record<string, unknown>,
-  fields?: Record<string, unknown>
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId> {
-  return (span as any)(parentOrMessage, Level.DEBUG, messageOrFields as string, fields);
+  return (span as any)(
+    parentOrMessage,
+    Level.DEBUG,
+    messageOrFields as string,
+    fields,
+  );
 }
 
 export function infoSpan<TSpanId>(
-  parent: AnonymousSpanId, message: string, fields?: Record<string, unknown>
+  parent: AnonymousSpanId,
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<TSpanId>;
 export function infoSpan(
-  message: string, fields?: Record<string, unknown>
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId>;
 export function infoSpan(
   parentOrMessage: AnonymousSpanId | string,
   messageOrFields?: string | Record<string, unknown>,
-  fields?: Record<string, unknown>
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId> {
-  return (span as any)(parentOrMessage, Level.INFO, messageOrFields as string, fields);
+  return (span as any)(
+    parentOrMessage,
+    Level.INFO,
+    messageOrFields as string,
+    fields,
+  );
 }
 
 export function warnSpan<TSpanId>(
-  parent: AnonymousSpanId, message: string, fields?: Record<string, unknown>
+  parent: AnonymousSpanId,
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<TSpanId>;
 export function warnSpan(
-  message: string, fields?: Record<string, unknown>
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId>;
 export function warnSpan(
   parentOrMessage: AnonymousSpanId | string,
   messageOrFields?: string | Record<string, unknown>,
-  fields?: Record<string, unknown>
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId> {
-  return (span as any)(parentOrMessage, Level.WARN, messageOrFields as string, fields);
+  return (span as any)(
+    parentOrMessage,
+    Level.WARN,
+    messageOrFields as string,
+    fields,
+  );
 }
 
 export function errorSpan<TSpanId>(
-  parent: AnonymousSpanId, message: string, fields?: Record<string, unknown>
+  parent: AnonymousSpanId,
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<TSpanId>;
 export function errorSpan(
-  message: string, fields?: Record<string, unknown>
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId>;
 export function errorSpan(
   parentOrMessage: AnonymousSpanId | string,
   messageOrFields?: string | Record<string, unknown>,
-  fields?: Record<string, unknown>
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId> {
-  return (span as any)(parentOrMessage, Level.ERROR, messageOrFields as string, fields);
+  return (span as any)(
+    parentOrMessage,
+    Level.ERROR,
+    messageOrFields as string,
+    fields,
+  );
 }
 
 export function criticalSpan<TSpanId>(
-  parent: AnonymousSpanId, message: string, fields?: Record<string, unknown>
+  parent: AnonymousSpanId,
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<TSpanId>;
 export function criticalSpan(
-  message: string, fields?: Record<string, unknown>
+  message: string,
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId>;
 export function criticalSpan(
   parentOrMessage: AnonymousSpanId | string,
   messageOrFields?: string | Record<string, unknown>,
-  fields?: Record<string, unknown>
+  fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId> {
-  return (span as any)(parentOrMessage, Level.CRITICAL, messageOrFields as string, fields);
+  return (span as any)(
+    parentOrMessage,
+    Level.CRITICAL,
+    messageOrFields as string,
+    fields,
+  );
 }

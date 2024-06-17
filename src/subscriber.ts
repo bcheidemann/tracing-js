@@ -44,4 +44,4 @@ export interface ISubscriber<TSpanId> {
    * awaited).
    */
   clone(): ISubscriber<TSpanId>;
-};
+}

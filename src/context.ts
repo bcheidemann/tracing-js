@@ -6,7 +6,9 @@ export type Context = {
   clone(): Context;
 };
 
-export const context: AsyncLocalStorage<Context> = new AsyncLocalStorage<Context>();
+export const context: AsyncLocalStorage<Context> = new AsyncLocalStorage<
+  Context
+>();
 
 export function createContext(subscriber: ISubscriber<unknown>): Context {
   return {

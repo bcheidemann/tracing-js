@@ -72,7 +72,9 @@ export class FmtSubscriber extends ManagedSubscriber {
   }
 
   private displayMessage(event: Event, spans: SpanAttributes[]) {
-    let message = `${this.displayTimestamp()} ${this.displayLevel(event.level)}`;
+    let message = `${this.displayTimestamp()} ${
+      this.displayLevel(event.level)
+    }`;
 
     let formattedSpans: string | undefined;
     if ((formattedSpans = this.displaySpans(spans))) {
@@ -104,7 +106,7 @@ export class FmtSubscriber extends ManagedSubscriber {
   private displayFields(event: Event, spans: SpanAttributes[]) {
     const eventFields = Object.entries(event.fields ?? {});
     const spanFields = spans.flatMap((span) =>
-      Object.entries(span.fields ?? {}),
+      Object.entries(span.fields ?? {})
     );
     const fields = [...eventFields, ...spanFields];
 
@@ -151,9 +153,11 @@ export class FmtSubscriber extends ManagedSubscriber {
       return;
     }
 
-    return `${spans
-      .map((span) => span.message)
-      .reverse()
-      .join(" > ")} :`;
+    return `${
+      spans
+        .map((span) => span.message)
+        .reverse()
+        .join(" > ")
+    } :`;
   }
 }
