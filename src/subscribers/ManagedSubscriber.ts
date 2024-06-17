@@ -20,7 +20,7 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
   protected constructor(
     private readonly level: Level = Level.INFO,
     private currentSpan: EnteredSpanNode | undefined = undefined,
-    private readonly pendingSpans = new Map<symbol, PendingSpanNode>(),
+    private readonly pendingSpans: Map<symbol, PendingSpanNode> = new Map(),
   ) {}
 
   enabledForLevel(level: Level): boolean {
