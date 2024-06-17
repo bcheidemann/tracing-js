@@ -115,6 +115,65 @@ class Application {
 
 A span is automatically entered when the function is called, and exited when the function ends. Note you must be using TypeScript with a bundler that supports [TC39 decorators](https://github.com/tc39/proposal-decorators).
 
+Similarly, functions can be instrumented like this:
+
+```ts
+const example = instumentCallback(
+  function example() {
+    // Do stuff
+  }
+);
+```
+
+By default, the span message will be the fully qualified name of the method (`<ClassName>.<methodName>`) or function (`<functionName>`). The span will also include an `args` field, which will include the runtime values of each argument passed to the method.
+
+You can customise the instrumentation of the function or method using various attributes. For example, arguments can be omitted from the automatically created span as follows:
+
+```ts
+class AuthService {
+  @instrument(skip("password"))
+  login(username: string, password: string) {
+    // Do stuff
+  }
+}
+```
+
+Or for instrumented functions:
+
+```ts
+const example = instumentCallback(
+  [skip("password")]
+  function login(username: string, password: string) {
+    // Do stuff
+  }
+);
+```
+
+The following attributes can be applied:
+
+| Attribute | Example                  | Description                                                                                                                 |
+|-----------|--------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| message   | `message("new message")` | Changes the instrumented spans message.                                                                                     |
+| target    | `target("functionName")` | Changes the instrumented spans target field.                                                                                |
+| level     | `level(Level.TRACE)`     | Changes the instrumented spans level.                                                                                       |
+| skip      | `skip("paramName")`      | Omits the named parameter from the instrumented spans `args` field.                                                         |
+|           | `skip(0)`                | Omits the indexed parameter from the instrumented spans `args` field.                                                       |
+|           | `skip(true, false)`      | Applies a positional mask to the parameters to omit from the instrumented spans `args` field.                               |
+| skipAll   | `skipAll`                | Omits all parameters and `this` from the instrumented spans `args` field.                                                   |
+| skipThis  | `skipThis`               | Omits the `this` parameter from this instrumented spans `args` field.                                                       |
+| field     | `field("key", "value")`  | Adds the specified key and value to the instrumented spans fields.                                                          |
+|           | `field("key", func)`     | Adds the specified field to the instrumented spans fields. The provided func will map the arguments to the field value.     |
+| logEnter  | `logEnter`               | Logs an event when the function or method is entered.                                                                       |
+| logExit   | `logExit`                | Logs an event when the function or method returns. Does not log an event if the function throws an error.                   |
+| logError  | `logError`               | Logs an event when the function or method throws an error.                                                                  |
+| log       | `log`                    | Shorthand for `logEnter`, `logExit`, and `logError`. Logs an event when the function or method is entered, exist or throws. |
+
+## Instrumenting Functions
+
+## Subscribers
+
+<!-- TODO: Add docs for subscribers -->
+
 ## Usage Considerations
 
 ### Usage in Asynchronous Code
@@ -233,3 +292,32 @@ This version of the program does not leak because each time the instrumented `le
 ### Performance
 
 If performance is critical to your application, it may be worth avoiding instrumenting functions where it is not neccessary for any of the reasons listed in [Usage in Asynchronous Code](#usage-in-asynchronous-code). This is because an instrumented function or method will always clone the context on entry, even if it is not necessary. Particularly in methods which are called often, this will create a significant amount of garbage which needs to be collected.
+
+### Minifiers
+
+When using the `skip` attribute when instrumenting functions or methods, be aware that skipping attributes by name is not supported when using a minifier. Instead, skip function parameters by index, using the skip by mask (`skip(true, false)`), or skip by index (`skip(0)`) syntax.
+
+### Bundler Support
+
+Some features `@bcheidemann/tracing` make use of TypeScript features which are not universally supported. The below table outlines bundler support by feature.
+
+> Last updated: 15th June 2024
+
+| Feature                   | JS (no bundler) | TSC | Vite | ESBuild | SWC |
+|---------------------------|-----------------|-----|------|---------|-----|
+| spans                     | ✅              | ✅   | ✅   | ✅       | ✅  |
+| events                    | ✅              | ✅   | ✅   | ✅       | ✅  |
+| subscribers               | ✅              | ✅   | ✅   | ✅       | ✅  |
+| function instrumentation  | ✅              | ✅   | ✅   | ✅       | ✅  |
+| method instrumentation    | ❌              | ✅   | ✅   | ✅       | ✅  |
+| `using` spans             | ❌              | ✅   | ✅   | ✅       | ✅  |
+
+### Runtime Support
+
+| Runtime            | Supported | Comment |
+|--------------------|-----------|---------|
+| Node               | ✅        | ****-       |
+| CloudFlare Workers | ✅*       | Untested. Requires [nodejs_compat](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/) flag |
+| Deno               | ✅*       | Untested | 
+| Bun                | ✅*       | Untested |
+| Browser            | ❌        | Requires `AsyncLocalStorage` API |

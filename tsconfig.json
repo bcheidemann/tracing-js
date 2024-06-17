@@ -1,8 +1,12 @@
 {
   "extends": "@tsconfig/deno/tsconfig.json",
   "compilerOptions": {
+    "strict": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
   },
   "include": ["src"],
 }
