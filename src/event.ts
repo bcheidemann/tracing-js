@@ -1,3 +1,8 @@
+/**
+ * @module
+ * This module provides functions for creating events.
+ */
+
 import { getContext } from "./context.ts";
 import { Level } from "./level.ts";
 

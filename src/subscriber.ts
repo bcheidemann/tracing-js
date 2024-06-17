@@ -1,6 +1,13 @@
+/**
+ * @module
+ * This module provides the subscriber interface, and some first party implementations of the subscriber interface.
+ */
+
 import type { SpanAttributes } from "./span.ts";
 import type { Event } from "./event.ts";
 import type { Level } from "./level.ts";
+
+export * from "./subscribers/mod.ts";
 
 export interface ISubscriber<TSpanId> {
   /**

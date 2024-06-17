@@ -1,3 +1,10 @@
+/**
+ * @module
+ * This module provides functions and type definitions to work with the AsyncLocalStorage tracing context.
+ * It's primarily intended for internal use, but the API is public, and may be useful when creating custom
+ * subscribers.
+ */
+
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { ISubscriber } from "./subscriber.ts";
 

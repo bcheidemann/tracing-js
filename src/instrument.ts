@@ -1,3 +1,8 @@
+/**
+ * @module
+ * This module provides functions for instrumenting methods and functions.
+ */
+
 import { parseParamNamesFromFunction } from "@bcheidemann/parse-params";
 import { context, getContext } from "./context.ts";
 import { event } from "./event.ts";

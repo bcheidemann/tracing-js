@@ -1,3 +1,8 @@
+/**
+ * @module
+ * This module provides the Level type and enum.
+ */
+
 export interface Levels {
   TRACE: 0;
   DEBUG: 1;
