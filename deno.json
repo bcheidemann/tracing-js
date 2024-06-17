@@ -2,6 +2,7 @@
   "name": "@bcheidemann/tracing",
   "version": "0.1.1",
   "tasks": {
+    "checks": "deno task test && deno lint && deno fmt --check",
     "check": "deno check src/mod.ts",
     "test": "deno test --allow-read=."
   },
