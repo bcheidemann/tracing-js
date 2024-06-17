@@ -44,7 +44,7 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
   }
 
   event(event: Event): void {
-    let spans = this.currentSpan ? [this.currentSpan] : [];
+    const spans = this.currentSpan ? [this.currentSpan] : [];
     let next: EnteredSpanNode | undefined;
     while ((next = spans.at(-1)?.parent)) {
       spans.push(next);
@@ -64,17 +64,14 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
   }
 
   exit(span: symbol): void {
-    const self = this;
-    exitSpan(this.currentSpan);
-
-    function exitSpan(node: EnteredSpanNode | undefined): void {
+    const exitSpan = (node: EnteredSpanNode | undefined) => {
       if (!node) {
-        self.currentSpan = undefined;
+        this.currentSpan = undefined;
         return;
       }
 
       if (node.id === span) {
-        self.currentSpan = node.parent;
+        this.currentSpan = node.parent;
         return;
       }
 
@@ -82,6 +79,7 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
 
       exitSpan(node.parent);
     }
+    exitSpan(this.currentSpan);
   }
 
   clone(): ISubscriber<symbol> {

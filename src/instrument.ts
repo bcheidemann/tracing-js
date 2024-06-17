@@ -5,6 +5,9 @@ import { Level } from "./level.ts";
 import { span } from "./span.ts";
 import { AssertionError } from "node:assert";
 
+// deno-lint-ignore no-explicit-any
+type AnyFunction = (this: any, ...args: any[]) => any;
+
 const AttributeKind = {
   Message: 0 as const,
   Target: 1 as const,
@@ -46,9 +49,11 @@ type LevelAttribute = {
   level: Level;
 };
 
+// deno-lint-ignore no-explicit-any
 type SkipByMask<TArgs extends any[]> = {
   [index in keyof TArgs]: boolean;
 };
+// deno-lint-ignore no-explicit-any
 type SkipAttribute<TArgs extends any[]> = {
   kind: AttributeKind["Skip"];
   skip: SkipByMask<TArgs> | string[] | number[];
@@ -62,6 +67,7 @@ type SkipThisAttribute = {
   kind: AttributeKind["SkipThis"];
 };
 
+// deno-lint-ignore no-explicit-any
 type FieldAttribute<TArgs extends any[]> = {
   kind: AttributeKind["Field"];
   name: string;
@@ -84,6 +90,7 @@ type LogAttribute = {
   kind: AttributeKind["Log"];
 };
 
+// deno-lint-ignore no-explicit-any
 type Attributes<TArgs extends any[]> =
   | MessageAttribute
   | TargetAttribute
@@ -97,7 +104,7 @@ type Attributes<TArgs extends any[]> =
   | LogErrorAttribute
   | LogAttribute;
 
-type InstrumentDecorator<TMethod extends (this: any, ...args: any[]) => any> = (
+type InstrumentDecorator<TMethod extends AnyFunction> = (
   target: TMethod,
   context: ClassMethodDecoratorContext<ThisParameterType<TMethod>, TMethod>,
 ) => TMethod;
@@ -132,11 +139,15 @@ export function level(level: Level): LevelAttribute {
   return { kind: AttributeKind.Level, level };
 }
 
+// deno-lint-ignore no-explicit-any
 export function skip<TArgs extends any[]>(
   ...mask: SkipByMask<TArgs>
 ): SkipAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
 export function skip(...paramNames: string[]): SkipAttribute<any>;
+// deno-lint-ignore no-explicit-any
 export function skip(...paramIndices: number[]): SkipAttribute<any>;
+// deno-lint-ignore no-explicit-any
 export function skip<TArgs extends any[]>(
   ...skip: SkipAttribute<TArgs>["skip"]
 ): SkipAttribute<TArgs> {
@@ -147,14 +158,17 @@ export const skipAll: SkipAllAttribute = { kind: AttributeKind.SkipAll };
 
 export const skipThis: SkipThisAttribute = { kind: AttributeKind.SkipThis };
 
+// deno-lint-ignore no-explicit-any
 export function field<TArgs extends any[]>(
   name: string,
   mapValue: (args: NoInfer<TArgs>) => unknown,
 ): FieldAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
 export function field<TArgs extends any[], TValue>(
   name: string,
-  value: TValue extends (...args: any[]) => any ? never : TValue,
+  value: TValue extends AnyFunction ? never : TValue,
 ): FieldAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
 export function field<TArgs extends any[]>(
   name: string,
   value: unknown | ((...args: TArgs[]) => unknown),
@@ -170,7 +184,7 @@ export const logError: LogErrorAttribute = { kind: AttributeKind.LogError };
 
 export const log: LogAttribute = { kind: AttributeKind.Log };
 
-export function instrument<TMethod extends (this: any, ...args: any[]) => any>(
+export function instrument<TMethod extends AnyFunction>(
   ...attributes: Attributes<Parameters<TMethod>>[]
 ): InstrumentDecorator<TMethod> {
   return function instrumentDecorator(
@@ -186,13 +200,13 @@ export function instrument<TMethod extends (this: any, ...args: any[]) => any>(
 }
 
 export function instrumentCallback<
-  TCallback extends (this: any, ...args: any[]) => any,
+  TCallback extends AnyFunction,
 >(fn: TCallback): TCallback;
 export function instrumentCallback<
-  TCallback extends (this: any, ...args: any[]) => any,
+  TCallback extends AnyFunction,
 >(attributes: Attributes<Parameters<TCallback>>[], fn: TCallback): TCallback;
 export function instrumentCallback<
-  TCallback extends (this: any, ...args: any[]) => any,
+  TCallback extends AnyFunction,
 >(
   attributesOrFn: TCallback | Attributes<Parameters<TCallback>>[],
   fn?: TCallback,
@@ -216,6 +230,7 @@ type Defaults = {
   [AttributeKind.Level]: LevelAttribute;
 };
 
+// deno-lint-ignore no-explicit-any
 function collectAttributes<TArgs extends any[]>(
   attributes: Attributes<TArgs>[],
   defaults: Defaults,
@@ -281,10 +296,12 @@ function collectAttributes<TArgs extends any[]>(
       case AttributeKind.Log:
         attributesByKind[AttributeKind.Log] = attribute;
         break;
+      // deno-lint-ignore no-case-declarations
       default:
         const _: never = attribute;
         throw new AssertionError({
           message: "Invalid attribute kind",
+          // deno-lint-ignore no-explicit-any
           actual: (attribute as any).kind,
           expected: Object.keys(AttributeKind).join(" | "),
         });
@@ -304,10 +321,11 @@ type Context =
     methodName: string;
   };
 
+// deno-lint-ignore ban-types
 const ParsedFunctionParams = new WeakMap<Function, string[]>();
 
 function instrumentCallbackImpl<
-  TCallback extends (this: any, ...args: any[]) => any,
+  TCallback extends AnyFunction,
 >(
   fn: TCallback,
   attributes: Attributes<Parameters<TCallback>>[],
@@ -340,8 +358,7 @@ function instrumentCallbackImpl<
       [AttributeKind.Level]: level(Level.INFO),
     };
     const attributesByKind = collectAttributes(attributes, defaults);
-    const self = this;
-    return context.run(ctx, function () {
+    return context.run(ctx, () => {
       const level = attributesByKind[AttributeKind.Level].level;
       const message = attributesByKind[AttributeKind.Message].message;
       const target = (() => {
@@ -365,11 +382,12 @@ function instrumentCallbackImpl<
           return [];
         }
         if (attributesByKind[AttributeKind.SkipThis] === undefined) {
-          logArgs["this"] = self;
+          logArgs["this"] = this;
         }
         for (const skipAttribute of attributesByKind[AttributeKind.Skip]) {
           skipAttribute.skip.forEach((skip, index) => {
             switch (typeof skip) {
+              // deno-lint-ignore no-case-declarations
               case "string":
                 const paramNames = ParsedFunctionParams.get(fn) ??
                   parseParamNamesFromFunction(fn);
@@ -418,7 +436,7 @@ function instrumentCallbackImpl<
         if (logEnter) {
           event(level, `Entering ${message}`);
         }
-        const returnValue = fn.apply(self, args);
+        const returnValue = fn.apply(this, args);
 
         // Handle async error / success
         if (returnValue instanceof Promise) {

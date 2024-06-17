@@ -40,6 +40,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument()
+        // deno-lint-ignore no-unused-vars
         test(arg0: string) {}
       }
       const instance = new Example();
@@ -214,6 +215,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(skip("arg0", "arg2"))
+        // deno-lint-ignore no-unused-vars
         test(arg0: string, arg1: string, arg2: string, arg3: string) {}
       }
       const instance = new Example();
@@ -251,6 +253,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(skip(true, false, true, false))
+        // deno-lint-ignore no-unused-vars
         test(arg0: string, arg1: string, arg2: string, arg3: string) {}
       }
       const instance = new Example();
@@ -288,6 +291,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(skip(0, 2))
+        // deno-lint-ignore no-unused-vars
         test(arg0: string, arg1: string, arg2: string, arg3: string) {}
       }
       const instance = new Example();
@@ -325,6 +329,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(skipAll)
+        // deno-lint-ignore no-unused-vars
         test(arg0: string, arg1: string) {}
       }
       const instance = new Example();
@@ -358,6 +363,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(skipThis)
+        // deno-lint-ignore no-unused-vars
         test(arg0: string, arg1: string) {}
       }
       const instance = new Example();
@@ -394,6 +400,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(field("fieldKey", "fieldValue"))
+        // deno-lint-ignore no-unused-vars
         test(arg0: string, arg1: string) {}
       }
       const instance = new Example();
@@ -432,6 +439,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(field("sum", ([arg0, arg1]) => arg0 + arg1))
+        // deno-lint-ignore no-unused-vars
         test(arg0: number, arg1: number) {}
       }
       const instance = new Example();
@@ -531,7 +539,9 @@ describe("instrument", () => {
       // Act
       try {
         instance.test();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(1);
@@ -561,7 +571,9 @@ describe("instrument", () => {
       // Act
       try {
         instance.test();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
@@ -597,7 +609,9 @@ describe("instrument", () => {
       // Act
       try {
         instance.test();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
@@ -640,6 +654,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument()
+        // deno-lint-ignore no-unused-vars
         async test(arg0: string) {
           await Promise.resolve();
         }
@@ -824,6 +839,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(skip("arg0", "arg2"))
+        // deno-lint-ignore no-unused-vars
         async test(arg0: string, arg1: string, arg2: string, arg3: string) {
           await Promise.resolve();
         }
@@ -863,6 +879,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(skip(true, false, true, false))
+        // deno-lint-ignore no-unused-vars
         async test(arg0: string, arg1: string, arg2: string, arg3: string) {
           await Promise.resolve();
         }
@@ -902,6 +919,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(skip(0, 2))
+        // deno-lint-ignore no-unused-vars
         async test(arg0: string, arg1: string, arg2: string, arg3: string) {
           await Promise.resolve();
         }
@@ -941,6 +959,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(skipAll)
+        // deno-lint-ignore no-unused-vars
         async test(arg0: string, arg1: string) {
           await Promise.resolve();
         }
@@ -976,6 +995,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(skipThis)
+        // deno-lint-ignore no-unused-vars
         async test(arg0: string, arg1: string) {}
       }
       const instance = new Example();
@@ -1012,6 +1032,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(field("fieldKey", "fieldValue"))
+        // deno-lint-ignore no-unused-vars
         async test(arg0: string, arg1: string) {
           await Promise.resolve();
         }
@@ -1052,6 +1073,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       class Example {
         @instrument(field("sum", ([arg0, arg1]) => arg0 + arg1))
+        // deno-lint-ignore no-unused-vars
         async test(arg0: number, arg1: number) {
           await Promise.resolve();
         }
@@ -1157,7 +1179,9 @@ describe("instrument", () => {
       // Act
       try {
         await instance.test();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(1);
@@ -1188,7 +1212,9 @@ describe("instrument", () => {
       // Act
       try {
         await instance.test();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
@@ -1225,7 +1251,9 @@ describe("instrument", () => {
       // Act
       try {
         await instance.test();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
@@ -1260,6 +1288,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
+      // deno-lint-ignore no-unused-vars
       function test(arg0: string) {}
 
       // Act
@@ -1423,9 +1452,13 @@ describe("instrument", () => {
       const testFn = instrumentCallback(
         [skip("arg0", "arg2")],
         function test(
+          // deno-lint-ignore no-unused-vars
           arg0: string,
+          // deno-lint-ignore no-unused-vars
           arg1: string,
+          // deno-lint-ignore no-unused-vars
           arg2: string,
+          // deno-lint-ignore no-unused-vars
           arg3: string,
         ) {},
       );
@@ -1462,9 +1495,13 @@ describe("instrument", () => {
       const testFn = instrumentCallback(
         [skip(true, false, true, false)],
         function test(
+          // deno-lint-ignore no-unused-vars
           arg0: string,
+          // deno-lint-ignore no-unused-vars
           arg1: string,
+          // deno-lint-ignore no-unused-vars
           arg2: string,
+          // deno-lint-ignore no-unused-vars
           arg3: string,
         ) {},
       );
@@ -1501,9 +1538,13 @@ describe("instrument", () => {
       const testFn = instrumentCallback(
         [skip(0, 2)],
         function test(
+          // deno-lint-ignore no-unused-vars
           arg0: string,
+          // deno-lint-ignore no-unused-vars
           arg1: string,
+          // deno-lint-ignore no-unused-vars
           arg2: string,
+          // deno-lint-ignore no-unused-vars
           arg3: string,
         ) {},
       );
@@ -1539,6 +1580,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skipAll],
+        // deno-lint-ignore no-unused-vars
         function test(arg0: string, arg1: string) {},
       );
 
@@ -1569,6 +1611,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skipThis],
+        // deno-lint-ignore no-unused-vars
         function test(arg0: string, arg1: string) {},
       );
 
@@ -1602,6 +1645,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [field("fieldKey", "fieldValue")],
+        // deno-lint-ignore no-unused-vars
         function test(arg0: string, arg1: string) {},
       );
 
@@ -1637,6 +1681,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [field("sum", ([arg0, arg1]) => arg0 + arg1)],
+        // deno-lint-ignore no-unused-vars
         function test(arg0: number, arg1: number) {},
       );
 
@@ -1721,7 +1766,9 @@ describe("instrument", () => {
       // Act
       try {
         testFn();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(1);
@@ -1747,7 +1794,9 @@ describe("instrument", () => {
       // Act
       try {
         testFn();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
@@ -1779,7 +1828,9 @@ describe("instrument", () => {
       // Act
       try {
         testFn();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
@@ -1816,6 +1867,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
+      // deno-lint-ignore no-unused-vars
       async function test(arg0: string) {
         await Promise.resolve();
       }
@@ -1987,9 +2039,13 @@ describe("instrument", () => {
       const testFn = instrumentCallback(
         [skip("arg0", "arg2")],
         async function test(
+          // deno-lint-ignore no-unused-vars
           arg0: string,
+          // deno-lint-ignore no-unused-vars
           arg1: string,
+          // deno-lint-ignore no-unused-vars
           arg2: string,
+          // deno-lint-ignore no-unused-vars
           arg3: string,
         ) {
           await Promise.resolve();
@@ -2028,9 +2084,13 @@ describe("instrument", () => {
       const testFn = instrumentCallback(
         [skip(true, false, true, false)],
         async function test(
+          // deno-lint-ignore no-unused-vars
           arg0: string,
+          // deno-lint-ignore no-unused-vars
           arg1: string,
+          // deno-lint-ignore no-unused-vars
           arg2: string,
+          // deno-lint-ignore no-unused-vars
           arg3: string,
         ) {
           await Promise.resolve();
@@ -2069,9 +2129,13 @@ describe("instrument", () => {
       const testFn = instrumentCallback(
         [skip(0, 2)],
         async function test(
+          // deno-lint-ignore no-unused-vars
           arg0: string,
+          // deno-lint-ignore no-unused-vars
           arg1: string,
+          // deno-lint-ignore no-unused-vars
           arg2: string,
+          // deno-lint-ignore no-unused-vars
           arg3: string,
         ) {},
       );
@@ -2107,6 +2171,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skipAll],
+        // deno-lint-ignore no-unused-vars
         async function test(arg0: string, arg1: string) {
           await Promise.resolve();
         },
@@ -2139,6 +2204,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skipThis],
+        // deno-lint-ignore no-unused-vars
         async function test(arg0: string, arg1: string) {
           await Promise.resolve();
         },
@@ -2174,6 +2240,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [field("fieldKey", "fieldValue")],
+        // deno-lint-ignore no-unused-vars
         async function test(arg0: string, arg1: string) {
           await Promise.resolve();
         },
@@ -2211,6 +2278,7 @@ describe("instrument", () => {
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [field("sum", ([arg0, arg1]) => arg0 + arg1)],
+        // deno-lint-ignore no-unused-vars
         async function test(arg0: number, arg1: number) {
           await Promise.resolve();
         },
@@ -2251,7 +2319,7 @@ describe("instrument", () => {
       });
 
       // Act
-      testFn();
+      await testFn();
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(1);
@@ -2301,7 +2369,9 @@ describe("instrument", () => {
       // Act
       try {
         await testFn();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(1);
@@ -2328,7 +2398,9 @@ describe("instrument", () => {
       // Act
       try {
         await testFn();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
@@ -2361,7 +2433,9 @@ describe("instrument", () => {
       // Act
       try {
         await testFn();
-      } catch {}
+      } catch {
+        // Do nothing
+      }
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
