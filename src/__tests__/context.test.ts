@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { context, createContext, getContext } from "../context";
+import { context, createContext, getContextOrThrow } from "../context";
 import { createTestSubscriber } from "./subscriber";
 
 describe("context", () => {
   describe("getContext", () => {
     it("should throw an error if no context is found", () => {
       // Act
-      const fn = () => getContext();
+      const fn = () => getContextOrThrow();
 
       // Assert
       expect(fn).toThrowError("No context found");
@@ -19,7 +19,7 @@ describe("context", () => {
       context.enterWith(ctx);
 
       // Act
-      const result = getContext();
+      const result = getContextOrThrow();
 
       // Assert
       expect(result).toBe(ctx);

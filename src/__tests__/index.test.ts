@@ -4,6 +4,14 @@ import { context, createContext } from "../context";
 import { span } from "../span";
 import { Level } from "../level";
 import { createAnonymousSpanId } from "./span";
+import { event } from "../event";
+
+it("should not throw when used without a registering a subscriber", () => {
+  // Act
+  const guard = span(Level.INFO, "test", { foo: "bar" }).enter();
+  event(Level.INFO, "test", { foo: "bar" });
+  guard.exit();
+});
 
 it("should call subscriber.newSpan on subscriber when a new span is created", () => {
   // Arrange

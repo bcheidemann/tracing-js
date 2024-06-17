@@ -17,7 +17,7 @@ export function createContext(subscriber: ISubscriber<unknown>): Context {
   };
 }
 
-export function getContext(): Context {
+export function getContextOrThrow(): Context {
   const ctx = context.getStore();
 
   if (!ctx) {
@@ -25,4 +25,8 @@ export function getContext(): Context {
   }
 
   return ctx;
+}
+
+export function getContext(): Context | undefined {
+  return context.getStore();
 }

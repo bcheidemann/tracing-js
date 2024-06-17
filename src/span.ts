@@ -33,6 +33,10 @@ export function span(
 ): Span<AnonymousSpanId> {
   const ctx = getContext();
 
+  if (!ctx) {
+    return { enter };
+  }
+
   let enabled = true;
 
   if (ctx.subscriber.enabledForLevel) {
@@ -66,6 +70,10 @@ export function span(
   };
 
   function enter() {
+    if (!ctx) {
+      return { exit, [Symbol.dispose]: exit };
+    }
+
     if (enabled) {
       ctx.subscriber.enter(spanId);
     }
@@ -76,7 +84,7 @@ export function span(
     };
 
     function exit() {
-      if (enabled) {
+      if (ctx && enabled) {
         ctx.subscriber.exit(spanId);
       }
     }

@@ -20,6 +20,18 @@ import {
 
 describe("instrument", () => {
   describe("method decorator", () => {
+    it("should not throw when used without a registered subscriber", () => {
+      // Arrange
+      class Example {
+        @instrument(log)
+        test() {}
+      }
+      const instance = new Example();
+
+      // Act
+      instance.test();
+    });
+
     it("should call subscriber.newSpan on subscriber when an instrumented method is called", () => {
       // Arrange
       const subscriber = createTestSubscriber();
@@ -607,6 +619,17 @@ describe("instrument", () => {
   });
 
   describe("function decorator", () => {
+    it("should not throw when used without a registered subscriber", () => {
+      // Arrange
+      const test = instrumentCallback(
+        [log],
+        function test() {},
+      );
+
+      // Act
+      test();
+    });
+
     it("should call subscriber.newSpan on subscriber when an instrumented method is called", () => {
       // Arrange
       const subscriber = createTestSubscriber();

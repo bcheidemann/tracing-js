@@ -315,6 +315,12 @@ function instrumentCallbackImpl<
     this: ThisParameterType<TCallback>,
     ...args: Parameters<TCallback>
   ) {
+    const ctx = getContext()?.clone();
+
+    if (!ctx) {
+      return fn.apply(this, args);
+    }
+
     const fnName = fn.name || "[unknown function]";
     const defaults: Defaults = {
       [AttributeKind.Message]:
@@ -335,7 +341,6 @@ function instrumentCallbackImpl<
     };
     const attributesByKind = collectAttributes(attributes, defaults);
     const self = this;
-    const ctx = getContext().clone();
     return context.run(ctx, function () {
       const level = attributesByKind[AttributeKind.Level].level;
       const message = attributesByKind[AttributeKind.Message].message;

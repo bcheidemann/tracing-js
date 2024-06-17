@@ -15,6 +15,10 @@ export function event(
 ) {
   const ctx = getContext();
 
+  if (!ctx) {
+    return;
+  }
+
   if (
     ctx.subscriber.enabledForLevel &&
     !ctx.subscriber.enabledForLevel(level)
