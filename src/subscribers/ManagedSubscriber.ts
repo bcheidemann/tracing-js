@@ -1,7 +1,7 @@
-import { Event } from "../event";
-import { Level } from "../level";
-import { SpanAttributes } from "../span";
-import { ISubscriber } from "../subscriber";
+import { Event } from "../event.ts";
+import { Level } from "../level.ts";
+import { SpanAttributes } from "../span.ts";
+import { ISubscriber } from "../subscriber.ts";
 
 type SpanNode = {
   id: symbol;

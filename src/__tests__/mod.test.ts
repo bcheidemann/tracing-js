@@ -1,10 +1,12 @@
-import { vi, it, expect } from "vitest";
-import { createTestSubscriber } from "./subscriber";
-import { context, createContext } from "../context";
-import { span } from "../span";
-import { Level } from "../level";
-import { createAnonymousSpanId } from "./span";
-import { event } from "../event";
+import { it } from "@std/testing/bdd";
+import { fn } from "jest-mock";
+import { expect } from "expect";
+import { createTestSubscriber } from "./subscriber.ts";
+import { context, createContext } from "../context.ts";
+import { span } from "../span.ts";
+import { Level } from "../level.ts";
+import { createAnonymousSpanId } from "./span.ts";
+import { event } from "../event.ts";
 
 it("should not throw when used without a registering a subscriber", () => {
   // Act
@@ -87,7 +89,7 @@ it("should call subscriber.exit when a span is exited via it's dispose", () => {
 it("should call subscriber.newSpan when subscriber.enabledForLevel returns true", () => {
   // Arrange
   const subscriber = createTestSubscriber({
-    enabledForLevel: vi.fn().mockReturnValue(true),
+    enabledForLevel: fn().mockReturnValue(true),
   });
   subscriber.enabledForLevel = undefined;
   const ctx = createContext(subscriber);
@@ -103,7 +105,7 @@ it("should call subscriber.newSpan when subscriber.enabledForLevel returns true"
 it("should not call subscriber.newSpan when subscriber.enabledForLevel returns false", () => {
   // Arrange
   const subscriber = createTestSubscriber({
-    enabledForLevel: vi.fn().mockReturnValue(false),
+    enabledForLevel: fn().mockReturnValue(false),
   });
   const ctx = createContext(subscriber);
   context.enterWith(ctx);
@@ -118,8 +120,8 @@ it("should not call subscriber.newSpan when subscriber.enabledForLevel returns f
 it("should call subscriber.newSpan when subscriber.enabledForLevel returns true and subscriber.enabled returns true", () => {
   // Arrange
   const subscriber = createTestSubscriber({
-    enabledForLevel: vi.fn().mockReturnValue(true),
-    enabled: vi.fn().mockReturnValue(true),
+    enabledForLevel: fn().mockReturnValue(true),
+    enabled: fn().mockReturnValue(true),
   });
   subscriber.enabledForLevel = undefined;
   const ctx = createContext(subscriber);
@@ -135,8 +137,8 @@ it("should call subscriber.newSpan when subscriber.enabledForLevel returns true 
 it("should not call subscriber.newSpan when subscriber.enabledForLevel returns true and subscriber.enabled returns false", () => {
   // Arrange
   const subscriber = createTestSubscriber({
-    enabledForLevel: vi.fn().mockReturnValue(true),
-    enabled: vi.fn().mockReturnValue(false),
+    enabledForLevel: fn().mockReturnValue(true),
+    enabled: fn().mockReturnValue(false),
   });
   const ctx = createContext(subscriber);
   context.enterWith(ctx);
@@ -151,8 +153,8 @@ it("should not call subscriber.newSpan when subscriber.enabledForLevel returns t
 it("should call subscriber.newSpan when subscriber.enabled returns true", () => {
   // Arrange
   const subscriber = createTestSubscriber({
-    enabledForLevel: vi.fn().mockReturnValue(true),
-    enabled: vi.fn().mockReturnValue(true),
+    enabledForLevel: fn().mockReturnValue(true),
+    enabled: fn().mockReturnValue(true),
   });
   subscriber.enabledForLevel = undefined;
   const ctx = createContext(subscriber);
@@ -168,8 +170,8 @@ it("should call subscriber.newSpan when subscriber.enabled returns true", () => 
 it("should not call subscriber.newSpan when subscriber.enabled returns false", () => {
   // Arrange
   const subscriber = createTestSubscriber({
-    enabledForLevel: vi.fn().mockReturnValue(true),
-    enabled: vi.fn().mockReturnValue(false),
+    enabledForLevel: fn().mockReturnValue(true),
+    enabled: fn().mockReturnValue(false),
   });
   const ctx = createContext(subscriber);
   context.enterWith(ctx);
@@ -184,7 +186,7 @@ it("should not call subscriber.newSpan when subscriber.enabled returns false", (
 it("should not call subscriber.enter when subscriber.enabled returns false", () => {
   // Arrange
   const subscriber = createTestSubscriber({
-    enabled: vi.fn().mockReturnValue(false),
+    enabled: fn().mockReturnValue(false),
   });
   const ctx = createContext(subscriber);
   context.enterWith(ctx);
@@ -199,7 +201,7 @@ it("should not call subscriber.enter when subscriber.enabled returns false", () 
 it("should not call subscriber.exit when subscriber.enabled returns false", () => {
   // Arrange
   const subscriber = createTestSubscriber({
-    enabled: vi.fn().mockReturnValue(false),
+    enabled: fn().mockReturnValue(false),
   });
   const ctx = createContext(subscriber);
   context.enterWith(ctx);

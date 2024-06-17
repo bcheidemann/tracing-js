@@ -1,22 +1,24 @@
-import { vi, Mock } from "vitest";
-import { ISubscriber } from "../subscriber";
+import { fn } from "jest-mock";
+import type { ISubscriber } from "../subscriber.ts";
+
+type Mock = ReturnType<typeof fn>;
 
 export function createTestSubscriber({
   enabledForLevel = undefined,
   enabled = undefined,
-  newSpan = vi.fn().mockReturnValue(Symbol("span")),
-  event = vi.fn(),
-  enter = vi.fn(),
-  exit = vi.fn(),
+  newSpan = fn().mockReturnValue(Symbol("span")),
+  event = fn(),
+  enter = fn(),
+  exit = fn(),
   clone = undefined,
 }: {
-  enabledForLevel?: Mock<any, any>,
-  enabled?: Mock<any, any>,
-  newSpan?: Mock<any, any>,
-  event?: Mock<any, any>,
-  enter?: Mock<any, any>,
-  exit?: Mock<any, any>,
-  clone?: Mock<any, any>,
+  enabledForLevel?: Mock,
+  enabled?: Mock,
+  newSpan?: Mock,
+  event?: Mock,
+  enter?: Mock,
+  exit?: Mock,
+  clone?: Mock,
 } = {}) {
   const subscriber = {
     enabledForLevel,
@@ -25,7 +27,7 @@ export function createTestSubscriber({
     event,
     enter,
     exit,
-    clone: clone ?? vi.fn<any, any>(),
+    clone: clone ?? fn(),
   } satisfies ISubscriber<unknown>;
 
   if (!clone) {

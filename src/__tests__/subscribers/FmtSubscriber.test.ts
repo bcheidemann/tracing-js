@@ -1,22 +1,17 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
-import { event } from "../../event";
-import { span } from "../../span";
-import { Level } from "../../level";
-import { FmtSubscriber } from "../../subscribers/FmtSubscriber";
+import { describe, it } from "@std/testing/bdd";
+import { FakeTime } from "@std/testing/time";
+import { expect } from "expect";
+import { spyOn } from "jest-mock";
+import { event } from "../../event.ts";
+import { span } from "../../span.ts";
+import { Level } from "../../level.ts";
+import { FmtSubscriber } from "../../subscribers/FmtSubscriber.ts";
 
 describe("FmtSubscriber", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-  
   it("should log the message to the console", () => {
     // Arrange
-    vi.setSystemTime(new Date(0));
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    using _time = new FakeTime(new Date(0));
+    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -27,34 +22,38 @@ describe("FmtSubscriber", () => {
     expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] test");
   });
 
-  it.each([
-    [Level.TRACE, "log"],
-    [Level.DEBUG, "log"],
-    [Level.INFO, "log"],
-    [Level.WARN, "warn"],
-    [Level.ERROR, "error"],
-    [Level.CRITICAL, "error"],
-  ] satisfies [Level, keyof typeof console][])(
-    "should log the message to the console for level %s with console.%s", 
-    (level, log) => {
-      // Arrange
-      const spy = vi.spyOn(console, log).mockImplementation(() => {});
-      FmtSubscriber.init({
-        level: Level.TRACE
-      });
+  for (
+    const [level, log] of [
+      [Level.TRACE, "log"],
+      [Level.DEBUG, "log"],
+      [Level.INFO, "log"],
+      [Level.WARN, "warn"],
+      [Level.ERROR, "error"],
+      [Level.CRITICAL, "error"],
+    ] satisfies [Level, keyof typeof console][]
+  ) {
+    it(
+      "should log the message to the console for level %s with console.%s",
+      () => {
+        // Arrange
+        const spy = spyOn(console, log).mockImplementation(() => {});
+        FmtSubscriber.init({
+          level: Level.TRACE,
+        });
 
-      // Act
-      event(level, "test");
+        // Act
+        event(level, "test");
 
-      // Assert
-      expect(spy).toHaveBeenCalled();
-    },
-  );
+        // Assert
+        expect(spy).toHaveBeenCalled();
+      },
+    );
+  }
 
   it("should log the message to the console with a field", () => {
     // Arrange
-    vi.setSystemTime(new Date(0));
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    using _time = new FakeTime(new Date(0));
+    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -64,13 +63,15 @@ describe("FmtSubscriber", () => {
 
     // Assert
     expect(log).toHaveBeenCalled();
-    expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] test (key=value)");
+    expect(log).toHaveBeenCalledWith(
+      "[1970-01-01T00:00:00.000Z] [INFO] test (key=value)",
+    );
   });
 
   it("should log the message to the console with object fields", () => {
     // Arrange
-    vi.setSystemTime(new Date(0));
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    using _time = new FakeTime(new Date(0));
+    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -83,20 +84,22 @@ describe("FmtSubscriber", () => {
       objArray: [
         {
           key: "value",
-          key2: { value: "innerValue" }
+          key2: { value: "innerValue" },
         },
       ],
     });
 
     // Assert
     expect(log).toHaveBeenCalled();
-    expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] test (target.class=Example, target.method=test, args.0=arg0, objArray.0.key=value, objArray.0.key2.value=innerValue)");
+    expect(log).toHaveBeenCalledWith(
+      "[1970-01-01T00:00:00.000Z] [INFO] test (target.class=Example, target.method=test, args.0=arg0, objArray.0.key=value, objArray.0.key2.value=innerValue)",
+    );
   });
 
   it("should log the message to the console with fields", () => {
     // Arrange
-    vi.setSystemTime(new Date(0));
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    using _time = new FakeTime(new Date(0));
+    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -107,13 +110,15 @@ describe("FmtSubscriber", () => {
 
     // Assert
     expect(log).toHaveBeenCalled();
-    expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] test (key=value, key2=value2)");
+    expect(log).toHaveBeenCalledWith(
+      "[1970-01-01T00:00:00.000Z] [INFO] test (key=value, key2=value2)",
+    );
   });
 
   it("should log the message to the console with a span", () => {
     // Arrange
-    vi.setSystemTime(new Date(0));
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    using _time = new FakeTime(new Date(0));
+    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -122,13 +127,15 @@ describe("FmtSubscriber", () => {
 
     // Assert
     expect(log).toHaveBeenCalled();
-    expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] test span : test");
+    expect(log).toHaveBeenCalledWith(
+      "[1970-01-01T00:00:00.000Z] [INFO] test span : test",
+    );
   });
 
   it("should log the message to the console with spans", () => {
     // Arrange
-    vi.setSystemTime(new Date(0));
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    using _time = new FakeTime(new Date(0));
+    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -138,13 +145,15 @@ describe("FmtSubscriber", () => {
 
     // Assert
     expect(log).toHaveBeenCalled();
-    expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] outer span > inner span : test");
+    expect(log).toHaveBeenCalledWith(
+      "[1970-01-01T00:00:00.000Z] [INFO] outer span > inner span : test",
+    );
   });
 
   it("should log fields from spans", () => {
     // Arrange
-    vi.setSystemTime(new Date(0));
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    using _time = new FakeTime(new Date(0));
+    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -160,13 +169,15 @@ describe("FmtSubscriber", () => {
 
     // Assert
     expect(log).toHaveBeenCalled();
-    expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] outer span > inner span : test (eventKey=event, innerSpanKey=inner, outerSpanKey=outer)");
+    expect(log).toHaveBeenCalledWith(
+      "[1970-01-01T00:00:00.000Z] [INFO] outer span > inner span : test (eventKey=event, innerSpanKey=inner, outerSpanKey=outer)",
+    );
   });
 
   it("should log object fields from spans", () => {
     // Arrange
-    vi.setSystemTime(new Date(0));
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    using _time = new FakeTime(new Date(0));
+    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -179,7 +190,7 @@ describe("FmtSubscriber", () => {
       objArray: [
         {
           key: "value",
-          key2: { value: "innerValue" }
+          key2: { value: "innerValue" },
         },
       ],
     }).enter();
@@ -189,6 +200,8 @@ describe("FmtSubscriber", () => {
 
     // Assert
     expect(log).toHaveBeenCalled();
-    expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] Example.test : test (eventKey=event, target.class=Example, target.method=test, args.0=arg0, objArray.0.key=value, objArray.0.key2.value=innerValue)");
+    expect(log).toHaveBeenCalledWith(
+      "[1970-01-01T00:00:00.000Z] [INFO] Example.test : test (eventKey=event, target.class=Example, target.method=test, args.0=arg0, objArray.0.key=value, objArray.0.key2.value=innerValue)",
+    );
   });
 });

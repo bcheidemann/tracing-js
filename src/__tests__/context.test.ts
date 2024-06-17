@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { context, createContext, getContextOrThrow } from "../context";
-import { createTestSubscriber } from "./subscriber";
+import { describe, it } from "@std/testing/bdd";
+import { expect } from "expect";
+import { context, createContext, getContextOrThrow } from "../context.ts";
+import { createTestSubscriber } from "./subscriber.ts";
 
 describe("context", () => {
   describe("getContext", () => {
@@ -34,7 +35,7 @@ describe("context", () => {
       context.enterWith(ctx);
 
       // Act
-      const result = ctx.clone();
+      ctx.clone();
 
       // Assert
       expect(subscriber.clone).toHaveBeenCalled();

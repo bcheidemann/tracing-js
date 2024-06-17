@@ -1,13 +1,15 @@
-import { vi, describe, it, expect } from "vitest";
-import { ManagedSubscriber } from "../../subscribers/ManagedSubscriber";
-import { event } from "../../event";
-import { span } from "../../span";
-import { context, createContext } from "../../context";
-import { Level } from "../../level";
-import { instrumentCallback, level } from "../../instrument";
+import { describe, it } from "@std/testing/bdd";
+import { expect } from "expect";
+import { fn } from "jest-mock";
+import { ManagedSubscriber } from "../../subscribers/ManagedSubscriber.ts";
+import { event } from "../../event.ts";
+import { span } from "../../span.ts";
+import { context, createContext } from "../../context.ts";
+import { Level } from "../../level.ts";
+import { instrumentCallback } from "../../instrument.ts";
 
 class TestSubscriber extends ManagedSubscriber {
-  public onEvent = vi.fn();
+  public onEvent = fn();
 
   public static init(): TestSubscriber {
     const subscriber = new TestSubscriber();

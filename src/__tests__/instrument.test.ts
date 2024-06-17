@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { createTestSubscriber } from "./subscriber";
-import { context, createContext } from "../context";
-import { Level } from "../level";
+import { describe, it } from "@std/testing/bdd";
+import { createTestSubscriber } from "./subscriber.ts";
+import { context, createContext } from "../context.ts";
+import { Level } from "../level.ts";
 import {
   field,
   instrument,
@@ -16,7 +16,8 @@ import {
   skipAll,
   skipThis,
   target,
-} from "../instrument";
+} from "../instrument.ts";
+import { expect } from "expect";
 
 describe("instrument", () => {
   describe("method decorator", () => {
@@ -47,7 +48,7 @@ describe("instrument", () => {
       instance.test("arg0");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -64,8 +65,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the message attribute", () => {
@@ -83,7 +84,7 @@ describe("instrument", () => {
       instance.test();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -99,8 +100,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the target attribute for classes", () => {
@@ -118,7 +119,7 @@ describe("instrument", () => {
       instance.test();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -134,8 +135,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the level attribute", () => {
@@ -153,7 +154,7 @@ describe("instrument", () => {
       instance.test();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.TRACE,
@@ -169,8 +170,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the target attribute for functions", () => {
@@ -188,7 +189,7 @@ describe("instrument", () => {
       instance.test();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -202,8 +203,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by param name", () => {
@@ -221,7 +222,7 @@ describe("instrument", () => {
       instance.test("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -239,8 +240,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by mask", () => {
@@ -258,7 +259,7 @@ describe("instrument", () => {
       instance.test("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -276,8 +277,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by index", () => {
@@ -295,7 +296,7 @@ describe("instrument", () => {
       instance.test("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -313,8 +314,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skipAll attribute", () => {
@@ -332,7 +333,7 @@ describe("instrument", () => {
       instance.test("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -346,8 +347,8 @@ describe("instrument", () => {
           args: [],
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skipThis attribute", () => {
@@ -365,7 +366,7 @@ describe("instrument", () => {
       instance.test("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -382,8 +383,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the field attribute with literal value", () => {
@@ -401,7 +402,7 @@ describe("instrument", () => {
       instance.test("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -420,8 +421,8 @@ describe("instrument", () => {
           fieldKey: "fieldValue",
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the field attribute with mapped", () => {
@@ -439,7 +440,7 @@ describe("instrument", () => {
       instance.test(40, 2);
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -458,8 +459,8 @@ describe("instrument", () => {
           sum: 42,
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the logEnter attribute", () => {
@@ -477,7 +478,7 @@ describe("instrument", () => {
       instance.test();
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,
@@ -503,7 +504,7 @@ describe("instrument", () => {
       instance.test();
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,
@@ -533,7 +534,7 @@ describe("instrument", () => {
       } catch {}
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,
@@ -649,7 +650,7 @@ describe("instrument", () => {
       await instance.test("arg0");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -666,8 +667,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the message attribute", async () => {
@@ -687,7 +688,7 @@ describe("instrument", () => {
       await instance.test();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -703,8 +704,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the target attribute for classes", async () => {
@@ -724,7 +725,7 @@ describe("instrument", () => {
       await instance.test();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -740,8 +741,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the level attribute", async () => {
@@ -761,7 +762,7 @@ describe("instrument", () => {
       await instance.test();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.TRACE,
@@ -777,8 +778,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the target attribute for functions", async () => {
@@ -798,7 +799,7 @@ describe("instrument", () => {
       await instance.test();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -812,8 +813,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by param name", async () => {
@@ -833,7 +834,7 @@ describe("instrument", () => {
       await instance.test("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -851,8 +852,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by mask", async () => {
@@ -872,7 +873,7 @@ describe("instrument", () => {
       await instance.test("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -890,8 +891,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by index", async () => {
@@ -911,7 +912,7 @@ describe("instrument", () => {
       await instance.test("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -929,8 +930,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skipAll attribute", async () => {
@@ -950,7 +951,7 @@ describe("instrument", () => {
       await instance.test("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -964,8 +965,8 @@ describe("instrument", () => {
           args: [],
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skipThis attribute", async () => {
@@ -983,7 +984,7 @@ describe("instrument", () => {
       await instance.test("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1000,8 +1001,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the field attribute with literal value", async () => {
@@ -1021,7 +1022,7 @@ describe("instrument", () => {
       await instance.test("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1040,8 +1041,8 @@ describe("instrument", () => {
           fieldKey: "fieldValue",
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the field attribute with mapped", async () => {
@@ -1061,7 +1062,7 @@ describe("instrument", () => {
       await instance.test(40, 2);
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1080,8 +1081,8 @@ describe("instrument", () => {
           sum: 42,
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the logEnter attribute", async () => {
@@ -1101,7 +1102,7 @@ describe("instrument", () => {
       await instance.test();
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,
@@ -1128,7 +1129,7 @@ describe("instrument", () => {
       await instance.test();
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,
@@ -1159,7 +1160,7 @@ describe("instrument", () => {
       } catch {}
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,
@@ -1265,7 +1266,7 @@ describe("instrument", () => {
       instrumentCallback(test)("arg0");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1280,8 +1281,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the message attribute", () => {
@@ -1298,7 +1299,7 @@ describe("instrument", () => {
       testFn();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1312,8 +1313,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the target attribute for classes", () => {
@@ -1330,7 +1331,7 @@ describe("instrument", () => {
       testFn();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1346,8 +1347,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the level attribute", () => {
@@ -1364,7 +1365,7 @@ describe("instrument", () => {
       testFn();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.TRACE,
@@ -1378,8 +1379,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the target attribute for functions", () => {
@@ -1396,7 +1397,7 @@ describe("instrument", () => {
       testFn();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1410,8 +1411,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by param name", () => {
@@ -1433,7 +1434,7 @@ describe("instrument", () => {
       testFn("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1449,8 +1450,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by mask", () => {
@@ -1472,7 +1473,7 @@ describe("instrument", () => {
       testFn("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1488,8 +1489,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by index", () => {
@@ -1511,7 +1512,7 @@ describe("instrument", () => {
       testFn("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1527,8 +1528,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skipAll attribute", () => {
@@ -1545,7 +1546,7 @@ describe("instrument", () => {
       testFn("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1557,8 +1558,8 @@ describe("instrument", () => {
           args: [],
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skipThis attribute", () => {
@@ -1575,7 +1576,7 @@ describe("instrument", () => {
       testFn("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1590,8 +1591,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the field attribute with literal value", () => {
@@ -1608,7 +1609,7 @@ describe("instrument", () => {
       testFn("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1625,8 +1626,8 @@ describe("instrument", () => {
           fieldKey: "fieldValue",
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the field attribute with mapped", () => {
@@ -1643,7 +1644,7 @@ describe("instrument", () => {
       testFn(40, 2);
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1660,8 +1661,8 @@ describe("instrument", () => {
           sum: 42,
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the logEnter attribute", () => {
@@ -1675,7 +1676,7 @@ describe("instrument", () => {
       testFn();
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,
@@ -1697,7 +1698,7 @@ describe("instrument", () => {
       testFn();
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,
@@ -1723,7 +1724,7 @@ describe("instrument", () => {
       } catch {}
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,
@@ -1823,7 +1824,7 @@ describe("instrument", () => {
       await instrumentCallback(test)("arg0");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1838,8 +1839,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the message attribute", async () => {
@@ -1858,7 +1859,7 @@ describe("instrument", () => {
       await testFn();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1872,8 +1873,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the target attribute for classes", async () => {
@@ -1892,7 +1893,7 @@ describe("instrument", () => {
       await testFn();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1908,8 +1909,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the level attribute", async () => {
@@ -1928,7 +1929,7 @@ describe("instrument", () => {
       await testFn();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.TRACE,
@@ -1942,8 +1943,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the target attribute for functions", async () => {
@@ -1960,7 +1961,7 @@ describe("instrument", () => {
       await testFn();
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -1974,8 +1975,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by param name", async () => {
@@ -1999,7 +2000,7 @@ describe("instrument", () => {
       await testFn("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -2015,8 +2016,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by mask", async () => {
@@ -2040,7 +2041,7 @@ describe("instrument", () => {
       await testFn("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -2056,8 +2057,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skip attribute by index", async () => {
@@ -2079,7 +2080,7 @@ describe("instrument", () => {
       await testFn("arg0", "arg1", "arg2", "arg3");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -2095,8 +2096,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skipAll attribute", async () => {
@@ -2115,7 +2116,7 @@ describe("instrument", () => {
       await testFn("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -2127,8 +2128,8 @@ describe("instrument", () => {
           args: [],
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the skipThis attribute", async () => {
@@ -2147,7 +2148,7 @@ describe("instrument", () => {
       await testFn("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -2162,8 +2163,8 @@ describe("instrument", () => {
           },
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the field attribute with literal value", async () => {
@@ -2182,7 +2183,7 @@ describe("instrument", () => {
       await testFn("arg0", "arg1");
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -2199,8 +2200,8 @@ describe("instrument", () => {
           fieldKey: "fieldValue",
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the field attribute with mapped", async () => {
@@ -2219,7 +2220,7 @@ describe("instrument", () => {
       await testFn(40, 2);
 
       // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledOnce();
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
@@ -2236,8 +2237,8 @@ describe("instrument", () => {
           sum: 42,
         },
       });
-      expect(subscriber.enter).toHaveBeenCalledOnce();
-      expect(subscriber.exit).toHaveBeenCalledOnce();
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
     it("should apply the logEnter attribute", async () => {
@@ -2253,7 +2254,7 @@ describe("instrument", () => {
       testFn();
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,
@@ -2276,7 +2277,7 @@ describe("instrument", () => {
       await testFn();
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,
@@ -2303,7 +2304,7 @@ describe("instrument", () => {
       } catch {}
 
       // Assert
-      expect(subscriber.event).toHaveBeenCalledOnce();
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
         level: Level.INFO,

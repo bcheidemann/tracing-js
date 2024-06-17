@@ -1,8 +1,10 @@
-import { vi, describe, it, expect } from "vitest";
-import { createTestSubscriber } from "./subscriber";
-import { context, createContext } from "../context";
-import { critical, debug, error, event, info, trace, warn } from "../event";
-import { Level } from "../level";
+import { describe, it } from "@std/testing/bdd";
+import { fn } from "jest-mock";
+import { expect } from "expect";
+import { createTestSubscriber } from "./subscriber.ts";
+import { context, createContext } from "../context.ts";
+import { critical, debug, error, event, info, trace, warn } from "../event.ts";
+import { Level } from "../level.ts";
 
 describe("event", () => {
   describe("event", () => {
@@ -28,7 +30,7 @@ describe("event", () => {
     it("should not call subscriber.event on subscriber when subscriber.enabledForLevel returns false", () => {
       // Arrange
       const subscriber = createTestSubscriber({
-        enabledForLevel: vi.fn().mockReturnValue(false),
+        enabledForLevel: fn().mockReturnValue(false),
       });
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
@@ -43,7 +45,7 @@ describe("event", () => {
     it("should not call subscriber.event on subscriber when subscriber.enabled returns false", () => {
       // Arrange
       const subscriber = createTestSubscriber({
-        enabled: vi.fn().mockReturnValue(false),
+        enabled: fn().mockReturnValue(false),
       });
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
@@ -56,31 +58,35 @@ describe("event", () => {
     });
   });
 
-  describe.each([
-    ["trace", Level.TRACE, trace],
-    ["debug", Level.DEBUG, debug],
-    ["info", Level.INFO, info],
-    ["warn", Level.WARN, warn],
-    ["error", Level.ERROR, error],
-    ["critical", Level.CRITICAL, critical],
-  ])(`%s`, (_, level, fn) => {
-    it("should call subscriber.event with the correct level", () => {
-      // Arrange
-      const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
-      context.enterWith(ctx);
+  for (
+    const [levelFmt, level, fn] of [
+      ["trace", Level.TRACE, trace],
+      ["debug", Level.DEBUG, debug],
+      ["info", Level.INFO, info],
+      ["warn", Level.WARN, warn],
+      ["error", Level.ERROR, error],
+      ["critical", Level.CRITICAL, critical],
+    ] satisfies [unknown, unknown, unknown][]
+  ) {
+    describe(levelFmt, () => {
+      it("should call subscriber.event with the correct level", () => {
+        // Arrange
+        const subscriber = createTestSubscriber();
+        const ctx = createContext(subscriber);
+        context.enterWith(ctx);
 
-      // Act
-      fn("test", { foo: "bar" });
+        // Act
+        fn("test", { foo: "bar" });
 
-      // Assert
-      expect(subscriber.event).toHaveBeenCalled();
-      expect(subscriber.event).toHaveBeenCalledWith({
-        isEvent: true,
-        level,
-        message: "test",
-        fields: { foo: "bar" },
+        // Assert
+        expect(subscriber.event).toHaveBeenCalled();
+        expect(subscriber.event).toHaveBeenCalledWith({
+          isEvent: true,
+          level,
+          message: "test",
+          fields: { foo: "bar" },
+        });
       });
     });
-  });
+  }
 });

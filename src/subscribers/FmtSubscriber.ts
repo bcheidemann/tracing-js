@@ -1,8 +1,8 @@
-import { context, createContext } from "../context";
-import { Event } from "../event";
-import { Level } from "../level";
-import { SpanAttributes } from "../span";
-import { ManagedSubscriber } from "./ManagedSubscriber";
+import { context, createContext } from "../context.ts";
+import { Event } from "../event.ts";
+import { Level } from "../level.ts";
+import { SpanAttributes } from "../span.ts";
+import { ManagedSubscriber } from "./ManagedSubscriber.ts";
 
 const levelToString: Record<Level, string> = {
   [Level.DISABLED]: "DISABLED",
