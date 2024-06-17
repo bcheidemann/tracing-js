@@ -16,6 +16,28 @@ type EnteredSpanNode = SpanNode & {
   parent: EnteredSpanNode | undefined;
 };
 
+/**
+ * The ManagedSubscriber class is a base class for subscribers which manage spans across async contexts. It exposes
+ * an ergonomic high-level API which makes it easy to create custom subscribers.
+ *
+ * @example
+ * ```ts
+ * import { ManagedSubscriber, Event, SpanAttributes } from "@bcheidemann/tracing";
+ *
+ * class MySubscriber extends ManagedSubscriber {
+ *   public static init(): MySubscriber {
+ *     const subscriber = new MySubscriber();
+ *     // Enter the new subscriber into the current async context
+ *     context.enterWith(createContext(subscriber));
+ *     return subscriber;
+ *   }
+ *
+ *   protected onEvent(event: Event, spans: SpanAttributes[]): void {
+ *     console.log(event, spans);
+ *   }
+ * }
+ * ```
+ */
 export abstract class ManagedSubscriber implements ISubscriber<symbol> {
   protected constructor(
     private readonly level: Level = Level.INFO,

@@ -114,15 +114,107 @@ type InstrumentDecorator<TMethod extends AnyFunction> = (
   context: ClassMethodDecoratorContext<ThisParameterType<TMethod>, TMethod>,
 ) => TMethod;
 
+/**
+ * The message attribute is used to override the message of the span created by the instrumented method or function.
+ *
+ * @example Instrument a method with a custom message
+ * ```ts
+ * import { instrument, message } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(message("Custom message"))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function with a custom message
+ * ```ts
+ * import { instrumentCallback, message } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [message("Custom message")],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param message The message to use for the span created by the instrumented method or function
+ * @returns The message attribute
+ */
 export function message(message: string): MessageAttribute {
   return { kind: AttributeKind.Message, message };
 }
 
+/**
+ * The target attribute is used to override the target field of the span created by the instrumented method or function.
+ *
+ * @example Instrument a method with a custom target
+ * ```ts
+ * import { instrument, target } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(target("Example", "test"))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function with a custom target
+ * ```ts
+ * import { instrumentCallback, target } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [target("test")],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param className The class name to use for the target field
+ * @param method The method name to use for the target field
+ * @param isPrivate Whether the method is private (optional)
+ * @returns The target attribute
+ */
 export function target(
   className: string,
   method: string,
   isPrivate?: boolean,
 ): TargetAttribute;
+/**
+ * The target attribute is used to override the target field of the span created by the instrumented method or function.
+ *
+ * @example Instrument a method with a custom target
+ * ```ts
+ * import { instrument, target } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(target("Example", "test"))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function with a custom target
+ * ```ts
+ * import { instrumentCallback, target } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [target("test")],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param functionName The function name to use for the target field
+ * @returns The target attribute
+ */
 export function target(functionName: string): TargetAttribute;
 export function target(
   classOrFunctionName: string,
@@ -140,16 +232,151 @@ export function target(
   return { kind: AttributeKind.Target, function: classOrFunctionName };
 }
 
+/**
+ * The level attribute is used to override the level of the span created by the instrumented method or function.
+ *
+ * @example Instrument a method with a custom level
+ * ```ts
+ * import { instrument, level, Level } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(level(Level.TRACE))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function with a custom level
+ * ```ts
+ * import { instrumentCallback, level, Level } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [level(Level.TRACE)],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param level The level to use for the span created by the instrumented method or function
+ * @returns The level attribute
+ */
 export function level(level: Level): LevelAttribute {
   return { kind: AttributeKind.Level, level };
 }
 
+/**
+ * The skip attribute is used to skip logging of specific arguments of the instrumented method or function.
+ *
+ * The skip attribute supports the following syntax:
+ * - `skip("arg0")`: Skip arguments by name (doesn't work in minified code)
+ * - `skip(0)`: Skip arguments by index
+ * - `skip(true, false, false)`: Skip arguments by mask
+ *
+ * @example Instrument a method and skip logging of the first argument
+ * ```ts
+ * import { instrument, skip } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(true, false)
+ *   test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and skip logging of the first argument
+ * ```ts
+ * import { instrumentCallback, skip } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [skip(true, false)],
+ *   function test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param mask The arguments to skip
+ * @returns The skip attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function skip<TArgs extends any[]>(
   ...mask: SkipByMask<TArgs>
 ): SkipAttribute<TArgs>;
+/**
+ * The skip attribute is used to skip logging of specific arguments of the instrumented method or function.
+ *
+ * The skip attribute supports the following syntax:
+ * - `skip("arg0")`: Skip arguments by name (doesn't work in minified code)
+ * - `skip(0)`: Skip arguments by index
+ * - `skip(true, false, false)`: Skip arguments by mask
+ *
+ * @example Instrument a method and skip logging of the first argument
+ * ```ts
+ * import { instrument, skip } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument("arg0")
+ *   test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and skip logging of the first argument
+ * ```ts
+ * import { instrumentCallback, skip } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [skip("arg0")],
+ *   function test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param paramNames The arguments to skip by name
+ * @returns The skip attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function skip(...paramNames: string[]): SkipAttribute<any>;
+/**
+ * The skip attribute is used to skip logging of specific arguments of the instrumented method or function.
+ *
+ * The skip attribute supports the following syntax:
+ * - `skip("arg0")`: Skip arguments by name (doesn't work in minified code)
+ * - `skip(0)`: Skip arguments by index
+ * - `skip(true, false, false)`: Skip arguments by mask
+ *
+ * @example Instrument a method and skip logging of the first argument
+ * ```ts
+ * import { instrument, skip } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(0)
+ *   test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and skip logging of the first argument
+ * ```ts
+ * import { instrumentCallback, skip } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [skip(0)],
+ *   function test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param paramIndices The arguments to skip by index
+ * @returns The skip attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function skip(...paramIndices: number[]): SkipAttribute<any>;
 // deno-lint-ignore no-explicit-any
@@ -159,15 +386,139 @@ export function skip<TArgs extends any[]>(
   return { kind: AttributeKind.Skip, skip };
 }
 
+/**
+ * The skipAll attribute is used to skip logging of all arguments and the `this` value of the instrumented method or function.
+ *
+ * @example Instrument a method and skip logging of all arguments and the `this` value
+ * ```ts
+ * import { instrument, skipAll } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(skipAll)
+ *   test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and skip logging of all arguments and the `this` value
+ * ```ts
+ * import { instrumentCallback, skipAll } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [skipAll],
+ *   function test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * );
+ * ```
+ */
 export const skipAll: SkipAllAttribute = { kind: AttributeKind.SkipAll };
 
+/**
+ * The skipThis attribute is used to skip logging of the `this` value of the instrumented method or function.
+ *
+ * @example Instrument a method and skip logging of the `this` value
+ * ```ts
+ * import { instrument, skipThis } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(skipThis)
+ *   test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and skip logging of the `this` value
+ * ```ts
+ * import { instrumentCallback, skipThis } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [skipThis],
+ *   function test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * );
+ * ```
+ */
 export const skipThis: SkipThisAttribute = { kind: AttributeKind.SkipThis };
 
+/**
+ * The field attribute is used to add custom fields to the span created by the instrumented method or function.
+ *
+ * The field attribute supports the following syntax:
+ * - `field("fieldName", "fieldValue")`: Add a field with a static value
+ * - `field("fieldName", (args) => args[0])`: Add a field with a dynamic value
+ *
+ * @example Instrument a method with a custom field
+ * ```ts
+ * import { instrument, field } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(field("fieldName", "fieldValue"))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function with a custom field
+ * ```ts
+ * import { instrumentCallback, field } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [field("fieldName", "fieldValue")],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param name The name of the field
+ * @param mapValue The value of the field
+ * @returns The field attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function field<TArgs extends any[]>(
   name: string,
   mapValue: (args: NoInfer<TArgs>) => unknown,
 ): FieldAttribute<TArgs>;
+/**
+ * The field attribute is used to add custom fields to the span created by the instrumented method or function.
+ *
+ * The field attribute supports the following syntax:
+ * - `field("fieldName", "fieldValue")`: Add a field with a static value
+ * - `field("fieldName", (args) => args[0])`: Add a field with a dynamic value
+ *
+ * @example Instrument a method with a custom field
+ * ```ts
+ * import { instrument, field } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(field("fieldName", (args) => args[0]))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function with a custom field
+ * ```ts
+ * import { instrumentCallback, field } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [field("fieldName", (args) => args[0]))],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param name The name of the field
+ * @param mapValue The value of the field
+ * @returns The field attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function field<TArgs extends any[], TValue>(
   name: string,
@@ -181,14 +532,152 @@ export function field<TArgs extends any[]>(
   return { kind: AttributeKind.Field, name, value };
 }
 
+/**
+ * The logEnter attribute is used to log a message when entering the instrumented method or function.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logEnter } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logEnter)
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logEnter } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logEnter],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ */
 export const logEnter: LogEnterAttribute = { kind: AttributeKind.LogEnter };
 
+/**
+ * The logExit attribute is used to log a message when exiting the instrumented method or function.
+ *
+ * @example Instrument a method and log a message when exiting
+ * ```ts
+ * import { instrument, logExit } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logExit)
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when exiting
+ * ```ts
+ * import { instrumentCallback, logExit } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logExit],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ */
 export const logExit: LogExitAttribute = { kind: AttributeKind.LogExit };
 
+/**
+ * The logError attribute is used to log a message when an error occurs in the instrumented method or function.
+ *
+ * @example Instrument a method and log a message when an error occurs
+ * ```ts
+ * import { instrument, logError } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logError)
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when an error occurs
+ * ```ts
+ * import { instrumentCallback, logError } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logError],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ */
 export const logError: LogErrorAttribute = { kind: AttributeKind.LogError };
 
+/**
+ * The log attribute is used to log a message when entering, exiting, or when an error occurs in the instrumented method or function.
+ *
+ * @example Instrument a method and log a message when entering, exiting, or when an error occurs
+ * ```ts
+ * import { instrument, log } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(log)
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering, exiting, or when an error occurs
+ * ```ts
+ * import { instrumentCallback, log } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [log],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ */
 export const log: LogAttribute = { kind: AttributeKind.Log };
 
+/**
+ * The instrument decorator is used to instrument a method with the provided attributes.
+ *
+ * @example Instrument a method
+ * ```ts
+ * import { instrument } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument()
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a method with a custom message
+ * ```ts
+ * import { instrument, message } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(message("Custom message"))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @param attributes The attributes to use for the instrumented method
+ * @returns The instrument decorator
+ */
 export function instrument<TMethod extends AnyFunction>(
   ...attributes: Attributes<Parameters<TMethod>>[]
 ): InstrumentDecorator<TMethod> {
@@ -204,6 +693,33 @@ export function instrument<TMethod extends AnyFunction>(
   };
 }
 
+/**
+ * The instrumentCallback function is used to instrument a function with the provided attributes.
+ *
+ * @example Instrument a function
+ * ```ts
+ * import { instrumentCallback } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(function test() {
+ *   // ...
+ * });
+ * ```
+ *
+ * @example Instrument a function with a custom message
+ * ```ts
+ * import { instrumentCallback, message } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [message("Custom message")],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param fn The function to instrument
+ * @returns The instrumented function
+ */
 export function instrumentCallback<
   TCallback extends AnyFunction,
 >(fn: TCallback): TCallback;

@@ -9,6 +9,16 @@ import type { Level } from "./level.ts";
 
 export * from "./subscribers/mod.ts";
 
+/**
+ * The subscriber interface. Subscribers are used to receive spans and events. This package is not perscriptive about
+ * how subscribers should be implemented, but provides a simple interface which can be used to create custom subscribers.
+ * Subscribers are typically used to format and log events.
+ *
+ * Note that the `ISubscriber` interface is quite low level, and implementing it directly is not recommended for most
+ * use cases. This is because implementing subscribers in a way that they correctly handle concurrent async contexts
+ * can be quite complex. Instead, consider extending the `ManagedSubscriber` class, which handles async contexts
+ * automatically, and exposes a much more ergonomic high-level API.
+ */
 export interface ISubscriber<TSpanId> {
   /**
    * Returns whether the subscriber is enabled for the given level.

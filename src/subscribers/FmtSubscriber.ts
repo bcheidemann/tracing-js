@@ -14,6 +14,7 @@ const levelToString: Record<Level, string> = {
   [Level.CRITICAL]: "CRITICAL",
 };
 
+// TODO Implement options
 export type FmtSubscriberOptions = {
   /**
    * The minimum level of logs to display.
@@ -41,6 +42,18 @@ export type FmtSubscriberOptions = {
   pretty?: boolean;
 };
 
+/**
+ * The FmtSubscriber class is a subscriber which logs events to the console in a human-readable format.
+ *
+ * @example
+ * ```ts
+ * import { FmtSubscriber } from "@bcheidemann/tracing";
+ *
+ * // Initialize the subscriber and enter it into the current async context
+ * // This should be called at the beginning of your program
+ * FmtSubscriber.init();
+ * ```
+ */
 export class FmtSubscriber extends ManagedSubscriber {
   constructor(private readonly options: FmtSubscriberOptions = {}) {
     super(options.level ?? Level.INFO);

@@ -6,6 +6,9 @@
 import { getContext } from "./context.ts";
 import { Level } from "./level.ts";
 
+/**
+ * The Event type represents the information which is passed to subscribers when an event is created.
+ */
 export type Event = {
   isEvent: true;
   level: Level;
@@ -13,11 +16,18 @@ export type Event = {
   fields?: Record<string, unknown>;
 };
 
+/**
+ * Creates a new event and passes it to the current subscriber.
+ *
+ * @param level The level of the event
+ * @param message The message of the event
+ * @param fields The fields of the event (optional additional information)
+ */
 export function event(
   level: Level,
   message: string,
   fields?: Record<string, unknown>,
-) {
+): void {
   const ctx = getContext();
 
   if (!ctx) {
@@ -53,30 +63,70 @@ export function event(
   });
 }
 
+/**
+ * Creates a new trace level event and passes it to the current subscriber.
+ *
+ * @param message The message of the event
+ * @param fields The fields of the event (optional additional information)
+ */
 export function trace(message: string, fields?: Record<string, unknown>) {
   event(Level.TRACE, message, fields);
 }
 
+/**
+ * Creates a new debug level event and passes it to the current subscriber.
+ *
+ * @param message The message of the event
+ * @param fields The fields of the event (optional additional information)
+ */
 export function debug(message: string, fields?: Record<string, unknown>) {
   event(Level.DEBUG, message, fields);
 }
 
+/**
+ * Creates a new info level event and passes it to the current subscriber.
+ *
+ * @param message The message of the event
+ * @param fields The fields of the event (optional additional information)
+ */
 export function info(message: string, fields?: Record<string, unknown>) {
   event(Level.INFO, message, fields);
 }
 
+/**
+ * Creates a new warn level event and passes it to the current subscriber.
+ *
+ * @param message The message of the event
+ * @param fields The fields of the event (optional additional information)
+ */
 export function warn(message: string, fields?: Record<string, unknown>) {
   event(Level.WARN, message, fields);
 }
 
+/**
+ * Creates a new error level event and passes it to the current subscriber.
+ *
+ * @param message The message of the event
+ * @param fields The fields of the event (optional additional information)
+ */
 export function error(message: string, fields?: Record<string, unknown>) {
   event(Level.ERROR, message, fields);
 }
 
+/**
+ * Creates a new critical level event and passes it to the current subscriber.
+ *
+ * @param message The message of the event
+ * @param fields The fields of the event (optional additional information)
+ */
 export function critical(message: string, fields?: Record<string, unknown>) {
   event(Level.CRITICAL, message, fields);
 }
 
+/**
+ * The Log object provides functions for creating events. It is a convenience object which provides the same functions
+ * as the module itself.
+ */
 export const Log = {
   trace,
   debug,
