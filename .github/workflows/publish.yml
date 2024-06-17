@@ -1,0 +1,43 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  checks:
+    runs-on: ${{ matrix.os }}
+    # Continue in case the canary run does not succeed
+    continue-on-error: ${{ matrix.canary }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        deno-version: [v1.x]
+        canary: [false]
+        include:
+          - deno-version: canary
+            os: ubuntu-latest
+            canary: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ matrix.deno-version }}
+      - name: Test
+        run: deno task test
+      - name: Lint
+        run: deno lint
+      - name: Format
+        run: deno fmt --check
+
+  publish:
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish package
+        run: npx jsr publish

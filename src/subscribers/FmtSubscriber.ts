@@ -1,7 +1,7 @@
 import { context, createContext } from "../context.ts";
-import { Event } from "../event.ts";
+import type { Event } from "../event.ts";
 import { Level } from "../level.ts";
-import { SpanAttributes } from "../span.ts";
+import type { SpanAttributes } from "../span.ts";
 import { ManagedSubscriber } from "./ManagedSubscriber.ts";
 
 const levelToString: Record<Level, string> = {

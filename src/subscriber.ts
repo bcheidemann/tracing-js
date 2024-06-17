@@ -1,6 +1,6 @@
-import { SpanAttributes } from "./span.ts";
-import { Event } from "./event.ts";
-import { Level } from "./level.ts";
+import type { SpanAttributes } from "./span.ts";
+import type { Event } from "./event.ts";
+import type { Level } from "./level.ts";
 
 export interface ISubscriber<TSpanId> {
   /**

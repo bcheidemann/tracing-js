@@ -1,7 +1,7 @@
-import { Event } from "../event.ts";
+import type { Event } from "../event.ts";
 import { Level } from "../level.ts";
-import { SpanAttributes } from "../span.ts";
-import { ISubscriber } from "../subscriber.ts";
+import type { SpanAttributes } from "../span.ts";
+import type { ISubscriber } from "../subscriber.ts";
 
 type SpanNode = {
   id: symbol;
@@ -78,7 +78,7 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
       // TODO: Log warning in debug mode
 
       exitSpan(node.parent);
-    }
+    };
     exitSpan(this.currentSpan);
   }
 

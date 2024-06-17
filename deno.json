@@ -1,7 +1,17 @@
 {
+  "name": "@bcheidemann/tracing",
+  "version": "0.1.0",
   "tasks": {
     "check": "deno check src/mod.ts",
     "test": "deno test --allow-read=."
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./context": "./src/context.ts",
+    "./instrument": "./src/instrument.ts",
+    "./level": "./src/level.ts",
+    "./span": "./src/span.ts",
+    "./subscriber": "./src/subscriber.ts"
   },
   "imports": {
     "@bcheidemann/parse-params": "jsr:@bcheidemann/parse-params@^0.2.1",
