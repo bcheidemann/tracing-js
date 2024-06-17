@@ -1,5 +1,9 @@
 # TracingJS
 
+[![JSR](https://jsr.io/badges/@bcheidemann/tracing)](https://jsr.io/@bcheidemann/tracing)
+[![JSR Score](https://jsr.io/badges/@bcheidemann/tracing/score)](https://jsr.io/@bcheidemann/tracing)
+![publish workflow](https://github.com/bcheidemann/tracing-js/actions/workflows/publish.yml/badge.svg)
+
 ## Overview
 
 `@bcheidemann/tracing` is a framework for collecting event based tracing,
