@@ -1,3 +1,4 @@
+<!-- TODO: Add link to examples folder -->
 # TracingJS
 
 [![JSR](https://jsr.io/badges/@bcheidemann/tracing)](https://jsr.io/@bcheidemann/tracing)
