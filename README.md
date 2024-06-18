@@ -188,22 +188,31 @@ const example = instumentCallback(
 
 The following attributes can be applied:
 
-| Attribute | Example                  | Description                                                                                                                 |
-| --------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| message   | `message("new message")` | Changes the instrumented spans message.                                                                                     |
-| target    | `target("functionName")` | Changes the instrumented spans target field.                                                                                |
-| level     | `level(Level.TRACE)`     | Changes the instrumented spans level.                                                                                       |
-| skip      | `skip("paramName")`      | Omits the named parameter from the instrumented spans `args` field.                                                         |
-|           | `skip(0)`                | Omits the indexed parameter from the instrumented spans `args` field.                                                       |
-|           | `skip(true, false)`      | Applies a positional mask to the parameters to omit from the instrumented spans `args` field.                               |
-| skipAll   | `skipAll`                | Omits all parameters and `this` from the instrumented spans `args` field.                                                   |
-| skipThis  | `skipThis`               | Omits the `this` parameter from this instrumented spans `args` field.                                                       |
-| field     | `field("key", "value")`  | Adds the specified key and value to the instrumented spans fields.                                                          |
-|           | `field("key", func)`     | Adds the specified field to the instrumented spans fields. The provided func will map the arguments to the field value.     |
-| logEnter  | `logEnter`               | Logs an event when the function or method is entered.                                                                       |
-| logExit   | `logExit`                | Logs an event when the function or method returns. Does not log an event if the function throws an error.                   |
-| logError  | `logError`               | Logs an event when the function or method throws an error.                                                                  |
-| log       | `log`                    | Shorthand for `logEnter`, `logExit`, and `logError`. Logs an event when the function or method is entered, exist or throws. |
+| Attribute | Example                            | Description                                                                                                                 |
+| --------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| message   | `message("new message")`           | Changes the instrumented spans message.                                                                                     |
+| target    | `target("functionName")`           | Changes the instrumented spans target field.                                                                                |
+| level     | `level(Level.TRACE)`               | Changes the instrumented spans level.                                                                                       |
+| skip      | `skip("paramName")`                | Omits the named parameter from the instrumented spans `args` field.                                                         |
+|           | `skip(0)`                          | Omits the indexed parameter from the instrumented spans `args` field.                                                       |
+|           | `skip(true, false)`                | Applies a positional mask to the parameters to omit from the instrumented spans `args` field.                               |
+| skipAll   | `skipAll`                          | Omits all parameters from the instrumented spans `args` field.                                                              |
+| field     | `field("key", "value")`            | Adds the specified key and value to the instrumented spans fields.                                                          |
+|           | `field("key", func)`               | Adds the specified field to the instrumented spans fields. The provided func will map the arguments to the field value.     |
+| logEnter  | `logEnter()`                       | Logs an event when the function or method is entered.                                                                       |
+|           | `logEnter("message")`              | Logs an event with the provided message when the function or method is entered.                                             |
+|           | `logEnter(Level.TRACE)`            | Logs an event at the provided level when the function or method is entered.                                                 |
+|           | `logEnter("message", Level.TRACE)` | Logs an event with the provided message at the provided level when the function or method is entered.                       |
+| logExit   | `logExit()`                        | Logs an event when the function or method returns. Does not log an event if the function throws an error.                   |
+|           | `logExit("message")`               | Logs an event with the provided message when the function or method returns.                                                |
+|           | `logExit(Level.TRACE)`             | Logs an event at the provided level when the function or method returns.                                                    |
+|           | `logExit("message", Level.TRACE)`  | Logs an event with the provided message at the provided level when the function or method returns.                          |
+| logError  | `logError()`                       | Logs an event when the function or method throws an error.                                                                  |
+|           | `logError("message")`              | Logs an event with the provided message when the function or method throws an error.                                        |
+|           | `logError(Level.TRACE)`            | Logs an event at the provided level when the function or method throws an error.                                            |
+|           | `logError("message", Level.TRACE)` | Logs an event with the provided message at the provided level when the function or method throws an error.                  |
+| log       | `log()`                            | Shorthand for `logEnter`, `logExit`, and `logError`. Logs an event when the function or method is entered, exist or throws. |
+|           | `log(Level.TRACE)`                 | Logs an event at the provided level when the function or method is entered or exist. Logs at error level on throw.          |
 
 ## Instrumenting Functions
 

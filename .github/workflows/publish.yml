@@ -30,6 +30,8 @@ jobs:
         run: deno lint
       - name: Format
         run: deno fmt --check
+      - name: Basic Example
+        run: deno run src/examples/basic/main.ts
 
   publish:
     needs: checks

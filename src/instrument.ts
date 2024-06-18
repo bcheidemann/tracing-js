@@ -19,10 +19,10 @@ const AttributeKind = {
   Level: 2 as const,
   Skip: 3 as const,
   SkipAll: 4 as const,
-  SkipThis: 5 as const,
-  Field: 6 as const,
-  LogEnter: 7 as const,
-  LogExit: 8 as const,
+  Field: 5 as const,
+  LogEnter: 6 as const,
+  LogExit: 7 as const,
+  LogReturnValue: 8 as const,
   LogError: 9 as const,
   Log: 10 as const,
 };
@@ -68,10 +68,6 @@ type SkipAllAttribute = {
   kind: AttributeKind["SkipAll"];
 };
 
-type SkipThisAttribute = {
-  kind: AttributeKind["SkipThis"];
-};
-
 // deno-lint-ignore no-explicit-any
 type FieldAttribute<TArgs extends any[]> = {
   kind: AttributeKind["Field"];
@@ -79,34 +75,54 @@ type FieldAttribute<TArgs extends any[]> = {
   value: unknown | ((args: TArgs[]) => unknown);
 };
 
-type LogEnterAttribute = {
+// deno-lint-ignore no-explicit-any
+type LogEnterAttribute<TArgs extends any[]> = {
   kind: AttributeKind["LogEnter"];
+  message?: string | ((args: TArgs) => string);
+  level?: Level;
 };
 
-type LogExitAttribute = {
+// deno-lint-ignore no-explicit-any
+type LogExitAttribute<TArgs extends any[]> = {
   kind: AttributeKind["LogExit"];
+  message?: string | ((args: TArgs) => string);
+  level?: Level;
 };
 
-type LogErrorAttribute = {
+// deno-lint-ignore no-explicit-any
+type LogReturnValueAttribute<TArgs extends any[], TReturn> = {
+  kind: AttributeKind["LogReturnValue"];
+  map?: (
+    returnValue: TReturn extends Promise<infer TReturnPromise> ? TReturnPromise
+      : TReturn,
+    args: TArgs,
+  ) => unknown;
+};
+
+// deno-lint-ignore no-explicit-any
+type LogErrorAttribute<TArgs extends any[]> = {
   kind: AttributeKind["LogError"];
+  message?: string | ((args: TArgs) => string);
+  level?: Level;
 };
 
 type LogAttribute = {
   kind: AttributeKind["Log"];
+  level?: Level;
 };
 
 // deno-lint-ignore no-explicit-any
-type Attributes<TArgs extends any[]> =
+type Attributes<TArgs extends any[], TReturn> =
   | MessageAttribute
   | TargetAttribute
   | LevelAttribute
   | SkipAttribute<TArgs>
   | SkipAllAttribute
-  | SkipThisAttribute
   | FieldAttribute<TArgs>
-  | LogEnterAttribute
-  | LogExitAttribute
-  | LogErrorAttribute
+  | LogEnterAttribute<TArgs>
+  | LogExitAttribute<TArgs>
+  | LogReturnValueAttribute<TArgs, TReturn>
+  | LogErrorAttribute<TArgs>
   | LogAttribute;
 
 type InstrumentDecorator<TMethod extends AnyFunction> = (
@@ -186,7 +202,7 @@ export function target(
   isPrivate?: boolean,
 ): TargetAttribute;
 /**
- * The target attribute is used to override the target field of the span created by the instrumented method or function.
+ * The target attribute is used to override the target of the span created by the instrumented method or function.
  *
  * @example Instrument a method with a custom target
  * ```ts
@@ -212,7 +228,6 @@ export function target(
  * );
  * ```
  *
- * @param functionName The function name to use for the target field
  * @returns The target attribute
  */
 export function target(functionName: string): TargetAttribute;
@@ -387,9 +402,9 @@ export function skip<TArgs extends any[]>(
 }
 
 /**
- * The skipAll attribute is used to skip logging of all arguments and the `this` value of the instrumented method or function.
+ * The skipAll attribute is used to skip logging of all arguments of the instrumented method or function.
  *
- * @example Instrument a method and skip logging of all arguments and the `this` value
+ * @example Instrument a method and skip logging of all arguments
  * ```ts
  * import { instrument, skipAll } from "@bcheidemann/tracing";
  *
@@ -401,7 +416,7 @@ export function skip<TArgs extends any[]>(
  * }
  * ```
  *
- * @example Instrument a function and skip logging of all arguments and the `this` value
+ * @example Instrument a function and skip logging of all arguments
  * ```ts
  * import { instrumentCallback, skipAll } from "@bcheidemann/tracing";
  *
@@ -414,35 +429,6 @@ export function skip<TArgs extends any[]>(
  * ```
  */
 export const skipAll: SkipAllAttribute = { kind: AttributeKind.SkipAll };
-
-/**
- * The skipThis attribute is used to skip logging of the `this` value of the instrumented method or function.
- *
- * @example Instrument a method and skip logging of the `this` value
- * ```ts
- * import { instrument, skipThis } from "@bcheidemann/tracing";
- *
- * class Example {
- *   @instrument(skipThis)
- *   test(arg0: string, arg1: number) {
- *     // ...
- *   }
- * }
- * ```
- *
- * @example Instrument a function and skip logging of the `this` value
- * ```ts
- * import { instrumentCallback, skipThis } from "@bcheidemann/tracing";
- *
- * const test = instrumentCallback(
- *   [skipThis],
- *   function test(arg0: string, arg1: number) {
- *     // ...
- *   }
- * );
- * ```
- */
-export const skipThis: SkipThisAttribute = { kind: AttributeKind.SkipThis };
 
 /**
  * The field attribute is used to add custom fields to the span created by the instrumented method or function.
@@ -535,12 +521,21 @@ export function field<TArgs extends any[]>(
 /**
  * The logEnter attribute is used to log a message when entering the instrumented method or function.
  *
+ * The logEnter attribute supports the following syntax:
+ *
+ * - `logEnter()`: Log the default message when entering with the default log level
+ * - `logEnter("Custom message")`: Log a custom message when entering with the default log level
+ * - `logEnter(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logEnter(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ *
+ * The default log level is `Level.INFO`, unless the `log` attribute is provided with a different log level.
+ *
  * @example Instrument a method and log a message when entering
  * ```ts
  * import { instrument, logEnter } from "@bcheidemann/tracing";
  *
  * class Example {
- *   @instrument(logEnter)
+ *   @instrument(logEnter())
  *   test() {
  *     // ...
  *   }
@@ -552,72 +547,218 @@ export function field<TArgs extends any[]>(
  * import { instrumentCallback, logEnter } from "@bcheidemann/tracing";
  *
  * const test = instrumentCallback(
- *   [logEnter],
+ *   [logEnter()],
  *   function test() {
  *     // ...
  *   }
  * );
  * ```
  */
-export const logEnter: LogEnterAttribute = { kind: AttributeKind.LogEnter };
+// deno-lint-ignore no-explicit-any
+export function logEnter<TArgs extends any[]>(): LogEnterAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logEnter<TArgs extends any[]>(
+  message: string | ((args: TArgs) => string),
+): LogEnterAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logEnter<TArgs extends any[]>(
+  level: Level,
+): LogEnterAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logEnter<TArgs extends any[]>(
+  level: Level,
+  message: string | ((args: TArgs) => string),
+): LogEnterAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logEnter<TArgs extends any[]>(
+  levelOrMessage?: Level | string | ((args: TArgs) => string),
+  message?: string | ((args: TArgs) => string),
+): LogEnterAttribute<TArgs> {
+  switch (typeof levelOrMessage) {
+    case "string":
+    case "function":
+      return { kind: AttributeKind.LogEnter, message: levelOrMessage };
+    case "number":
+      return { kind: AttributeKind.LogEnter, level: levelOrMessage, message };
+    case "undefined":
+      return { kind: AttributeKind.LogEnter };
+    // deno-lint-ignore no-case-declarations
+    default:
+      const _: never = levelOrMessage;
+      throw new AssertionError({
+        message: "Invalid type for logEnter attribute value",
+        actual: typeof levelOrMessage,
+        expected: "string | number | function | undefined",
+      });
+  }
+}
 
 /**
  * The logExit attribute is used to log a message when exiting the instrumented method or function.
  *
- * @example Instrument a method and log a message when exiting
+ * The logExit attribute supports the following syntax:
+ *
+ * - `logExit()`: Log the default message when entering with the default log level
+ * - `logExit("Custom message")`: Log a custom message when entering with the default log level
+ * - `logExit(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logExit(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ *
+ * The default log level is `Level.INFO`, unless the `log` attribute is provided with a different log level.
+ *
+ * @example Instrument a method and log a message when entering
  * ```ts
  * import { instrument, logExit } from "@bcheidemann/tracing";
  *
  * class Example {
- *   @instrument(logExit)
+ *   @instrument(logExit())
  *   test() {
  *     // ...
  *   }
  * }
  * ```
  *
- * @example Instrument a function and log a message when exiting
+ * @example Instrument a function and log a message when entering
  * ```ts
  * import { instrumentCallback, logExit } from "@bcheidemann/tracing";
  *
  * const test = instrumentCallback(
- *   [logExit],
+ *   [logExit()],
  *   function test() {
  *     // ...
  *   }
  * );
  * ```
  */
-export const logExit: LogExitAttribute = { kind: AttributeKind.LogExit };
+// deno-lint-ignore no-explicit-any
+export function logExit<TArgs extends any[]>(): LogExitAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logExit<TArgs extends any[]>(
+  message: string | ((args: TArgs) => string),
+): LogExitAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logExit<TArgs extends any[]>(
+  level: Level,
+): LogExitAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logExit<TArgs extends any[]>(
+  level: Level,
+  message: string | ((args: TArgs) => string),
+): LogExitAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logExit<TArgs extends any[]>(
+  levelOrMessage?: Level | string | ((args: TArgs) => string),
+  message?: string | ((args: TArgs) => string),
+): LogExitAttribute<TArgs> {
+  switch (typeof levelOrMessage) {
+    case "string":
+    case "function":
+      return { kind: AttributeKind.LogExit, message: levelOrMessage };
+    case "number":
+      return { kind: AttributeKind.LogExit, level: levelOrMessage, message };
+    case "undefined":
+      return { kind: AttributeKind.LogExit };
+    // deno-lint-ignore no-case-declarations
+    default:
+      const _: never = levelOrMessage;
+      throw new AssertionError({
+        message: "Invalid type for logExit attribute value",
+        actual: typeof levelOrMessage,
+        expected: "string | number | function | undefined",
+      });
+  }
+}
 
 /**
- * The logError attribute is used to log a message when an error occurs in the instrumented method or function.
+ * The logReturnValue attribute is used to log a message when exiting the instrumented method or function. It has no effect
+ * when used without the `log` or `logExit` attribute.
  *
- * @example Instrument a method and log a message when an error occurs
+ * The logReturnValue attribute supports the following syntax:
+ * - `logReturnValue()`: Add the returnValue field to the exit message
+ * - `logReturnValue((returnValue, args) => returnValue)`: Add the returnValue field to the exit message with a custom value
+ *
+ * @param map The function to map the return value to a custom value
+ */
+// deno-lint-ignore no-explicit-any
+export function logReturnValue<TArgs extends any[], TReturn>(
+  map?: LogReturnValueAttribute<TArgs, TReturn>["map"],
+): LogReturnValueAttribute<TArgs, TReturn> {
+  return { kind: AttributeKind.LogReturnValue, map };
+}
+
+/**
+ * The logError attribute is used to log a message when exiting the instrumented method or function.
+ *
+ * The logError attribute supports the following syntax:
+ *
+ * - `logError()`: Log the default message when entering with the default log level
+ * - `logError("Custom message")`: Log a custom message when entering with the default log level
+ * - `logError(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logError(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ *
+ * The default log level is `Level.ERROR`.
+ *
+ * @example Instrument a method and log a message when entering
  * ```ts
  * import { instrument, logError } from "@bcheidemann/tracing";
  *
  * class Example {
- *   @instrument(logError)
+ *   @instrument(logError())
  *   test() {
  *     // ...
  *   }
  * }
  * ```
  *
- * @example Instrument a function and log a message when an error occurs
+ * @example Instrument a function and log a message when entering
  * ```ts
  * import { instrumentCallback, logError } from "@bcheidemann/tracing";
  *
  * const test = instrumentCallback(
- *   [logError],
+ *   [logError()],
  *   function test() {
  *     // ...
  *   }
  * );
  * ```
  */
-export const logError: LogErrorAttribute = { kind: AttributeKind.LogError };
+// deno-lint-ignore no-explicit-any
+export function logError<TArgs extends any[]>(): LogErrorAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logError<TArgs extends any[]>(
+  message: string | ((args: TArgs) => string),
+): LogErrorAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logError<TArgs extends any[]>(
+  level: Level,
+): LogErrorAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logError<TArgs extends any[]>(
+  level: Level,
+  message: string | ((args: TArgs) => string),
+): LogErrorAttribute<TArgs>;
+// deno-lint-ignore no-explicit-any
+export function logError<TArgs extends any[]>(
+  levelOrMessage?: Level | string | ((args: TArgs) => string),
+  message?: string | ((args: TArgs) => string),
+): LogErrorAttribute<TArgs> {
+  switch (typeof levelOrMessage) {
+    case "string":
+    case "function":
+      return { kind: AttributeKind.LogError, message: levelOrMessage };
+    case "number":
+      return { kind: AttributeKind.LogError, level: levelOrMessage, message };
+    case "undefined":
+      return { kind: AttributeKind.LogError };
+    // deno-lint-ignore no-case-declarations
+    default:
+      const _: never = levelOrMessage;
+      throw new AssertionError({
+        message: "Invalid type for logError attribute value",
+        actual: typeof levelOrMessage,
+        expected: "string | number | function | undefined",
+      });
+  }
+}
 
 /**
  * The log attribute is used to log a message when entering, exiting, or when an error occurs in the instrumented method or function.
@@ -627,7 +768,7 @@ export const logError: LogErrorAttribute = { kind: AttributeKind.LogError };
  * import { instrument, log } from "@bcheidemann/tracing";
  *
  * class Example {
- *   @instrument(log)
+ *   @instrument(log())
  *   test() {
  *     // ...
  *   }
@@ -639,14 +780,16 @@ export const logError: LogErrorAttribute = { kind: AttributeKind.LogError };
  * import { instrumentCallback, log } from "@bcheidemann/tracing";
  *
  * const test = instrumentCallback(
- *   [log],
+ *   [log()],
  *   function test() {
  *     // ...
  *   }
  * );
  * ```
  */
-export const log: LogAttribute = { kind: AttributeKind.Log };
+export function log(level?: Level): LogAttribute {
+  return { kind: AttributeKind.Log, level };
+}
 
 /**
  * The instrument decorator is used to instrument a method with the provided attributes.
@@ -679,7 +822,7 @@ export const log: LogAttribute = { kind: AttributeKind.Log };
  * @returns The instrument decorator
  */
 export function instrument<TMethod extends AnyFunction>(
-  ...attributes: Attributes<Parameters<TMethod>>[]
+  ...attributes: Attributes<Parameters<TMethod>, ReturnType<TMethod>>[]
 ): InstrumentDecorator<TMethod> {
   return function instrumentDecorator(
     target: TMethod,
@@ -725,17 +868,26 @@ export function instrumentCallback<
 >(fn: TCallback): TCallback;
 export function instrumentCallback<
   TCallback extends AnyFunction,
->(attributes: Attributes<Parameters<TCallback>>[], fn: TCallback): TCallback;
+>(
+  attributes: Attributes<Parameters<TCallback>, ReturnType<TCallback>>[],
+  fn: TCallback,
+): TCallback;
 export function instrumentCallback<
   TCallback extends AnyFunction,
 >(
-  attributesOrFn: TCallback | Attributes<Parameters<TCallback>>[],
+  attributesOrFn: TCallback | Attributes<
+    Parameters<TCallback>,
+    ReturnType<TCallback>
+  >[],
   fn?: TCallback,
 ): TCallback {
   if (fn) {
     return instrumentCallbackImpl(
       fn,
-      attributesOrFn as Attributes<Parameters<TCallback>>[],
+      attributesOrFn as Attributes<
+        Parameters<TCallback>,
+        ReturnType<TCallback>
+      >[],
       { kind: "function" },
     );
   }
@@ -746,38 +898,38 @@ export function instrumentCallback<
 }
 
 type Defaults = {
-  [AttributeKind.Message]: MessageAttribute;
-  [AttributeKind.Target]: TargetAttribute;
   [AttributeKind.Level]: LevelAttribute;
 };
 
 // deno-lint-ignore no-explicit-any
-function collectAttributes<TArgs extends any[]>(
-  attributes: Attributes<TArgs>[],
+function collectAttributes<TArgs extends any[], TReturnType>(
+  attributes: Attributes<TArgs, TReturnType>[],
   defaults: Defaults,
 ): {
-  [AttributeKind.Message]: MessageAttribute;
-  [AttributeKind.Target]: TargetAttribute;
   [AttributeKind.Level]: LevelAttribute;
+  [AttributeKind.Message]?: MessageAttribute;
+  [AttributeKind.Target]?: TargetAttribute;
   [AttributeKind.Skip]: SkipAttribute<TArgs>[];
   [AttributeKind.SkipAll]?: SkipAllAttribute;
-  [AttributeKind.SkipThis]?: SkipThisAttribute;
   [AttributeKind.Field]: FieldAttribute<TArgs>[];
-  [AttributeKind.LogEnter]?: LogEnterAttribute;
-  [AttributeKind.LogExit]?: LogExitAttribute;
-  [AttributeKind.LogError]?: LogErrorAttribute;
+  [AttributeKind.LogEnter]?: LogEnterAttribute<TArgs>;
+  [AttributeKind.LogExit]?: LogExitAttribute<TArgs>;
+  [AttributeKind.LogReturnValue]?: LogReturnValueAttribute<TArgs, TReturnType>;
+  [AttributeKind.LogError]?: LogErrorAttribute<TArgs>;
   [AttributeKind.Log]?: LogAttribute;
 } {
-  const attributesByKind: ReturnType<typeof collectAttributes<TArgs>> = {
-    [AttributeKind.Message]: defaults[AttributeKind.Message],
-    [AttributeKind.Target]: defaults[AttributeKind.Target],
+  const attributesByKind: ReturnType<
+    typeof collectAttributes<TArgs, TReturnType>
+  > = {
     [AttributeKind.Level]: defaults[AttributeKind.Level],
+    [AttributeKind.Message]: undefined,
+    [AttributeKind.Target]: undefined,
     [AttributeKind.Skip]: [],
     [AttributeKind.SkipAll]: undefined,
-    [AttributeKind.SkipThis]: undefined,
     [AttributeKind.Field]: [],
     [AttributeKind.LogEnter]: undefined,
     [AttributeKind.LogExit]: undefined,
+    [AttributeKind.LogReturnValue]: undefined,
     [AttributeKind.LogError]: undefined,
     [AttributeKind.Log]: undefined,
   };
@@ -799,9 +951,6 @@ function collectAttributes<TArgs extends any[]>(
       case AttributeKind.SkipAll:
         attributesByKind[AttributeKind.SkipAll] = attribute;
         break;
-      case AttributeKind.SkipThis:
-        attributesByKind[AttributeKind.SkipThis] = attribute;
-        break;
       case AttributeKind.Field:
         attributesByKind[AttributeKind.Field].push(attribute);
         break;
@@ -810,6 +959,9 @@ function collectAttributes<TArgs extends any[]>(
         break;
       case AttributeKind.LogExit:
         attributesByKind[AttributeKind.LogExit] = attribute;
+        break;
+      case AttributeKind.LogReturnValue:
+        attributesByKind[AttributeKind.LogReturnValue] = attribute;
         break;
       case AttributeKind.LogError:
         attributesByKind[AttributeKind.LogError] = attribute;
@@ -849,7 +1001,7 @@ function instrumentCallbackImpl<
   TCallback extends AnyFunction,
 >(
   fn: TCallback,
-  attributes: Attributes<Parameters<TCallback>>[],
+  attributes: Attributes<Parameters<TCallback>, ReturnType<TCallback>>[],
   instrumentCtx: Context,
 ): TCallback {
   return function instrumentedCallback(
@@ -862,28 +1014,19 @@ function instrumentCallbackImpl<
       return fn.apply(this, args);
     }
 
-    const fnName = fn.name || "[unknown function]";
     const defaults: Defaults = {
-      [AttributeKind.Message]: instrumentCtx.kind === "function"
-        ? message(fn.name)
-        : message(
-          `${this?.constructor?.name ?? "[unknown class]"}.${fnName}`,
-        ),
-      [AttributeKind.Target]: instrumentCtx.kind === "function"
-        ? target(fnName)
-        : target(
-          this?.constructor?.name ?? "[unknown class]",
-          instrumentCtx.methodName,
-          instrumentCtx.isPrivate,
-        ),
       [AttributeKind.Level]: level(Level.INFO),
     };
     const attributesByKind = collectAttributes(attributes, defaults);
     return context.run(ctx, () => {
-      const level = attributesByKind[AttributeKind.Level].level;
-      const message = attributesByKind[AttributeKind.Message].message;
+      const spanLevel = attributesByKind[AttributeKind.Level].level;
+      const defaultEventLevel = attributesByKind[AttributeKind.Log]?.level ??
+        Level.INFO;
       const target = (() => {
         const targetAttribute = attributesByKind[AttributeKind.Target];
+        if (!targetAttribute) {
+          return;
+        }
         if ("class" in targetAttribute) {
           return {
             class: targetAttribute.class,
@@ -895,15 +1038,25 @@ function instrumentCallbackImpl<
           function: targetAttribute.function,
         };
       })();
+      const fmtTarget = (() => {
+        if (target) {
+          return target.function
+            ? target.function
+            : `${target.class}.${target.method}`;
+        }
+        const fnName = fn.name || "[unknown function]";
+        return instrumentCtx.kind === "function"
+          ? fn.name
+          : `${this?.constructor?.name ?? "[unknown class]"}.${fnName}`;
+      })();
+      const message = attributesByKind[AttributeKind.Message]?.message ||
+        fmtTarget;
       const logArgs = (() => {
-        const logArgs: Record<number, unknown> & { this?: unknown } = {
+        const logArgs: Record<number, unknown> = {
           ...args,
         };
         if (attributesByKind[AttributeKind.SkipAll] !== undefined) {
           return [];
-        }
-        if (attributesByKind[AttributeKind.SkipThis] === undefined) {
-          logArgs["this"] = this;
         }
         for (const skipAttribute of attributesByKind[AttributeKind.Skip]) {
           skipAttribute.skip.forEach((skip, index) => {
@@ -935,10 +1088,11 @@ function instrumentCallbackImpl<
         }
         return logArgs;
       })();
-      const log = Boolean(attributesByKind[AttributeKind.Log]);
-      const logEnter = log || Boolean(attributesByKind[AttributeKind.LogEnter]);
-      const logExit = log || Boolean(attributesByKind[AttributeKind.LogExit]);
-      const logError = log || Boolean(attributesByKind[AttributeKind.LogError]);
+      const log = attributesByKind[AttributeKind.Log];
+      const logEnter = log || attributesByKind[AttributeKind.LogEnter];
+      const logExit = log || attributesByKind[AttributeKind.LogExit];
+      const logReturnValue = attributesByKind[AttributeKind.LogReturnValue];
+      const logError = log || attributesByKind[AttributeKind.LogError];
       const fields = attributesByKind[AttributeKind.Field].reduce(
         (acc, field) => {
           acc[field.name] = typeof field.value === "function"
@@ -948,14 +1102,22 @@ function instrumentCallbackImpl<
         },
         {} as Record<string, unknown>,
       );
-      const guard = span(level, message, {
-        target,
+      const guard = span(spanLevel, message, {
         args: logArgs,
         ...fields,
       }).enter();
       try {
         if (logEnter) {
-          event(level, `Entering ${message}`);
+          if (
+            "message" in logEnter && typeof logEnter.message !== "undefined"
+          ) {
+            const message = typeof logEnter.message === "function"
+              ? logEnter.message(args)
+              : logEnter.message;
+            event(logEnter.level ?? defaultEventLevel, message);
+          } else {
+            event(logEnter.level ?? defaultEventLevel, `Entering ${fmtTarget}`);
+          }
         }
         const returnValue = fn.apply(this, args);
 
@@ -964,14 +1126,46 @@ function instrumentCallbackImpl<
           return returnValue
             .catch((error) => {
               if (logError) {
-                event(level, `Error in ${message}`, { error });
+                if (
+                  "message" in logError &&
+                  typeof logError.message !== "undefined"
+                ) {
+                  const message = typeof logError.message === "function"
+                    ? logError.message(args)
+                    : logError.message;
+                  event(logError.level ?? Level.ERROR, message);
+                } else {
+                  event(
+                    logError.level ?? Level.ERROR,
+                    `Error in ${fmtTarget}`,
+                    { error },
+                  );
+                }
               }
               guard.exit();
               throw error;
             })
             .then((returnValue) => {
               if (logExit) {
-                event(level, `Exiting ${message}`, { returnValue });
+                const fields = logReturnValue && {
+                  returnValue: logReturnValue.map
+                    ? logReturnValue.map(returnValue, args)
+                    : returnValue,
+                };
+                if (
+                  "message" in logExit && typeof logExit.message !== "undefined"
+                ) {
+                  const message = typeof logExit.message === "function"
+                    ? logExit.message(args)
+                    : logExit.message;
+                  event(logExit.level ?? Level.ERROR, message, fields);
+                } else {
+                  event(
+                    logExit.level ?? defaultEventLevel,
+                    `Exiting ${fmtTarget}`,
+                    fields,
+                  );
+                }
               }
               guard.exit();
               return returnValue;
@@ -979,18 +1173,49 @@ function instrumentCallbackImpl<
         }
 
         // Handle sync success
+        // TODO: Tidy up duplicate code
         if (logExit) {
-          event(level, `Exiting ${message}`, { returnValue });
+          const fields = logReturnValue && {
+            returnValue: logReturnValue.map
+              ? logReturnValue.map(returnValue, args)
+              : returnValue,
+          };
+          if (
+            "message" in logExit && typeof logExit.message !== "undefined"
+          ) {
+            const message = typeof logExit.message === "function"
+              ? logExit.message(args)
+              : logExit.message;
+            event(logExit.level ?? Level.ERROR, message, fields);
+          } else {
+            event(
+              logExit.level ?? defaultEventLevel,
+              `Exiting ${fmtTarget}`,
+              fields,
+            );
+          }
         }
         guard.exit();
         return returnValue;
-      } catch (err) {
+      } catch (error) {
         // Handle sync errors
         if (logError) {
-          event(level, `Error in ${message}`, { error: err });
+          if (
+            "message" in logError &&
+            typeof logError.message !== "undefined"
+          ) {
+            const message = typeof logError.message === "function"
+              ? logError.message(args)
+              : logError.message;
+            event(logError.level ?? Level.ERROR, message);
+          } else {
+            event(logError.level ?? Level.ERROR, `Error in ${fmtTarget}`, {
+              error,
+            });
+          }
         }
         guard.exit();
-        throw err;
+        throw error;
       }
     });
   } as TCallback;

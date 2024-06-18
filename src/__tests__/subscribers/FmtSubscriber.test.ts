@@ -1,17 +1,27 @@
-import { describe, it } from "@std/testing/bdd";
+import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { FakeTime } from "@std/testing/time";
 import { expect } from "expect";
-import { spyOn } from "jest-mock";
+import { type SpiedFunction, spyOn } from "jest-mock";
 import { event } from "../../event.ts";
 import { span } from "../../span.ts";
 import { Level } from "../../level.ts";
 import { FmtSubscriber } from "../../subscribers/FmtSubscriber.ts";
 
 describe("FmtSubscriber", () => {
+  // deno-lint-ignore no-explicit-any
+  let log: SpiedFunction<(...data: any[]) => void>;
+
+  beforeEach(() => {
+    log = spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    log.mockReset();
+  });
+
   it("should log the message to the console", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -53,7 +63,6 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with a field", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -71,7 +80,6 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with object fields", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -99,7 +107,6 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with fields", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -118,7 +125,6 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with a span", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -128,14 +134,13 @@ describe("FmtSubscriber", () => {
     // Assert
     expect(log).toHaveBeenCalled();
     expect(log).toHaveBeenCalledWith(
-      "[1970-01-01T00:00:00.000Z] [INFO] test span : test",
+      "[1970-01-01T00:00:00.000Z] [INFO] test span: test",
     );
   });
 
   it("should log the message to the console with spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -146,14 +151,13 @@ describe("FmtSubscriber", () => {
     // Assert
     expect(log).toHaveBeenCalled();
     expect(log).toHaveBeenCalledWith(
-      "[1970-01-01T00:00:00.000Z] [INFO] outer span > inner span : test",
+      "[1970-01-01T00:00:00.000Z] [INFO] outer span:inner span: test",
     );
   });
 
   it("should log fields from spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -170,14 +174,13 @@ describe("FmtSubscriber", () => {
     // Assert
     expect(log).toHaveBeenCalled();
     expect(log).toHaveBeenCalledWith(
-      "[1970-01-01T00:00:00.000Z] [INFO] outer span > inner span : test (eventKey=event, innerSpanKey=inner, outerSpanKey=outer)",
+      "[1970-01-01T00:00:00.000Z] [INFO] outer span{outerSpanKey=outer}:inner span{innerSpanKey=inner}: test (eventKey=event)",
     );
   });
 
   it("should log object fields from spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    const log = spyOn(console, "log").mockImplementation(() => {});
     FmtSubscriber.init();
 
     // Act
@@ -201,7 +204,7 @@ describe("FmtSubscriber", () => {
     // Assert
     expect(log).toHaveBeenCalled();
     expect(log).toHaveBeenCalledWith(
-      "[1970-01-01T00:00:00.000Z] [INFO] Example.test : test (eventKey=event, target.class=Example, target.method=test, args.0=arg0, objArray.0.key=value, objArray.0.key2.value=innerValue)",
+      "[1970-01-01T00:00:00.000Z] [INFO] Example.test{target.class=Example, target.method=test, args.0=arg0, objArray.0.key=value, objArray.0.key2.value=innerValue}: test (eventKey=event)",
     );
   });
 });

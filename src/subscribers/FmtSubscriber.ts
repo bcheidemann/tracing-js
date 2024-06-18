@@ -57,7 +57,6 @@ export type FmtSubscriberOptions = {
  * ```
  */
 export class FmtSubscriber extends ManagedSubscriber {
-  // TODO: Implement the FmtSubscriber
   constructor(private readonly options: FmtSubscriberOptions = {}) {
     super(options.level ?? Level.INFO);
   }
@@ -92,15 +91,15 @@ export class FmtSubscriber extends ManagedSubscriber {
       this.displayLevel(event.level)
     }`;
 
-    let formattedSpans: string | undefined;
-    if ((formattedSpans = this.displaySpans(spans))) {
+    const formattedSpans = this.displaySpans(spans);
+    if (formattedSpans) {
       message += ` ${formattedSpans}`;
     }
 
     message += ` ${event.message}`;
 
-    let fields: string | undefined;
-    if (event.fields && (fields = this.displayFields(event, spans))) {
+    const fields = this.displayEventFields(event);
+    if (fields) {
       message += ` ${fields}`;
     }
 
@@ -119,12 +118,32 @@ export class FmtSubscriber extends ManagedSubscriber {
     return new Date().toISOString();
   }
 
-  private displayFields(event: Event, spans: SpanAttributes[]) {
-    const eventFields = Object.entries(event.fields ?? {});
-    const spanFields = spans.flatMap((span) =>
-      Object.entries(span.fields ?? {})
-    );
-    const fields = [...eventFields, ...spanFields];
+  private displaySpans(spans: SpanAttributes[]) {
+    if (!spans.length) {
+      return;
+    }
+
+    return `${
+      spans
+        .map(this.displaySpan.bind(this))
+        .reverse()
+        .join(":")
+    }:`;
+  }
+
+  private displaySpan(span: SpanAttributes) {
+    let message = span.message;
+
+    const fields = this.displaySpanFields(span);
+    if (fields) {
+      message += fields;
+    }
+
+    return message;
+  }
+
+  private displayEventFields(event: Event) {
+    const fields = Object.entries(event.fields ?? {});
 
     if (!fields.length) return;
 
@@ -134,12 +153,36 @@ export class FmtSubscriber extends ManagedSubscriber {
     return `(${fieldsFmt.join(", ")})`;
   }
 
+  private displaySpanFields(span: SpanAttributes) {
+    const fields = Object.entries(span.fields ?? {});
+
+    if (!fields.length) return;
+
+    const fieldsFmt = this.flattenFields(fields).map(
+      ([key, value]) => `${key}=${this.displayValue(value)}`,
+    );
+    return `{${fieldsFmt.join(", ")}}`;
+  }
+
   private flattenFields(fields: [unknown, unknown][]): [string, unknown][] {
     return fields.flatMap(([outerKey, value]) => {
       if (typeof value === "object" && value !== null) {
         const entries: [string, unknown][] = Object.entries(value).map(
           ([innerKey, value]) => [`${outerKey}.${innerKey}`, value],
         );
+        if (value instanceof Error) {
+          entries.push(
+            [`${outerKey}.name`, value.name],
+            [`${outerKey}.message`, value.message],
+          );
+          if (typeof value.stack === "string") {
+            entries.push(
+              [`${outerKey}.stack`, value.stack],
+            );
+          }
+        } else if (!entries.length && "constructor" in value) {
+          entries.push([`${outerKey}`, value.constructor.name]);
+        }
         return this.flattenFields(entries);
       } else {
         return [[this.displayValue(outerKey), value]];
@@ -162,18 +205,5 @@ export class FmtSubscriber extends ManagedSubscriber {
       case "undefined":
         return "undefined";
     }
-  }
-
-  private displaySpans(spans: SpanAttributes[]) {
-    if (!spans.length) {
-      return;
-    }
-
-    return `${
-      spans
-        .map((span) => span.message)
-        .reverse()
-        .join(" > ")
-    } :`;
   }
 }

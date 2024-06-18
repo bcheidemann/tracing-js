@@ -14,7 +14,6 @@ import {
   message,
   skip,
   skipAll,
-  skipThis,
   target,
 } from "../instrument.ts";
 import { expect } from "expect";
@@ -24,7 +23,7 @@ describe("instrument", () => {
     it("should not throw when used without a registered subscriber", () => {
       // Arrange
       class Example {
-        @instrument(log)
+        @instrument(log())
         test() {}
       }
       const instance = new Example();
@@ -55,13 +54,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             0: "arg0",
           },
         },
@@ -91,14 +84,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test message",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
-          args: {
-            this: instance,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -124,16 +110,9 @@ describe("instrument", () => {
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
-        message: "Example.test",
+        message: "SomeClass.someMethod",
         fields: {
-          target: {
-            class: "SomeClass",
-            method: "someMethod",
-            private: true,
-          },
-          args: {
-            this: instance,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -161,14 +140,7 @@ describe("instrument", () => {
         level: Level.TRACE,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
-          args: {
-            this: instance,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -194,14 +166,9 @@ describe("instrument", () => {
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
-        message: "Example.test",
+        message: "someFunction",
         fields: {
-          target: {
-            function: "someFunction",
-          },
-          args: {
-            this: instance,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -230,13 +197,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             1: "arg1",
             3: "arg3",
           },
@@ -268,13 +229,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             1: "arg1",
             3: "arg3",
           },
@@ -306,13 +261,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             1: "arg1",
             3: "arg3",
           },
@@ -344,49 +293,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: [],
-        },
-      });
-      expect(subscriber.enter).toHaveBeenCalledTimes(1);
-      expect(subscriber.exit).toHaveBeenCalledTimes(1);
-    });
-
-    it("should apply the skipThis attribute", () => {
-      // Arrange
-      const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
-      context.enterWith(ctx);
-      class Example {
-        @instrument(skipThis)
-        // deno-lint-ignore no-unused-vars
-        test(arg0: string, arg1: string) {}
-      }
-      const instance = new Example();
-
-      // Act
-      instance.test("arg0", "arg1");
-
-      // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
-      expect(subscriber.newSpan).toHaveBeenCalledWith({
-        isSpan: true,
-        level: Level.INFO,
-        message: "Example.test",
-        fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
-          args: {
-            0: "arg0",
-            1: "arg1",
-          },
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -415,13 +322,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             0: "arg0",
             1: "arg1",
           },
@@ -454,13 +355,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             0: 40,
             1: 2,
           },
@@ -471,13 +366,14 @@ describe("instrument", () => {
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
+    // TODO: Add tests for different logEnter syntaxes
     it("should apply the logEnter attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(logEnter)
+        @instrument(logEnter())
         test() {}
       }
       const instance = new Example();
@@ -495,13 +391,15 @@ describe("instrument", () => {
       });
     });
 
+    // TODO: Add tests for different logExit syntaxes
+    // TODO: Add tests for logReturnValue
     it("should apply the logExit attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(logExit)
+        @instrument(logExit())
         test() {
           return 42;
         }
@@ -517,19 +415,18 @@ describe("instrument", () => {
         isEvent: true,
         level: Level.INFO,
         message: "Exiting Example.test",
-        fields: {
-          returnValue: 42,
-        },
+        fields: undefined,
       });
     });
 
+    // TODO: Add tests for different logError syntaxes
     it("should apply the logError attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(logError)
+        @instrument(logError())
         test() {
           throw 42;
         }
@@ -547,7 +444,7 @@ describe("instrument", () => {
       expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
-        level: Level.INFO,
+        level: Level.ERROR,
         message: "Error in Example.test",
         fields: {
           error: 42,
@@ -555,13 +452,14 @@ describe("instrument", () => {
       });
     });
 
+    // TODO: Add tests for different log syntaxes
     it("should apply the log attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(log)
+        @instrument(log())
         test() {
           return 42;
         }
@@ -577,19 +475,17 @@ describe("instrument", () => {
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(1, {
         isEvent: true,
         level: Level.INFO,
         message: "Entering Example.test",
         fields: undefined,
       });
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(2, {
         isEvent: true,
         level: Level.INFO,
         message: "Exiting Example.test",
-        fields: {
-          returnValue: 42,
-        },
+        fields: undefined,
       });
     });
 
@@ -599,7 +495,7 @@ describe("instrument", () => {
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(log)
+        @instrument(log())
         test() {
           throw 42;
         }
@@ -615,15 +511,15 @@ describe("instrument", () => {
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(1, {
         isEvent: true,
         level: Level.INFO,
         message: "Entering Example.test",
         fields: undefined,
       });
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(2, {
         isEvent: true,
-        level: Level.INFO,
+        level: Level.ERROR,
         message: "Error in Example.test",
         fields: {
           error: 42,
@@ -636,7 +532,7 @@ describe("instrument", () => {
     it("should not throw when used without a registered subscriber", async () => {
       // Arrange
       class Example {
-        @instrument(log)
+        @instrument(log())
         async test() {
           await Promise.resolve();
         }
@@ -671,13 +567,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             0: "arg0",
           },
         },
@@ -709,14 +599,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test message",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
-          args: {
-            this: instance,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -744,16 +627,9 @@ describe("instrument", () => {
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
-        message: "Example.test",
+        message: "SomeClass.someMethod",
         fields: {
-          target: {
-            class: "SomeClass",
-            method: "someMethod",
-            private: true,
-          },
-          args: {
-            this: instance,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -783,14 +659,7 @@ describe("instrument", () => {
         level: Level.TRACE,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
-          args: {
-            this: instance,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -818,14 +687,9 @@ describe("instrument", () => {
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
-        message: "Example.test",
+        message: "someFunction",
         fields: {
-          target: {
-            function: "someFunction",
-          },
-          args: {
-            this: instance,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -856,13 +720,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             1: "arg1",
             3: "arg3",
           },
@@ -896,13 +754,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             1: "arg1",
             3: "arg3",
           },
@@ -936,13 +788,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             1: "arg1",
             3: "arg3",
           },
@@ -976,49 +822,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: [],
-        },
-      });
-      expect(subscriber.enter).toHaveBeenCalledTimes(1);
-      expect(subscriber.exit).toHaveBeenCalledTimes(1);
-    });
-
-    it("should apply the skipThis attribute", async () => {
-      // Arrange
-      const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
-      context.enterWith(ctx);
-      class Example {
-        @instrument(skipThis)
-        // deno-lint-ignore no-unused-vars
-        async test(arg0: string, arg1: string) {}
-      }
-      const instance = new Example();
-
-      // Act
-      await instance.test("arg0", "arg1");
-
-      // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
-      expect(subscriber.newSpan).toHaveBeenCalledWith({
-        isSpan: true,
-        level: Level.INFO,
-        message: "Example.test",
-        fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
-          args: {
-            0: "arg0",
-            1: "arg1",
-          },
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -1049,13 +853,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             0: "arg0",
             1: "arg1",
           },
@@ -1090,13 +888,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {
-          target: {
-            class: "Example",
-            method: "test",
-            private: false,
-          },
           args: {
-            this: instance,
             0: 40,
             1: 2,
           },
@@ -1113,7 +905,7 @@ describe("instrument", () => {
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(logEnter)
+        @instrument(logEnter())
         async test() {
           await Promise.resolve();
         }
@@ -1139,7 +931,7 @@ describe("instrument", () => {
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(logExit)
+        @instrument(logExit())
         async test() {
           await Promise.resolve();
           return 42;
@@ -1156,9 +948,7 @@ describe("instrument", () => {
         isEvent: true,
         level: Level.INFO,
         message: "Exiting Example.test",
-        fields: {
-          returnValue: 42,
-        },
+        fields: undefined,
       });
     });
 
@@ -1168,7 +958,7 @@ describe("instrument", () => {
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(logError)
+        @instrument(logError())
         async test() {
           await Promise.resolve();
           throw 42;
@@ -1187,7 +977,7 @@ describe("instrument", () => {
       expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
-        level: Level.INFO,
+        level: Level.ERROR,
         message: "Error in Example.test",
         fields: {
           error: 42,
@@ -1201,7 +991,7 @@ describe("instrument", () => {
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(log)
+        @instrument(log())
         async test() {
           await Promise.resolve();
           return 42;
@@ -1228,9 +1018,7 @@ describe("instrument", () => {
         isEvent: true,
         level: Level.INFO,
         message: "Exiting Example.test",
-        fields: {
-          returnValue: 42,
-        },
+        fields: undefined,
       });
     });
 
@@ -1240,7 +1028,7 @@ describe("instrument", () => {
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(log)
+        @instrument(log())
         async test() {
           await Promise.resolve();
           throw 42;
@@ -1257,15 +1045,15 @@ describe("instrument", () => {
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(1, {
         isEvent: true,
         level: Level.INFO,
         message: "Entering Example.test",
         fields: undefined,
       });
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(2, {
         isEvent: true,
-        level: Level.INFO,
+        level: Level.ERROR,
         message: "Error in Example.test",
         fields: {
           error: 42,
@@ -1277,7 +1065,7 @@ describe("instrument", () => {
   describe("function decorator", () => {
     it("should not throw when used without a registered subscriber", () => {
       // Arrange
-      const test = instrumentCallback([log], function test() {});
+      const test = instrumentCallback([log()], function test() {});
 
       // Act
       test();
@@ -1301,11 +1089,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             0: "arg0",
           },
         },
@@ -1334,12 +1118,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test message",
         fields: {
-          target: {
-            function: "test",
-          },
-          args: {
-            this: undefined,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -1364,16 +1143,9 @@ describe("instrument", () => {
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
-        message: "test",
+        message: "SomeClass.someMethod",
         fields: {
-          target: {
-            class: "SomeClass",
-            method: "someMethod",
-            private: true,
-          },
-          args: {
-            this: undefined,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -1400,12 +1172,7 @@ describe("instrument", () => {
         level: Level.TRACE,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
-          args: {
-            this: undefined,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -1430,14 +1197,9 @@ describe("instrument", () => {
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
-        message: "test",
+        message: "someFunction",
         fields: {
-          target: {
-            function: "someFunction",
-          },
-          args: {
-            this: undefined,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -1473,11 +1235,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             1: "arg1",
             3: "arg3",
           },
@@ -1516,11 +1274,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             1: "arg1",
             3: "arg3",
           },
@@ -1559,11 +1313,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             1: "arg1",
             3: "arg3",
           },
@@ -1594,44 +1344,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: [],
-        },
-      });
-      expect(subscriber.enter).toHaveBeenCalledTimes(1);
-      expect(subscriber.exit).toHaveBeenCalledTimes(1);
-    });
-
-    it("should apply the skipThis attribute", () => {
-      // Arrange
-      const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
-      context.enterWith(ctx);
-      const testFn = instrumentCallback(
-        [skipThis],
-        // deno-lint-ignore no-unused-vars
-        function test(arg0: string, arg1: string) {},
-      );
-
-      // Act
-      testFn("arg0", "arg1");
-
-      // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
-      expect(subscriber.newSpan).toHaveBeenCalledWith({
-        isSpan: true,
-        level: Level.INFO,
-        message: "test",
-        fields: {
-          target: {
-            function: "test",
-          },
-          args: {
-            0: "arg0",
-            1: "arg1",
-          },
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -1659,11 +1372,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             0: "arg0",
             1: "arg1",
           },
@@ -1695,11 +1404,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             0: 40,
             1: 2,
           },
@@ -1715,7 +1420,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback([logEnter], function test() {});
+      const testFn = instrumentCallback([logEnter()], function test() {});
 
       // Act
       testFn();
@@ -1735,7 +1440,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback([logExit], function test() {
+      const testFn = instrumentCallback([logExit()], function test() {
         return 42;
       });
 
@@ -1748,9 +1453,6 @@ describe("instrument", () => {
         isEvent: true,
         level: Level.INFO,
         message: "Exiting test",
-        fields: {
-          returnValue: 42,
-        },
       });
     });
 
@@ -1759,7 +1461,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback([logError], function test() {
+      const testFn = instrumentCallback([logError()], function test() {
         throw 42;
       });
 
@@ -1774,7 +1476,7 @@ describe("instrument", () => {
       expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
-        level: Level.INFO,
+        level: Level.ERROR,
         message: "Error in test",
         fields: {
           error: 42,
@@ -1787,7 +1489,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback([log], function test() {
+      const testFn = instrumentCallback([log()], function test() {
         return 42;
       });
 
@@ -1800,19 +1502,16 @@ describe("instrument", () => {
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(1, {
         isEvent: true,
         level: Level.INFO,
         message: "Entering test",
         fields: undefined,
       });
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(2, {
         isEvent: true,
         level: Level.INFO,
         message: "Exiting test",
-        fields: {
-          returnValue: 42,
-        },
       });
     });
 
@@ -1821,7 +1520,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback([log], function test() {
+      const testFn = instrumentCallback([log()], function test() {
         throw 42;
       });
 
@@ -1834,15 +1533,15 @@ describe("instrument", () => {
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(1, {
         isEvent: true,
         level: Level.INFO,
         message: "Entering test",
         fields: undefined,
       });
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(2, {
         isEvent: true,
-        level: Level.INFO,
+        level: Level.ERROR,
         message: "Error in test",
         fields: {
           error: 42,
@@ -1854,7 +1553,7 @@ describe("instrument", () => {
   describe("async function decorator", () => {
     it("should not throw when used without a registered subscriber", async () => {
       // Arrange
-      const test = instrumentCallback([log], async function test() {
+      const test = instrumentCallback([log()], async function test() {
         await Promise.resolve();
       });
 
@@ -1882,11 +1581,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             0: "arg0",
           },
         },
@@ -1917,12 +1612,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test message",
         fields: {
-          target: {
-            function: "test",
-          },
-          args: {
-            this: undefined,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -1949,16 +1639,9 @@ describe("instrument", () => {
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
-        message: "test",
+        message: "SomeClass.someMethod",
         fields: {
-          target: {
-            class: "SomeClass",
-            method: "someMethod",
-            private: true,
-          },
-          args: {
-            this: undefined,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -1970,7 +1653,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback(
+      const test = instrumentCallback(
         [level(Level.TRACE)],
         async function test() {
           await Promise.resolve();
@@ -1978,7 +1661,7 @@ describe("instrument", () => {
       );
 
       // Act
-      await testFn();
+      await test();
 
       // Assert
       expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
@@ -1987,12 +1670,7 @@ describe("instrument", () => {
         level: Level.TRACE,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
-          args: {
-            this: undefined,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -2017,14 +1695,9 @@ describe("instrument", () => {
       expect(subscriber.newSpan).toHaveBeenCalledWith({
         isSpan: true,
         level: Level.INFO,
-        message: "test",
+        message: "someFunction",
         fields: {
-          target: {
-            function: "someFunction",
-          },
-          args: {
-            this: undefined,
-          },
+          args: {},
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -2062,11 +1735,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             1: "arg1",
             3: "arg3",
           },
@@ -2107,11 +1776,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             1: "arg1",
             3: "arg3",
           },
@@ -2150,11 +1815,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             1: "arg1",
             3: "arg3",
           },
@@ -2187,46 +1848,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: [],
-        },
-      });
-      expect(subscriber.enter).toHaveBeenCalledTimes(1);
-      expect(subscriber.exit).toHaveBeenCalledTimes(1);
-    });
-
-    it("should apply the skipThis attribute", async () => {
-      // Arrange
-      const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
-      context.enterWith(ctx);
-      const testFn = instrumentCallback(
-        [skipThis],
-        // deno-lint-ignore no-unused-vars
-        async function test(arg0: string, arg1: string) {
-          await Promise.resolve();
-        },
-      );
-
-      // Act
-      await testFn("arg0", "arg1");
-
-      // Assert
-      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
-      expect(subscriber.newSpan).toHaveBeenCalledWith({
-        isSpan: true,
-        level: Level.INFO,
-        message: "test",
-        fields: {
-          target: {
-            function: "test",
-          },
-          args: {
-            0: "arg0",
-            1: "arg1",
-          },
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
@@ -2256,11 +1878,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             0: "arg0",
             1: "arg1",
           },
@@ -2294,11 +1912,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {
-          target: {
-            function: "test",
-          },
           args: {
-            this: undefined,
             0: 40,
             1: 2,
           },
@@ -2314,7 +1928,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback([logEnter], async function test() {
+      const testFn = instrumentCallback([logEnter()], async function test() {
         await Promise.resolve();
       });
 
@@ -2336,7 +1950,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback([logExit], async function test() {
+      const testFn = instrumentCallback([logExit()], async function test() {
         await Promise.resolve();
         return 42;
       });
@@ -2350,9 +1964,7 @@ describe("instrument", () => {
         isEvent: true,
         level: Level.INFO,
         message: "Exiting test",
-        fields: {
-          returnValue: 42,
-        },
+        fields: undefined,
       });
     });
 
@@ -2361,7 +1973,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback([logError], async function test() {
+      const testFn = instrumentCallback([logError()], async function test() {
         await Promise.resolve();
         throw 42;
       });
@@ -2377,7 +1989,7 @@ describe("instrument", () => {
       expect(subscriber.event).toHaveBeenCalledTimes(1);
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
-        level: Level.INFO,
+        level: Level.ERROR,
         message: "Error in test",
         fields: {
           error: 42,
@@ -2390,7 +2002,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback([log], async function test() {
+      const testFn = instrumentCallback([log()], async function test() {
         await Promise.resolve();
         return 42;
       });
@@ -2404,19 +2016,17 @@ describe("instrument", () => {
 
       // Assert
       expect(subscriber.event).toHaveBeenCalledTimes(2);
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(1, {
         isEvent: true,
         level: Level.INFO,
         message: "Entering test",
         fields: undefined,
       });
-      expect(subscriber.event).toHaveBeenCalledWith({
+      expect(subscriber.event).toHaveBeenNthCalledWith(2, {
         isEvent: true,
         level: Level.INFO,
         message: "Exiting test",
-        fields: {
-          returnValue: 42,
-        },
+        fields: undefined,
       });
     });
 
@@ -2425,7 +2035,7 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback([log], async function test() {
+      const testFn = instrumentCallback([log()], async function test() {
         await Promise.resolve();
         throw 42;
       });
@@ -2447,7 +2057,7 @@ describe("instrument", () => {
       });
       expect(subscriber.event).toHaveBeenCalledWith({
         isEvent: true,
-        level: Level.INFO,
+        level: Level.ERROR,
         message: "Error in test",
         fields: {
           error: 42,
