@@ -14,7 +14,9 @@ const levelToString: Record<Level, string> = {
   [Level.CRITICAL]: "CRITICAL",
 };
 
-// TODO Implement options
+/**
+ * Options for the FmtSubscriber.
+ */
 export type FmtSubscriberOptions = {
   /**
    * The minimum level of logs to display.
@@ -55,6 +57,7 @@ export type FmtSubscriberOptions = {
  * ```
  */
 export class FmtSubscriber extends ManagedSubscriber {
+  // TODO: Implement the FmtSubscriber
   constructor(private readonly options: FmtSubscriberOptions = {}) {
     super(options.level ?? Level.INFO);
   }
