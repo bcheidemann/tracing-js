@@ -1669,7 +1669,7 @@ function instrumentCallbackImpl<
           ...args,
         };
         if (attributesByKind[AttributeKind.SkipAll] !== undefined) {
-          return [];
+          return undefined;
         }
         for (const skipAttribute of attributesByKind[AttributeKind.Skip]) {
           skipAttribute.skip.forEach((skip, index) => {
@@ -1697,7 +1697,7 @@ function instrumentCallbackImpl<
             }
           });
         }
-        return logArgs;
+        return Object.keys(logArgs).length === 0 ? undefined : logArgs;
       })();
       const log = attributesByKind[AttributeKind.Log];
       const logEnter = log || attributesByKind[AttributeKind.LogEnter];
@@ -1713,10 +1713,10 @@ function instrumentCallbackImpl<
         },
         {} as Record<string, unknown>,
       );
-      const guard = span(spanLevel, message, {
-        args: logArgs,
-        ...fields,
-      }).enter();
+      if (logArgs) {
+        fields.args = logArgs;
+      }
+      const guard = span(spanLevel, message, fields).enter();
       try {
         if (logEnter) {
           if (

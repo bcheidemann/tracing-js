@@ -83,9 +83,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "test message",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -111,9 +109,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "SomeClass.someMethod",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -139,9 +135,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.TRACE,
         message: "Example.test",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -167,9 +161,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "someFunction",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -292,9 +284,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "Example.test",
-        fields: {
-          args: [],
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -598,9 +588,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "test message",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -628,9 +616,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "SomeClass.someMethod",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -658,9 +644,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.TRACE,
         message: "Example.test",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -688,9 +672,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "someFunction",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -821,9 +803,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "Example.test",
-        fields: {
-          args: [],
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1117,9 +1097,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "test message",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1144,9 +1122,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "SomeClass.someMethod",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1171,9 +1147,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.TRACE,
         message: "test",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1198,9 +1172,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "someFunction",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1343,9 +1315,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "test",
-        fields: {
-          args: [],
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1611,9 +1581,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "test message",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1640,9 +1608,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "SomeClass.someMethod",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1669,9 +1635,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.TRACE,
         message: "test",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1696,9 +1660,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "someFunction",
-        fields: {
-          args: {},
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1847,9 +1809,7 @@ describe("instrument", () => {
         isSpan: true,
         level: Level.INFO,
         message: "test",
-        fields: {
-          args: [],
-        },
+        fields: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
