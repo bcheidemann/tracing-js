@@ -14,6 +14,7 @@ import type { Event } from "../event.ts";
 import { Level } from "../level.ts";
 import type { SpanAttributes } from "../span.ts";
 import { ManagedSubscriber } from "./ManagedSubscriber.ts";
+import { supportsColor } from "../utils/supportsColor.ts";
 
 const levelToString: Record<Level, string> = {
   [Level.DISABLED]: "DISABLED",
@@ -80,13 +81,15 @@ export type FmtSubscriberOptions = {
  * ```
  */
 export class FmtSubscriber extends ManagedSubscriber {
-  private color = false;
+  private color: boolean;
 
   constructor(private readonly options: FmtSubscriberOptions = {}) {
     super(options.level ?? Level.INFO);
 
-    if (Deno.stdin.isTerminal() && !Deno.noColor && options.color !== false) {
-      this.color = true;
+    if (typeof options.color === "boolean") {
+      this.color = options.color;
+    } else {
+      this.color = supportsColor();
     }
   }
 

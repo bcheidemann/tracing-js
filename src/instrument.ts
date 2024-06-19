@@ -8,7 +8,7 @@ import { context, getContext } from "./context.ts";
 import { event } from "./event.ts";
 import { Level } from "./level.ts";
 import { span } from "./span.ts";
-import { AssertionError } from "node:assert";
+import { AssertionError } from "@std/assert";
 
 // deno-lint-ignore no-explicit-any
 type AnyFunction = (this: any, ...args: any[]) => any;
@@ -753,11 +753,9 @@ export function logEnter<TArgs extends any[]>(
     // deno-lint-ignore no-case-declarations
     default:
       const _: never = levelOrMessage;
-      throw new AssertionError({
-        message: "Invalid type for logEnter attribute value",
-        actual: typeof levelOrMessage,
-        expected: "string | number | function | undefined",
-      });
+      throw new AssertionError(
+        `Invalid type for logEnter attribute value. Received "${typeof levelOrMessage}" but expected: "string | number | function | undefined"`,
+      );
   }
 }
 
@@ -1001,11 +999,9 @@ export function logExit<TArgs extends any[]>(
     // deno-lint-ignore no-case-declarations
     default:
       const _: never = levelOrMessage;
-      throw new AssertionError({
-        message: "Invalid type for logExit attribute value",
-        actual: typeof levelOrMessage,
-        expected: "string | number | function | undefined",
-      });
+      throw new AssertionError(
+        `Invalid type for logExit attribute value. Received "${typeof levelOrMessage}" but expected "string | number | function | undefined".`,
+      );
   }
 }
 
@@ -1315,11 +1311,9 @@ export function logError<TArgs extends any[]>(
     // deno-lint-ignore no-case-declarations
     default:
       const _: never = levelOrMessage;
-      throw new AssertionError({
-        message: "Invalid type for logError attribute value",
-        actual: typeof levelOrMessage,
-        expected: "string | number | function | undefined",
-      });
+      throw new AssertionError(
+        `Invalid type for logError attribute value. Received "${typeof levelOrMessage}" but expected "string | number | function | undefined".`,
+      );
   }
 }
 
@@ -1591,12 +1585,13 @@ function collectAttributes<TArgs extends any[], TReturnType>(
       // deno-lint-ignore no-case-declarations
       default:
         const _: never = attribute;
-        throw new AssertionError({
-          message: "Invalid attribute kind",
-          // deno-lint-ignore no-explicit-any
-          actual: (attribute as any).kind,
-          expected: Object.keys(AttributeKind).join(" | "),
-        });
+        throw new AssertionError(
+          `Invalid attribute kind. Received "${
+            // deno-lint-ignore no-explicit-any
+            (attribute as any).kind}" but expected "${
+            Object.keys(AttributeKind).join(" | ")
+          }".`,
+        );
     }
   }
 
@@ -1696,11 +1691,9 @@ function instrumentCallbackImpl<
                 }
                 break;
               default:
-                throw new AssertionError({
-                  message: "Invalid type for skip attribute value",
-                  actual: typeof skip,
-                  expected: "string | number | boolean",
-                });
+                throw new AssertionError(
+                  `Invalid type for skip attribute value. Received "${typeof skip}" but expected "string | number | boolean".`,
+                );
             }
           });
         }
