@@ -165,7 +165,7 @@ export function message(message: string): MessageAttribute {
 }
 
 /**
- * The target attribute is used to override the target field of the span created by the instrumented method or function.
+ * The target attribute is used to override the target of the span created by the instrumented method or function.
  *
  * @example Instrument a method with a custom target
  * ```ts
@@ -193,13 +193,11 @@ export function message(message: string): MessageAttribute {
  *
  * @param className The class name to use for the target field
  * @param method The method name to use for the target field
- * @param isPrivate Whether the method is private (optional)
  * @returns The target attribute
  */
 export function target(
   className: string,
   method: string,
-  isPrivate?: boolean,
 ): TargetAttribute;
 /**
  * The target attribute is used to override the target of the span created by the instrumented method or function.
@@ -228,20 +226,19 @@ export function target(
  * );
  * ```
  *
+ * @param functionName The function name to use for the target field
  * @returns The target attribute
  */
 export function target(functionName: string): TargetAttribute;
 export function target(
   classOrFunctionName: string,
   method?: string,
-  isPrivate?: boolean,
 ): TargetAttribute {
   if (method !== undefined) {
     return {
       kind: AttributeKind.Target,
       class: classOrFunctionName,
       method,
-      private: isPrivate ?? false,
     };
   }
   return { kind: AttributeKind.Target, function: classOrFunctionName };
@@ -281,45 +278,6 @@ export function level(level: Level): LevelAttribute {
   return { kind: AttributeKind.Level, level };
 }
 
-/**
- * The skip attribute is used to skip logging of specific arguments of the instrumented method or function.
- *
- * The skip attribute supports the following syntax:
- * - `skip("arg0")`: Skip arguments by name (doesn't work in minified code)
- * - `skip(0)`: Skip arguments by index
- * - `skip(true, false, false)`: Skip arguments by mask
- *
- * @example Instrument a method and skip logging of the first argument
- * ```ts
- * import { instrument, skip } from "@bcheidemann/tracing";
- *
- * class Example {
- *   @instrument(true, false)
- *   test(arg0: string, arg1: number) {
- *     // ...
- *   }
- * }
- * ```
- *
- * @example Instrument a function and skip logging of the first argument
- * ```ts
- * import { instrumentCallback, skip } from "@bcheidemann/tracing";
- *
- * const test = instrumentCallback(
- *   [skip(true, false)],
- *   function test(arg0: string, arg1: number) {
- *     // ...
- *   }
- * );
- * ```
- *
- * @param mask The arguments to skip
- * @returns The skip attribute
- */
-// deno-lint-ignore no-explicit-any
-export function skip<TArgs extends any[]>(
-  ...mask: SkipByMask<TArgs>
-): SkipAttribute<TArgs>;
 /**
  * The skip attribute is used to skip logging of specific arguments of the instrumented method or function.
  *
@@ -394,6 +352,45 @@ export function skip(...paramNames: string[]): SkipAttribute<any>;
  */
 // deno-lint-ignore no-explicit-any
 export function skip(...paramIndices: number[]): SkipAttribute<any>;
+/**
+ * The skip attribute is used to skip logging of specific arguments of the instrumented method or function.
+ *
+ * The skip attribute supports the following syntax:
+ * - `skip("arg0")`: Skip arguments by name (doesn't work in minified code)
+ * - `skip(0)`: Skip arguments by index
+ * - `skip(true, false, false)`: Skip arguments by mask
+ *
+ * @example Instrument a method and skip logging of the first argument
+ * ```ts
+ * import { instrument, skip } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(true, false)
+ *   test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and skip logging of the first argument
+ * ```ts
+ * import { instrumentCallback, skip } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [skip(true, false)],
+ *   function test(arg0: string, arg1: number) {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param mask The arguments to skip
+ * @returns The skip attribute
+ */
+// deno-lint-ignore no-explicit-any
+export function skip<TArgs extends any[]>(
+  ...mask: SkipByMask<TArgs>
+): SkipAttribute<TArgs>;
 // deno-lint-ignore no-explicit-any
 export function skip<TArgs extends any[]>(
   ...skip: SkipAttribute<TArgs>["skip"]
@@ -553,17 +550,188 @@ export function field<TArgs extends any[]>(
  *   }
  * );
  * ```
+ *
+ * @returns The logEnter attribute
  */
 // deno-lint-ignore no-explicit-any
 export function logEnter<TArgs extends any[]>(): LogEnterAttribute<TArgs>;
+/**
+ * The logEnter attribute is used to log a message when entering the instrumented method or function.
+ *
+ * The logEnter attribute supports the following syntax:
+ *
+ * - `logEnter()`: Log the default message when entering with the default log level
+ * - `logEnter("Custom message")`: Log a custom message when entering with the default log level
+ * - `logEnter((args) => arg[0])`: Log a custom message mapped from arguments when entering with the default log level
+ * - `logEnter(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logEnter(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logEnter(Level.TRACE, (args) => arg[0])`: Log a custom message mapped from arguments when entering with a custom log level
+ *
+ * The default log level is `Level.INFO`, unless the `log` attribute is provided with a different log level.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logEnter } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logEnter("my message"))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logEnter } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logEnter("my message")],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param message The message to log when entering
+ * @returns The logEnter attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function logEnter<TArgs extends any[]>(
-  message: string | ((args: TArgs) => string),
+  message: string,
 ): LogEnterAttribute<TArgs>;
+/**
+ * The logEnter attribute is used to log a message when entering the instrumented method or function.
+ *
+ * The logEnter attribute supports the following syntax:
+ *
+ * - `logEnter()`: Log the default message when entering with the default log level
+ * - `logEnter("Custom message")`: Log a custom message when entering with the default log level
+ * - `logEnter((args) => arg[0])`: Log a custom message mapped from arguments when entering with the default log level
+ * - `logEnter(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logEnter(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logEnter(Level.TRACE, (args) => arg[0])`: Log a custom message mapped from arguments when entering with a custom log level
+ *
+ * The default log level is `Level.INFO`, unless the `log` attribute is provided with a different log level.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logEnter } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logEnter((args) => `entering with ${args.length} args`))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logEnter } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logEnter((args) => `entering with ${args.length} args`)],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param message Callback to map function arguments to the message to log when entering the function
+ * @returns The logEnter attribute
+ */
+// deno-lint-ignore no-explicit-any
+export function logEnter<TArgs extends any[]>(
+  message: (args: TArgs) => string,
+): LogEnterAttribute<TArgs>;
+/**
+ * The logEnter attribute is used to log a message when entering the instrumented method or function.
+ *
+ * The logEnter attribute supports the following syntax:
+ *
+ * - `logEnter()`: Log the default message when entering with the default log level
+ * - `logEnter("Custom message")`: Log a custom message when entering with the default log level
+ * - `logEnter((args) => arg[0])`: Log a custom message mapped from arguments when entering with the default log level
+ * - `logEnter(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logEnter(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logEnter(Level.TRACE, (args) => arg[0])`: Log a custom message mapped from arguments when entering with a custom log level
+ *
+ * The default log level is `Level.INFO`, unless the `log` attribute is provided with a different log level.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logEnter, Level } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logEnter(Level.TRACE))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logEnter, Level } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logEnter(Level.TRACE)],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param level The log level to use when logging the message
+ * @returns The logEnter attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function logEnter<TArgs extends any[]>(
   level: Level,
 ): LogEnterAttribute<TArgs>;
+/**
+ * The logEnter attribute is used to log a message when entering the instrumented method or function.
+ *
+ * The logEnter attribute supports the following syntax:
+ *
+ * - `logEnter()`: Log the default message when entering with the default log level
+ * - `logEnter("Custom message")`: Log a custom message when entering with the default log level
+ * - `logEnter((args) => arg[0])`: Log a custom message mapped from arguments when entering with the default log level
+ * - `logEnter(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logEnter(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logEnter(Level.TRACE, (args) => arg[0])`: Log a custom message mapped from arguments when entering with a custom log level
+ *
+ * The default log level is `Level.INFO`, unless the `log` attribute is provided with a different log level.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logEnter, Level } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logEnter(Level.TRACE, "my message"))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logEnter, Level } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logEnter(Level.TRACE, "my message")],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param level The log level to use when logging the message
+ * @param message The message to log when entering
+ * @returns The logEnter attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function logEnter<TArgs extends any[]>(
   level: Level,
@@ -600,8 +768,10 @@ export function logEnter<TArgs extends any[]>(
  *
  * - `logExit()`: Log the default message when entering with the default log level
  * - `logExit("Custom message")`: Log a custom message when entering with the default log level
+ * - `logExit((args) => args[0])`: Log a custom message mapped from args when entering with the default log level
  * - `logExit(Level.TRACE)`: Log the default message when entering with a custom log level
  * - `logExit(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logExit(Level.TRACE, (args) => args[0])`: Log a custom message mapped from args when entering with a custom log level
  *
  * The default log level is `Level.INFO`, unless the `log` attribute is provided with a different log level.
  *
@@ -628,17 +798,188 @@ export function logEnter<TArgs extends any[]>(
  *   }
  * );
  * ```
+ *
+ * @returns The logExit attribute
  */
 // deno-lint-ignore no-explicit-any
 export function logExit<TArgs extends any[]>(): LogExitAttribute<TArgs>;
+/**
+ * The logExit attribute is used to log a message when exiting the instrumented method or function.
+ *
+ * The logExit attribute supports the following syntax:
+ *
+ * - `logExit()`: Log the default message when entering with the default log level
+ * - `logExit("Custom message")`: Log a custom message when entering with the default log level
+ * - `logExit((args) => args[0])`: Log a custom message mapped from args when entering with the default log level
+ * - `logExit(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logExit(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logExit(Level.TRACE, (args) => args[0])`: Log a custom message mapped from args when entering with a custom log level
+ *
+ * The default log level is `Level.INFO`, unless the `log` attribute is provided with a different log level.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logExit } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logExit("my message"))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logExit } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logExit("my message")],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param message The message to log when exiting
+ * @returns The logExit attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function logExit<TArgs extends any[]>(
-  message: string | ((args: TArgs) => string),
+  message: string,
 ): LogExitAttribute<TArgs>;
+/**
+ * The logExit attribute is used to log a message when exiting the instrumented method or function.
+ *
+ * The logExit attribute supports the following syntax:
+ *
+ * - `logExit()`: Log the default message when entering with the default log level
+ * - `logExit("Custom message")`: Log a custom message when entering with the default log level
+ * - `logExit((args) => args[0])`: Log a custom message mapped from args when entering with the default log level
+ * - `logExit(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logExit(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logExit(Level.TRACE, (args) => args[0])`: Log a custom message mapped from args when entering with a custom log level
+ *
+ * The default log level is `Level.INFO`, unless the `log` attribute is provided with a different log level.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logExit } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logExit((args) => args[0]))
+ *   test(arg0: string) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logExit } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logExit((args) => args[0])],
+ *   function test(arg0: string) {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param message Callback to map function arguments to the message to log when exiting the function
+ * @returns The logExit attribute
+ */
+// deno-lint-ignore no-explicit-any
+export function logExit<TArgs extends any[]>(
+  message: (args: TArgs) => string,
+): LogExitAttribute<TArgs>;
+/**
+ * The logExit attribute is used to log a message when exiting the instrumented method or function.
+ *
+ * The logExit attribute supports the following syntax:
+ *
+ * - `logExit()`: Log the default message when entering with the default log level
+ * - `logExit("Custom message")`: Log a custom message when entering with the default log level
+ * - `logExit((args) => args[0])`: Log a custom message mapped from args when entering with the default log level
+ * - `logExit(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logExit(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logExit(Level.TRACE, (args) => args[0])`: Log a custom message mapped from args when entering with a custom log level
+ *
+ * The default log level is `Level.INFO`, unless the `log` attribute is provided with a different log level.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logExit, Level } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logExit(Level.TRACE))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logExit, Level } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logExit(Level.TRACE)],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param level The log level to use when logging the message
+ * @returns The logExit attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function logExit<TArgs extends any[]>(
   level: Level,
 ): LogExitAttribute<TArgs>;
+/**
+ * The logExit attribute is used to log a message when exiting the instrumented method or function.
+ *
+ * The logExit attribute supports the following syntax:
+ *
+ * - `logExit()`: Log the default message when entering with the default log level
+ * - `logExit("Custom message")`: Log a custom message when entering with the default log level
+ * - `logExit((args) => args[0])`: Log a custom message mapped from args when entering with the default log level
+ * - `logExit(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logExit(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logExit(Level.TRACE, (args) => args[0])`: Log a custom message mapped from args when entering with a custom log level
+ *
+ * The default log level is `Level.INFO`, unless the `log` attribute is provided with a different log level.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logExit, Level } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logExit(Level.TRACE, "my message"))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logExit, Level } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logExit(Level.TRACE, "my message")],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param level The log level to use when logging the message
+ * @param message The message to log when exiting
+ * @returns The logExit attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function logExit<TArgs extends any[]>(
   level: Level,
@@ -676,7 +1017,56 @@ export function logExit<TArgs extends any[]>(
  * - `logReturnValue()`: Add the returnValue field to the exit message
  * - `logReturnValue((returnValue, args) => returnValue)`: Add the returnValue field to the exit message with a custom value
  *
+ * @example Instrument a method and log the return value when exiting
+ * ```ts
+ * import { instrument, logReturnValue } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logReturnValue())
+ *   test() {
+ *     return "test";
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a method and log the mappped return value when exiting
+ * ```ts
+ * import { instrument, logReturnValue } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logReturnValue((returnValue, args) => returnValue.toUpperCase())
+ *   test() {
+ *     return "test";
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log the return value when exiting
+ * ```ts
+ * import { instrumentCallback, logReturnValue } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logReturnValue()],
+ *   function test() {
+ *     return "test";
+ *   }
+ * );
+ * ```
+ *
+ * @example Instrument a function and log the mapped return value when exiting
+ * ```ts
+ * import { instrumentCallback, logReturnValue } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logReturnValue((returnValue, args) => returnValue.toUpperCase()],
+ *   function test() {
+ *     return "test";
+ *   }
+ * );
+ * ```
+ *
  * @param map The function to map the return value to a custom value
+ * @returns The logReturnValue attribute
  */
 // deno-lint-ignore no-explicit-any
 export function logReturnValue<TArgs extends any[], TReturn>(
@@ -686,14 +1076,16 @@ export function logReturnValue<TArgs extends any[], TReturn>(
 }
 
 /**
- * The logError attribute is used to log a message when exiting the instrumented method or function.
+ * The logError attribute is used to log a message when the instrumented method or function throws an error.
  *
  * The logError attribute supports the following syntax:
  *
  * - `logError()`: Log the default message when entering with the default log level
  * - `logError("Custom message")`: Log a custom message when entering with the default log level
+ * - `logError((args) => args[0])`: Log a custom message mapped from args when entering with the default log level
  * - `logError(Level.TRACE)`: Log the default message when entering with a custom log level
  * - `logError(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logError(Level.TRACE, (args) => args[0])`: Log a custom message mapped from return value and args when entering with a custom log level
  *
  * The default log level is `Level.ERROR`.
  *
@@ -720,17 +1112,188 @@ export function logReturnValue<TArgs extends any[], TReturn>(
  *   }
  * );
  * ```
+ *
+ * @returns The logError attribute
  */
 // deno-lint-ignore no-explicit-any
 export function logError<TArgs extends any[]>(): LogErrorAttribute<TArgs>;
+/**
+ * The logError attribute is used to log a message when the instrumented method or function throws an error.
+ *
+ * The logError attribute supports the following syntax:
+ *
+ * - `logError()`: Log the default message when entering with the default log level
+ * - `logError("Custom message")`: Log a custom message when entering with the default log level
+ * - `logError((args) => args[0])`: Log a custom message mapped from args when entering with the default log level
+ * - `logError(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logError(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logError(Level.TRACE, (args) => args[0])`: Log a custom message mapped from return value and args when entering with a custom log level
+ *
+ * The default log level is `Level.ERROR`.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logError } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logError("my message"))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logError } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logError("my message")],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param message The message to log on error
+ * @returns The logError attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function logError<TArgs extends any[]>(
-  message: string | ((args: TArgs) => string),
+  message: string,
 ): LogErrorAttribute<TArgs>;
+/**
+ * The logError attribute is used to log a message when the instrumented method or function throws an error.
+ *
+ * The logError attribute supports the following syntax:
+ *
+ * - `logError()`: Log the default message when entering with the default log level
+ * - `logError("Custom message")`: Log a custom message when entering with the default log level
+ * - `logError((args) => args[0])`: Log a custom message mapped from args when entering with the default log level
+ * - `logError(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logError(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logError(Level.TRACE, (args) => args[0])`: Log a custom message mapped from return value and args when entering with a custom log level
+ *
+ * The default log level is `Level.ERROR`.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logError } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logError((args) => args[0]))
+ *   test(arg0: string) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logError } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logError((args) => args[0])],
+ *   function test(arg0: string) {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param message Callback to map function arguments to the message to log on error
+ * @returns The logError attribute
+ */
+// deno-lint-ignore no-explicit-any
+export function logError<TArgs extends any[]>(
+  message: (args: TArgs) => string,
+): LogErrorAttribute<TArgs>;
+/**
+ * The logError attribute is used to log a message when the instrumented method or function throws an error.
+ *
+ * The logError attribute supports the following syntax:
+ *
+ * - `logError()`: Log the default message when entering with the default log level
+ * - `logError("Custom message")`: Log a custom message when entering with the default log level
+ * - `logError((args) => args[0])`: Log a custom message mapped from args when entering with the default log level
+ * - `logError(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logError(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logError(Level.TRACE, (args) => args[0])`: Log a custom message mapped from return value and args when entering with a custom log level
+ *
+ * The default log level is `Level.ERROR`.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logError, Level } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logError(Level.CRITICAL))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logError, Level } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logError(Level.CRITICAL)],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param level The log level to use when logging the message
+ * @returns The logError attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function logError<TArgs extends any[]>(
   level: Level,
 ): LogErrorAttribute<TArgs>;
+/**
+ * The logError attribute is used to log a message when the instrumented method or function throws an error.
+ *
+ * The logError attribute supports the following syntax:
+ *
+ * - `logError()`: Log the default message when entering with the default log level
+ * - `logError("Custom message")`: Log a custom message when entering with the default log level
+ * - `logError((args) => args[0])`: Log a custom message mapped from args when entering with the default log level
+ * - `logError(Level.TRACE)`: Log the default message when entering with a custom log level
+ * - `logError(Level.TRACE, "Custom message")`: Log a custom message when entering with a custom log level
+ * - `logError(Level.TRACE, (args) => args[0])`: Log a custom message mapped from return value and args when entering with a custom log level
+ *
+ * The default log level is `Level.ERROR`.
+ *
+ * @example Instrument a method and log a message when entering
+ * ```ts
+ * import { instrument, logErrorm, Level } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(logError(Level.CRITICAL, "my message"))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a function and log a message when entering
+ * ```ts
+ * import { instrumentCallback, logError, Level } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [logError(logError(Level.CRITICAL, "my message"))],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param level The log level to use when logging the message
+ * @param message The message to log on error
+ * @returns The logError attribute
+ */
 // deno-lint-ignore no-explicit-any
 export function logError<TArgs extends any[]>(
   level: Level,
@@ -775,12 +1338,35 @@ export function logError<TArgs extends any[]>(
  * }
  * ```
  *
+ * @example Instrument a method and log a message when entering, exiting, or when an error occurs (with level)
+ * ```ts
+ * import { instrument, log, Level } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(log(Level.TRACE))
+ *   test() {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
  * @example Instrument a function and log a message when entering, exiting, or when an error occurs
  * ```ts
  * import { instrumentCallback, log } from "@bcheidemann/tracing";
  *
  * const test = instrumentCallback(
  *   [log()],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ *
+ * @example Instrument a function and log a message when entering, exiting, or when an error occurs (with level)
+ * ```ts
+ * import { instrumentCallback, log, Level } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [log(Level.TRACE)],
  *   function test() {
  *     // ...
  *   }
@@ -792,7 +1378,9 @@ export function log(level?: Level): LogAttribute {
 }
 
 /**
- * The instrument decorator is used to instrument a method with the provided attributes.
+ * The instrument decorator is used to instrument a class method. This will create a span when the method
+ * is entered. By default, the span message will be the name of the method, and the arguments will be included
+ * in the fields. This behaviour can be customised using attributes.
  *
  * @example Instrument a method
  * ```ts
@@ -830,14 +1418,15 @@ export function instrument<TMethod extends AnyFunction>(
   ) {
     return instrumentCallbackImpl(target, attributes, {
       kind: "method",
-      isPrivate: ctx.private,
       methodName: typeof ctx.name === "symbol" ? ctx.name.toString() : ctx.name,
     });
   };
 }
 
 /**
- * The instrumentCallback function is used to instrument a function with the provided attributes.
+ * The instrumentCallback function is used to instrument a function. This will create a span when the function
+ * is entered. By default, the span message will be the name of the function, and the arguments will be included
+ * in the fields. This behaviour can be customised using attributes.
  *
  * @example Instrument a function
  * ```ts
@@ -866,6 +1455,36 @@ export function instrument<TMethod extends AnyFunction>(
 export function instrumentCallback<
   TCallback extends AnyFunction,
 >(fn: TCallback): TCallback;
+/**
+ * The instrumentCallback function is used to instrument a function. This will create a span when the function
+ * is entered. By default, the span message will be the name of the function, and the arguments will be included
+ * in the fields. This behaviour can be customised using attributes.
+ *
+ * @example Instrument a function
+ * ```ts
+ * import { instrumentCallback } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(function test() {
+ *   // ...
+ * });
+ * ```
+ *
+ * @example Instrument a function with a custom message
+ * ```ts
+ * import { instrumentCallback, message } from "@bcheidemann/tracing";
+ *
+ * const test = instrumentCallback(
+ *   [message("Custom message")],
+ *   function test() {
+ *     // ...
+ *   }
+ * );
+ * ```
+ *
+ * @param attributes The attributes to apply to the instrumented function
+ * @param fn The function to instrument
+ * @returns The instrumented function
+ */
 export function instrumentCallback<
   TCallback extends AnyFunction,
 >(
@@ -990,7 +1609,6 @@ type Context =
   }
   | {
     kind: "method";
-    isPrivate: boolean;
     methodName: string;
   };
 

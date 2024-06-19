@@ -97,7 +97,7 @@ describe("instrument", () => {
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(target("SomeClass", "someMethod", true))
+        @instrument(target("SomeClass", "someMethod"))
         test() {}
       }
       const instance = new Example();
@@ -612,7 +612,7 @@ describe("instrument", () => {
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(target("SomeClass", "someMethod", true))
+        @instrument(target("SomeClass", "someMethod"))
         async test() {
           await Promise.resolve();
         }
@@ -1131,7 +1131,7 @@ describe("instrument", () => {
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
-        [target("SomeClass", "someMethod", true)],
+        [target("SomeClass", "someMethod")],
         function test() {},
       );
 
@@ -1625,7 +1625,7 @@ describe("instrument", () => {
       const ctx = createContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
-        [target("SomeClass", "someMethod", true)],
+        [target("SomeClass", "someMethod")],
         async function test() {
           await Promise.resolve();
         },
