@@ -56,6 +56,10 @@ events which happen during that span if they are above the minimum level.
 
 ## Usage
 
+### Examples
+
+You can find usage examples [here](https://github.com/bcheidemann/tracing-js/tree/main/src/examples).
+
 ### Recording Spans
 
 Spans can be created and entered like this:
