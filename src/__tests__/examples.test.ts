@@ -13,6 +13,31 @@ describe("basic example", () => {
       ],
       env: {
         IS_SNAPSHOT_RUN: "true",
+        NO_COLOR: "true",
+      },
+      stdout: "piped",
+      stderr: "piped",
+    }).spawn();
+    const buf = new Buffer();
+    mergeReadableStreams(command.stdout, command.stderr).pipeTo(buf.writable);
+    const status = await command.status;
+    const output = new TextDecoder().decode(buf.bytes());
+    assert(status.success, `The command failed:\n\n${output}`);
+    await assertSnapshot(context, output);
+  });
+});
+
+describe("api-class-instrumentation example", () => {
+  it("should match the snapshot", async (context) => {
+    const command = new Deno.Command("deno", {
+      args: [
+        "run",
+        "--allow-env=IS_SNAPSHOT_RUN",
+        "src/examples/api-class-instrumentation/main.ts",
+      ],
+      env: {
+        IS_SNAPSHOT_RUN: "true",
+        NO_COLOR: "true",
       },
       stdout: "piped",
       stderr: "piped",

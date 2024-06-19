@@ -22,7 +22,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init();
+    FmtSubscriber.init({ color: false });
 
     // Act
     event(Level.INFO, "test");
@@ -49,6 +49,7 @@ describe("FmtSubscriber", () => {
         const spy = spyOn(console, log).mockImplementation(() => {});
         FmtSubscriber.init({
           level: Level.TRACE,
+          color: false,
         });
 
         // Act
@@ -63,7 +64,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with a field", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init();
+    FmtSubscriber.init({ color: false });
 
     // Act
     event(Level.INFO, "test", {
@@ -80,7 +81,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with object fields", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init();
+    FmtSubscriber.init({ color: false });
 
     // Act
     event(Level.INFO, "test", {
@@ -107,7 +108,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with fields", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init();
+    FmtSubscriber.init({ color: false });
 
     // Act
     event(Level.INFO, "test", {
@@ -125,7 +126,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with a span", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init();
+    FmtSubscriber.init({ color: false });
 
     // Act
     span(Level.INFO, "test span").enter();
@@ -141,7 +142,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init();
+    FmtSubscriber.init({ color: false });
 
     // Act
     span(Level.INFO, "outer span").enter();
@@ -158,7 +159,7 @@ describe("FmtSubscriber", () => {
   it("should log fields from spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init();
+    FmtSubscriber.init({ color: false });
 
     // Act
     span(Level.INFO, "outer span", {
@@ -181,7 +182,7 @@ describe("FmtSubscriber", () => {
   it("should log object fields from spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init();
+    FmtSubscriber.init({ color: false });
 
     // Act
     span(Level.INFO, "Example.test", {

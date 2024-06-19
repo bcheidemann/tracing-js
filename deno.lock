@@ -652,6 +652,7 @@
     "dependencies": [
       "jsr:@bcheidemann/parse-params@^0.2.1",
       "jsr:@std/assert@^0.226.0",
+      "jsr:@std/fmt@^0.225.4",
       "jsr:@std/streams@^0.224.5",
       "jsr:@std/testing@^0.225.2",
       "npm:expect@29.7.0"

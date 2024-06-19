@@ -1,3 +1,4 @@
+import { gray, magenta, cyan, green, yellow, red, bold, bgRed, italic } from "@std/fmt/colors";
 import { context, createContext } from "../context.ts";
 import type { Event } from "../event.ts";
 import { Level } from "../level.ts";
@@ -12,6 +13,16 @@ const levelToString: Record<Level, string> = {
   [Level.WARN]: "WARN",
   [Level.ERROR]: "ERROR",
   [Level.CRITICAL]: "CRITICAL",
+};
+
+const levelToFormatter: Record<Level, (str: string) => string> = {
+  [Level.DISABLED]: str => gray(str),
+  [Level.TRACE]: str => bold(magenta(str)),
+  [Level.DEBUG]: str => bold(cyan(str)),
+  [Level.INFO]: str => bold(green(str)),
+  [Level.WARN]: str => bold(yellow(str)),
+  [Level.ERROR]: str => bold(red(str)),
+  [Level.CRITICAL]: str => bold(bgRed(str)),
 };
 
 /**
@@ -32,16 +43,18 @@ export type FmtSubscriberOptions = {
   timestamp?: boolean;
   /**
    * Log messages in color.
+   * 
+   * Defaults to true if supported by the terminal environment.
    *
    * @default true
    */
   color?: boolean;
   /**
-   * Spreads logs over multiple lines for better readability.
+   * Abbreviate long field values.
    *
    * @default false
    */
-  pretty?: boolean;
+  abbreviateLongFieldValues?: boolean | number;
 };
 
 /**
@@ -57,8 +70,14 @@ export type FmtSubscriberOptions = {
  * ```
  */
 export class FmtSubscriber extends ManagedSubscriber {
+  private color = false;
+
   constructor(private readonly options: FmtSubscriberOptions = {}) {
     super(options.level ?? Level.INFO);
+
+    if (Deno.stdin.isTerminal() && !Deno.noColor && options.color !== false) {
+      this.color = true;
+    }
   }
 
   public static init(options: FmtSubscriberOptions = {}): FmtSubscriber {
@@ -107,11 +126,13 @@ export class FmtSubscriber extends ManagedSubscriber {
   }
 
   private displayLevel(level: Level) {
-    return `[${levelToString[level]}]`;
+    const levelStr = `[${levelToString[level]}]`;
+    return this.color ? levelToFormatter[level](levelStr) : levelStr;
   }
 
   private displayTimestamp() {
-    return `[${this.timestamp}]`;
+    const timestamp = `[${this.timestamp}]`;
+    return this.color ? gray(timestamp) : timestamp;
   }
 
   private get timestamp() {
@@ -123,20 +144,21 @@ export class FmtSubscriber extends ManagedSubscriber {
       return;
     }
 
+    const separator = this.color ? gray(":") : ":";
     return `${
       spans
         .map(this.displaySpan.bind(this))
         .reverse()
-        .join(":")
-    }:`;
+        .join(separator)
+    }${separator}`;
   }
 
   private displaySpan(span: SpanAttributes) {
-    let message = span.message;
+    let message = this.color ? bold(span.message) : span.message;
 
     const fields = this.displaySpanFields(span);
     if (fields) {
-      message += fields;
+      message += this.color ? gray(fields) : fields;
     }
 
     return message;
@@ -148,9 +170,10 @@ export class FmtSubscriber extends ManagedSubscriber {
     if (!fields.length) return;
 
     const fieldsFmt = this.flattenFields(fields).map(
-      ([key, value]) => `${key}=${this.displayValue(value)}`,
+      ([key, value]) => `${this.color ? italic(key) : key}=${this.displayValue(value, true)}`,
     );
-    return `(${fieldsFmt.join(", ")})`;
+    const fieldsStr = `(${fieldsFmt.join(", ")})`;
+    return this.color ? gray(fieldsStr) : fieldsStr;
   }
 
   private displaySpanFields(span: SpanAttributes) {
@@ -159,7 +182,7 @@ export class FmtSubscriber extends ManagedSubscriber {
     if (!fields.length) return;
 
     const fieldsFmt = this.flattenFields(fields).map(
-      ([key, value]) => `${key}=${this.displayValue(value)}`,
+      ([key, value]) => `${this.color ? italic(key) : key}=${this.displayValue(value, true)}`,
     );
     return `{${fieldsFmt.join(", ")}}`;
   }
@@ -190,20 +213,37 @@ export class FmtSubscriber extends ManagedSubscriber {
     });
   }
 
-  private displayValue(value: unknown): string {
+  private displayValue(value: unknown, isFieldValue?: boolean): string {
+    let str: string;
     switch (typeof value) {
       case "bigint":
       case "boolean":
       case "function":
       case "symbol":
-        return value.toString();
+        str = value.toString();
+        break;
       case "number":
       case "string":
-        return value.toString();
+        str = value.toString();
+        break;
       case "object":
-        return JSON.stringify(value);
+        str = JSON.stringify(value);
+        break;
       case "undefined":
-        return "undefined";
+        str = "undefined";
+        break;
     }
+
+    if (isFieldValue && this.options.abbreviateLongFieldValues) {
+      const maxLength = typeof this.options.abbreviateLongFieldValues === "number" ? this.options.abbreviateLongFieldValues : 32;
+      const charsToRemove = str.length - maxLength;
+      if (charsToRemove > 3) {
+        const startCut = Math.round((str.length - charsToRemove) / 2);
+        const endCut = Math.round((str.length + charsToRemove) / 2);
+        str = `${str.slice(0, startCut)}...${str.slice(endCut)}`;
+      }
+    }
+
+    return str;
   }
 }

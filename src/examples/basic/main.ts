@@ -1,23 +1,18 @@
 import "../__utils__/snapshotHelper.ts";
-import { debug } from "../../event.ts";
+import { critical, debug, error, info, trace, warn } from "../../event.ts";
 import { Level } from "../../level.ts";
 import { infoSpan } from "../../span.ts";
 import { FmtSubscriber } from "../../subscriber.ts";
-import { LoginController } from "./controllers/LoginController.ts";
-import { TokenRepository } from "./repositories/TokenRepository.ts";
-import { UserRepository } from "./repositories/UserRepository.ts";
-import { AuthService } from "./services/AuthService.ts";
 
 FmtSubscriber.init({
-  level: Level.DEBUG,
+  level: Level.DISABLED,
 });
 
-const userRepository = new UserRepository();
-const tokenRepository = new TokenRepository();
-const authService = new AuthService(userRepository, tokenRepository);
-const controller = new LoginController(authService);
+using _guard = infoSpan("basic-example", { dummy: "value" }).enter();
 
-using _guard = infoSpan("request", { requestId: "123" }).enter();
-
-const response = await controller.login("user", "password");
-debug("Issued tokens", { tokens: response.tokens });
+trace("This is a trace message", { key: "value" });
+debug("This is a debug message", { key: "value" });
+info("This is an info message", { key: "value" });
+warn("This is a warn message", { key: "value" });
+error("This is an error message", { key: "value" });
+critical("This is a critical message", { key: "value" });
