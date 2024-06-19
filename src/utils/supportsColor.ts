@@ -16,9 +16,10 @@ export function supportsColorDeno(): boolean {
 }
 
 export function supportsColorNode(): boolean {
-  return typeof global.process.stdin?.fd === "number" &&
-    global.tty.isatty(global.process.stdin.fd) && !global.process.env.NO_COLOR;
+  return typeof global.process.stdin !== "undefined" &&
+    global.process.stdin.isTTY && !global.process.env.NO_COLOR;
 }
+
 export function supportsColorUnknownRuntime(): boolean {
   return false;
 }
