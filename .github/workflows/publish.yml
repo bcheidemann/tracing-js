@@ -30,8 +30,10 @@ jobs:
         run: deno lint
       - name: Format
         run: deno fmt --check
-      - name: Basic Example
-        run: deno run src/examples/basic/main.ts
+      - name: Example (basic)
+        run: deno task example:basic
+      - name: Example (basic)
+        run: deno task example:api-class-instrumentation
 
   publish:
     needs: checks

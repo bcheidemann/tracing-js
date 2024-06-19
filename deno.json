@@ -2,7 +2,7 @@
   "name": "@bcheidemann/tracing",
   "version": "0.3.0",
   "tasks": {
-    "checks": "deno task test && deno lint && deno fmt --check && deno run src/examples/basic/main.ts",
+    "checks": "deno task test && deno lint && deno fmt --check && deno task example:basic && deno task example:api-class-instrumentation",
     "check": "deno check src/mod.ts",
     "test": "deno test --allow-read=. --allow-run=deno",
     "test:update": "deno test --allow-read=. --allow-run=deno --allow-write=src/__tests__/__snapshots__ -- --update",
