@@ -3,7 +3,7 @@
  * This module provides functions for creating spans.
  */
 
-import { getContext } from "./context.ts";
+import { getSubscriberContext } from "./context.ts";
 import { Level } from "./level.ts";
 
 /**
@@ -63,7 +63,7 @@ export function span(
   message: string,
   fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId> {
-  const ctx = getContext();
+  const ctx = getSubscriberContext();
 
   if (!ctx) {
     return { enter };

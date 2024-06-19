@@ -3,7 +3,7 @@
  * This module provides functions for creating events.
  */
 
-import { getContext } from "./context.ts";
+import { getSubscriberContext } from "./context.ts";
 import { Level } from "./level.ts";
 
 /**
@@ -28,7 +28,7 @@ export function event(
   message: string,
   fields?: Record<string, unknown>,
 ): void {
-  const ctx = getContext();
+  const ctx = getSubscriberContext();
 
   if (!ctx) {
     return;

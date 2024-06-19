@@ -8,10 +8,12 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { ISubscriber } from "./subscriber.ts";
 
+let defaultGlobalSubscriber: SubscriberContext | undefined = undefined;
+
 /**
  * The subscriber context. This holds a reference to the current subscriber registered in the async context.
  */
-export type Context = {
+export type SubscriberContext = {
   /**
    * The subscriber registered in the async context.
    */
@@ -19,27 +21,30 @@ export type Context = {
   /**
    * Clones the current context.
    */
-  clone(): Context;
+  clone(): SubscriberContext;
 };
 
 /**
  * The AsyncLocalStorage instance used to store the subscriber context.
  */
-export const context: AsyncLocalStorage<Context> = new AsyncLocalStorage<
-  Context
->();
+export const context: AsyncLocalStorage<SubscriberContext> =
+  new AsyncLocalStorage<
+    SubscriberContext
+  >();
 
 /**
- * Creates a new context with the provided subscriber.
+ * Creates a new subscriber context with the provided subscriber.
  *
  * @param subscriber The subscriber to use in the new context.
  * @returns The new context.
  */
-export function createContext(subscriber: ISubscriber<unknown>): Context {
+export function createSubscriberContext(
+  subscriber: ISubscriber<unknown>,
+): SubscriberContext {
   return {
     subscriber,
     clone() {
-      return createContext(this.subscriber.clone());
+      return createSubscriberContext(this.subscriber.clone());
     },
   };
 }
@@ -49,8 +54,8 @@ export function createContext(subscriber: ISubscriber<unknown>): Context {
  *
  * @returns The current subscriber context or throws an error if no context is found.
  */
-export function getContextOrThrow(): Context {
-  const ctx = context.getStore();
+export function getSubscriberContextOrThrow(): SubscriberContext {
+  const ctx = context.getStore() || defaultGlobalSubscriber;
 
   if (!ctx) {
     throw new Error("No context found");
@@ -64,6 +69,10 @@ export function getContextOrThrow(): Context {
  *
  * @returns The current subscriber context or `undefined` if no context is found.
  */
-export function getContext(): Context | undefined {
-  return context.getStore();
+export function getSubscriberContext(): SubscriberContext | undefined {
+  return context.getStore() || defaultGlobalSubscriber;
+}
+
+export function setDefaultGlobalSubscriber(subscriber: SubscriberContext) {
+  defaultGlobalSubscriber = subscriber;
 }

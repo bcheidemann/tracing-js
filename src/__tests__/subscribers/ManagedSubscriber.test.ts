@@ -4,7 +4,7 @@ import { fn } from "jest-mock";
 import { ManagedSubscriber } from "../../subscribers/ManagedSubscriber.ts";
 import { event } from "../../event.ts";
 import { span } from "../../span.ts";
-import { context, createContext } from "../../context.ts";
+import { context, createSubscriberContext } from "../../context.ts";
 import { Level } from "../../level.ts";
 import { instrumentCallback } from "../../instrument.ts";
 
@@ -13,7 +13,7 @@ class TestSubscriber extends ManagedSubscriber {
 
   public static init(): TestSubscriber {
     const subscriber = new TestSubscriber();
-    context.enterWith(createContext(subscriber));
+    context.enterWith(createSubscriberContext(subscriber));
     return subscriber;
   }
 }

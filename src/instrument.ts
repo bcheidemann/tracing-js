@@ -4,7 +4,7 @@
  */
 
 import { parseParamNamesFromFunction } from "@bcheidemann/parse-params";
-import { context, getContext } from "./context.ts";
+import { context, getSubscriberContext } from "./context.ts";
 import { event } from "./event.ts";
 import { Level } from "./level.ts";
 import { span } from "./span.ts";
@@ -1621,7 +1621,7 @@ function instrumentCallbackImpl<
     this: ThisParameterType<TCallback>,
     ...args: Parameters<TCallback>
   ) {
-    const ctx = getContext()?.clone();
+    const ctx = getSubscriberContext()?.clone();
 
     if (!ctx) {
       return fn.apply(this, args);

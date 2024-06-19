@@ -2,7 +2,7 @@ import { it } from "@std/testing/bdd";
 import { fn } from "jest-mock";
 import { expect } from "expect";
 import { createTestSubscriber } from "./subscriber.ts";
-import { context, createContext } from "../context.ts";
+import { context, createSubscriberContext } from "../context.ts";
 import { span } from "../span.ts";
 import { Level } from "../level.ts";
 import { createAnonymousSpanId } from "./span.ts";
@@ -18,7 +18,7 @@ it("should not throw when used without a registering a subscriber", () => {
 it("should call subscriber.newSpan on subscriber when a new span is created", () => {
   // Arrange
   const subscriber = createTestSubscriber();
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
 
   // Act
@@ -39,7 +39,7 @@ it("should call subscriber.enter when entering a span", () => {
   const subscriber = createTestSubscriber();
   const spanId = createAnonymousSpanId();
   subscriber.newSpan.mockReturnValue(spanId);
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
 
   // Act
@@ -55,7 +55,7 @@ it("should call subscriber.exit when entering a span", () => {
   const subscriber = createTestSubscriber();
   const spanId = createAnonymousSpanId();
   subscriber.newSpan.mockReturnValue(spanId);
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
   const guard = span(Level.INFO, "test").enter();
 
@@ -72,7 +72,7 @@ it("should call subscriber.exit when a span is exited via it's dispose", () => {
   const subscriber = createTestSubscriber();
   const spanId = createAnonymousSpanId();
   subscriber.newSpan.mockReturnValue(spanId);
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
   const guard = span(Level.INFO, "test").enter();
 
@@ -92,7 +92,7 @@ it("should call subscriber.newSpan when subscriber.enabledForLevel returns true"
     enabledForLevel: fn().mockReturnValue(true),
   });
   subscriber.enabledForLevel = undefined;
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
 
   // Act
@@ -107,7 +107,7 @@ it("should not call subscriber.newSpan when subscriber.enabledForLevel returns f
   const subscriber = createTestSubscriber({
     enabledForLevel: fn().mockReturnValue(false),
   });
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
 
   // Act
@@ -124,7 +124,7 @@ it("should call subscriber.newSpan when subscriber.enabledForLevel returns true 
     enabled: fn().mockReturnValue(true),
   });
   subscriber.enabledForLevel = undefined;
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
 
   // Act
@@ -140,7 +140,7 @@ it("should not call subscriber.newSpan when subscriber.enabledForLevel returns t
     enabledForLevel: fn().mockReturnValue(true),
     enabled: fn().mockReturnValue(false),
   });
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
 
   // Act
@@ -157,7 +157,7 @@ it("should call subscriber.newSpan when subscriber.enabled returns true", () => 
     enabled: fn().mockReturnValue(true),
   });
   subscriber.enabledForLevel = undefined;
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
 
   // Act
@@ -173,7 +173,7 @@ it("should not call subscriber.newSpan when subscriber.enabled returns false", (
     enabledForLevel: fn().mockReturnValue(true),
     enabled: fn().mockReturnValue(false),
   });
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
 
   // Act
@@ -188,7 +188,7 @@ it("should not call subscriber.enter when subscriber.enabled returns false", () 
   const subscriber = createTestSubscriber({
     enabled: fn().mockReturnValue(false),
   });
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
 
   // Act
@@ -203,7 +203,7 @@ it("should not call subscriber.exit when subscriber.enabled returns false", () =
   const subscriber = createTestSubscriber({
     enabled: fn().mockReturnValue(false),
   });
-  const ctx = createContext(subscriber);
+  const ctx = createSubscriberContext(subscriber);
   context.enterWith(ctx);
   const guard = span(Level.INFO, "test").enter();
 

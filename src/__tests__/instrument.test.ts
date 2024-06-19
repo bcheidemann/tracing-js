@@ -1,6 +1,6 @@
 import { describe, it } from "@std/testing/bdd";
 import { createTestSubscriber } from "./subscriber.ts";
-import { context, createContext } from "../context.ts";
+import { context, createSubscriberContext } from "../context.ts";
 import { Level } from "../level.ts";
 import {
   field,
@@ -35,7 +35,7 @@ describe("instrument", () => {
     it("should call subscriber.newSpan on subscriber when an instrumented method is called", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument()
@@ -66,7 +66,7 @@ describe("instrument", () => {
     it("should apply the message attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(message("test message"))
@@ -94,7 +94,7 @@ describe("instrument", () => {
     it("should apply the target attribute for classes", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(target("SomeClass", "someMethod"))
@@ -122,7 +122,7 @@ describe("instrument", () => {
     it("should apply the level attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(level(Level.TRACE))
@@ -150,7 +150,7 @@ describe("instrument", () => {
     it("should apply the target attribute for functions", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(target("someFunction"))
@@ -178,7 +178,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by param name", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(skip("arg0", "arg2"))
@@ -210,7 +210,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by mask", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(skip(true, false, true, false))
@@ -242,7 +242,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by index", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(skip(0, 2))
@@ -274,7 +274,7 @@ describe("instrument", () => {
     it("should apply the skipAll attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(skipAll)
@@ -303,7 +303,7 @@ describe("instrument", () => {
     it("should apply the field attribute with literal value", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(field("fieldKey", "fieldValue"))
@@ -336,7 +336,7 @@ describe("instrument", () => {
     it("should apply the field attribute with mapped", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(field("sum", ([arg0, arg1]) => arg0 + arg1))
@@ -370,7 +370,7 @@ describe("instrument", () => {
     it("should apply the logEnter attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(logEnter())
@@ -396,7 +396,7 @@ describe("instrument", () => {
     it("should apply the logExit attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(logExit())
@@ -423,7 +423,7 @@ describe("instrument", () => {
     it("should apply the logError attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(logError())
@@ -456,7 +456,7 @@ describe("instrument", () => {
     it("should apply the log attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(log())
@@ -492,7 +492,7 @@ describe("instrument", () => {
     it("should apply the log attribute for errors", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(log())
@@ -546,7 +546,7 @@ describe("instrument", () => {
     it("should call subscriber.newSpan on subscriber when an instrumented method is called", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument()
@@ -579,7 +579,7 @@ describe("instrument", () => {
     it("should apply the message attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(message("test message"))
@@ -609,7 +609,7 @@ describe("instrument", () => {
     it("should apply the target attribute for classes", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(target("SomeClass", "someMethod"))
@@ -639,7 +639,7 @@ describe("instrument", () => {
     it("should apply the level attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(level(Level.TRACE))
@@ -669,7 +669,7 @@ describe("instrument", () => {
     it("should apply the target attribute for functions", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(target("someFunction"))
@@ -699,7 +699,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by param name", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(skip("arg0", "arg2"))
@@ -733,7 +733,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by mask", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(skip(true, false, true, false))
@@ -767,7 +767,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by index", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(skip(0, 2))
@@ -801,7 +801,7 @@ describe("instrument", () => {
     it("should apply the skipAll attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(skipAll)
@@ -832,7 +832,7 @@ describe("instrument", () => {
     it("should apply the field attribute with literal value", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(field("fieldKey", "fieldValue"))
@@ -867,7 +867,7 @@ describe("instrument", () => {
     it("should apply the field attribute with mapped", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(field("sum", ([arg0, arg1]) => arg0 + arg1))
@@ -902,7 +902,7 @@ describe("instrument", () => {
     it("should apply the logEnter attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(logEnter())
@@ -928,7 +928,7 @@ describe("instrument", () => {
     it("should apply the logExit attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(logExit())
@@ -955,7 +955,7 @@ describe("instrument", () => {
     it("should apply the logError attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(logError())
@@ -988,7 +988,7 @@ describe("instrument", () => {
     it("should apply the log attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(log())
@@ -1025,7 +1025,7 @@ describe("instrument", () => {
     it("should apply the log attribute for errors", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
         @instrument(log())
@@ -1074,7 +1074,7 @@ describe("instrument", () => {
     it("should call subscriber.newSpan on subscriber when an instrumented method is called", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       // deno-lint-ignore no-unused-vars
       function test(arg0: string) {}
@@ -1101,7 +1101,7 @@ describe("instrument", () => {
     it("should apply the message attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [message("test message")],
@@ -1128,7 +1128,7 @@ describe("instrument", () => {
     it("should apply the target attribute for classes", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [target("SomeClass", "someMethod")],
@@ -1155,7 +1155,7 @@ describe("instrument", () => {
     it("should apply the level attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [level(Level.TRACE)],
@@ -1182,7 +1182,7 @@ describe("instrument", () => {
     it("should apply the target attribute for functions", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [target("someFunction")],
@@ -1209,7 +1209,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by param name", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skip("arg0", "arg2")],
@@ -1248,7 +1248,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by mask", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skip(true, false, true, false)],
@@ -1287,7 +1287,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by index", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skip(0, 2)],
@@ -1326,7 +1326,7 @@ describe("instrument", () => {
     it("should apply the skipAll attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skipAll],
@@ -1354,7 +1354,7 @@ describe("instrument", () => {
     it("should apply the field attribute with literal value", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [field("fieldKey", "fieldValue")],
@@ -1386,7 +1386,7 @@ describe("instrument", () => {
     it("should apply the field attribute with mapped", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [field("sum", ([arg0, arg1]) => arg0 + arg1)],
@@ -1418,7 +1418,7 @@ describe("instrument", () => {
     it("should apply the logEnter attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback([logEnter()], function test() {});
 
@@ -1438,7 +1438,7 @@ describe("instrument", () => {
     it("should apply the logExit attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback([logExit()], function test() {
         return 42;
@@ -1459,7 +1459,7 @@ describe("instrument", () => {
     it("should apply the logError attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback([logError()], function test() {
         throw 42;
@@ -1487,7 +1487,7 @@ describe("instrument", () => {
     it("should apply the log attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback([log()], function test() {
         return 42;
@@ -1518,7 +1518,7 @@ describe("instrument", () => {
     it("should apply the log attribute for errors", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback([log()], function test() {
         throw 42;
@@ -1564,7 +1564,7 @@ describe("instrument", () => {
     it("should call subscriber.newSpan on subscriber when an instrumented method is called", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       // deno-lint-ignore no-unused-vars
       async function test(arg0: string) {
@@ -1593,7 +1593,7 @@ describe("instrument", () => {
     it("should apply the message attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [message("test message")],
@@ -1622,7 +1622,7 @@ describe("instrument", () => {
     it("should apply the target attribute for classes", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [target("SomeClass", "someMethod")],
@@ -1651,7 +1651,7 @@ describe("instrument", () => {
     it("should apply the level attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const test = instrumentCallback(
         [level(Level.TRACE)],
@@ -1680,7 +1680,7 @@ describe("instrument", () => {
     it("should apply the target attribute for functions", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [target("someFunction")],
@@ -1707,7 +1707,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by param name", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skip("arg0", "arg2")],
@@ -1748,7 +1748,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by mask", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skip(true, false, true, false)],
@@ -1789,7 +1789,7 @@ describe("instrument", () => {
     it("should apply the skip attribute by index", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skip(0, 2)],
@@ -1828,7 +1828,7 @@ describe("instrument", () => {
     it("should apply the skipAll attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [skipAll],
@@ -1858,7 +1858,7 @@ describe("instrument", () => {
     it("should apply the field attribute with literal value", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [field("fieldKey", "fieldValue")],
@@ -1892,7 +1892,7 @@ describe("instrument", () => {
     it("should apply the field attribute with mapped", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback(
         [field("sum", ([arg0, arg1]) => arg0 + arg1)],
@@ -1926,7 +1926,7 @@ describe("instrument", () => {
     it("should apply the logEnter attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback([logEnter()], async function test() {
         await Promise.resolve();
@@ -1948,7 +1948,7 @@ describe("instrument", () => {
     it("should apply the logExit attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback([logExit()], async function test() {
         await Promise.resolve();
@@ -1971,7 +1971,7 @@ describe("instrument", () => {
     it("should apply the logError attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback([logError()], async function test() {
         await Promise.resolve();
@@ -2000,7 +2000,7 @@ describe("instrument", () => {
     it("should apply the log attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback([log()], async function test() {
         await Promise.resolve();
@@ -2033,7 +2033,7 @@ describe("instrument", () => {
     it("should apply the log attribute for errors", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       const testFn = instrumentCallback([log()], async function test() {
         await Promise.resolve();

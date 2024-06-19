@@ -2,7 +2,7 @@ import { describe, it } from "@std/testing/bdd";
 import { fn } from "jest-mock";
 import { expect } from "expect";
 import { createTestSubscriber } from "./subscriber.ts";
-import { context, createContext } from "../context.ts";
+import { context, createSubscriberContext } from "../context.ts";
 import { critical, debug, error, event, info, trace, warn } from "../event.ts";
 import { Level } from "../level.ts";
 
@@ -11,7 +11,7 @@ describe("event", () => {
     it("should call subscriber.event on subscriber when a new event is created", () => {
       // Arrange
       const subscriber = createTestSubscriber();
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
 
       // Act
@@ -32,7 +32,7 @@ describe("event", () => {
       const subscriber = createTestSubscriber({
         enabledForLevel: fn().mockReturnValue(false),
       });
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
 
       // Act
@@ -47,7 +47,7 @@ describe("event", () => {
       const subscriber = createTestSubscriber({
         enabled: fn().mockReturnValue(false),
       });
-      const ctx = createContext(subscriber);
+      const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
 
       // Act
@@ -72,7 +72,7 @@ describe("event", () => {
       it("should call subscriber.event with the correct level", () => {
         // Arrange
         const subscriber = createTestSubscriber();
-        const ctx = createContext(subscriber);
+        const ctx = createSubscriberContext(subscriber);
         context.enterWith(ctx);
 
         // Act

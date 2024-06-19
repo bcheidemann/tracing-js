@@ -22,13 +22,13 @@ type EnteredSpanNode = SpanNode & {
  *
  * @example
  * ```ts
- * import { ManagedSubscriber, Event, SpanAttributes } from "@bcheidemann/tracing";
+ * import { ManagedSubscriber, Event, SpanAttributes, setDefaultGlobalSubscriber } from "@bcheidemann/tracing";
  *
  * class MySubscriber extends ManagedSubscriber {
  *   public static init(): MySubscriber {
  *     const subscriber = new MySubscriber();
  *     // Enter the new subscriber into the current async context
- *     context.enterWith(createContext(subscriber));
+ *     setDefaultGlobalSubscriber(subscriber);
  *     return subscriber;
  *   }
  *

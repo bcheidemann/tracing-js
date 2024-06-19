@@ -9,7 +9,10 @@ import {
   red,
   yellow,
 } from "@std/fmt/colors";
-import { context, createContext } from "../context.ts";
+import {
+  createSubscriberContext,
+  setDefaultGlobalSubscriber,
+} from "../context.ts";
 import type { Event } from "../event.ts";
 import { Level } from "../level.ts";
 import type { SpanAttributes } from "../span.ts";
@@ -93,9 +96,12 @@ export class FmtSubscriber extends ManagedSubscriber {
     }
   }
 
+  /**
+   * Initialises the FmtSubscriber as the default global subscriber.
+   */
   public static init(options: FmtSubscriberOptions = {}): FmtSubscriber {
     const subscriber = new FmtSubscriber(options);
-    context.enterWith(createContext(subscriber));
+    setDefaultGlobalSubscriber(createSubscriberContext(subscriber));
     return subscriber;
   }
 
