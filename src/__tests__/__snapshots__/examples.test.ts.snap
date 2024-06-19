@@ -1,0 +1,10 @@
+export const snapshot = {};
+
+snapshot[`basic example > should match the snapshot 1`] = `
+"[1970-01-01T00:00:00.000Z] [INFO] request{requestId=123}:LoginController.login{args.0=user}: Entering LoginController.login
+[1970-01-01T00:00:00.000Z] [ERROR] request{requestId=123}:LoginController.login{args.0=user}:AuthService.login{args.0=user}:UserRepository.findUserByUsername{args.0=user}: Found user matching username (returnValue.user.id=42)
+[1970-01-01T00:00:00.000Z] [INFO] request{requestId=123}:LoginController.login{args.0=user}:AuthService.login{args.0=user}:TokenRepository.generateUserToken{args.0=42}: Issuing tokens for user
+[1970-01-01T00:00:00.000Z] [INFO] request{requestId=123}:LoginController.login{args.0=user}: Exiting LoginController.login
+[1970-01-01T00:00:00.000Z] [DEBUG] request{requestId=123}: Issued tokens (tokens.authToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c, tokens.refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODEwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.E0uq7OLbMmqSViHYTadPEJ_2F1QiIRyXaPwXFfeigrU)
+"
+`;

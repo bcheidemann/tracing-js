@@ -4,7 +4,8 @@
   "tasks": {
     "checks": "deno task test && deno lint && deno fmt --check && deno run src/examples/basic/main.ts",
     "check": "deno check src/mod.ts",
-    "test": "deno test --allow-read=."
+    "test": "deno test --allow-read=. --allow-run=deno",
+    "test:update": "deno test --allow-read=. --allow-run=deno --allow-write=src/__tests__/__snapshots__ -- --update"
   },
   "exports": {
     ".": "./src/mod.ts",
@@ -17,6 +18,7 @@
   "imports": {
     "@bcheidemann/parse-params": "jsr:@bcheidemann/parse-params@^0.2.1",
     "@std/assert": "jsr:@std/assert@^0.226.0",
+    "@std/streams": "jsr:@std/streams@^0.224.5",
     "@std/testing": "jsr:@std/testing@^0.225.2",
     "expect": "npm:expect@29.7.0",
     "jest-mock": "https://esm.sh/jest-mock@29.7.0?pin=v133"

@@ -1,3 +1,4 @@
+import "../__utils__/snapshotHelper.ts";
 import { debug } from "../../event.ts";
 import { Level } from "../../level.ts";
 import { infoSpan } from "../../span.ts";
