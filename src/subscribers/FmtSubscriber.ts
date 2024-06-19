@@ -224,8 +224,16 @@ export class FmtSubscriber extends ManagedSubscriber {
               [`${outerKey}.stack`, value.stack],
             );
           }
-        } else if (!entries.length && "constructor" in value) {
-          entries.push([`${outerKey}`, value.constructor.name]);
+        } else if (
+          !entries.length && "constructor" in value
+        ) {
+          entries.push([
+            `${outerKey}`,
+            value.constructor.name === "Object"
+              ? value
+              : value.constructor.name,
+          ]);
+          return entries;
         }
         return this.flattenFields(entries);
       } else {

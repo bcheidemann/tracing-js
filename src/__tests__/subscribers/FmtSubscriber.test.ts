@@ -208,4 +208,24 @@ describe("FmtSubscriber", () => {
       "[1970-01-01T00:00:00.000Z] [INFO] Example.test{target.class=Example, target.method=test, args.0=arg0, objArray.0.key=value, objArray.0.key2.value=innerValue}: test (eventKey=event)",
     );
   });
+
+  it("should serialize empty objects correctly", () => {
+    // Arrange
+    using _time = new FakeTime(new Date(0));
+    FmtSubscriber.init({ color: false });
+
+    // Act
+    span(Level.INFO, "Example.test", {
+      emptyObject: {},
+    }).enter();
+    event(Level.INFO, "test", {
+      emptyObject: {},
+    });
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith(
+      "[1970-01-01T00:00:00.000Z] [INFO] Example.test{emptyObject={}}: test (emptyObject={})",
+    );
+  });
 });
