@@ -6,7 +6,11 @@ import { describe, it } from "jsr:@std/testing@^0.225.2/bdd";
 describe("basic example", () => {
   it("should match the snapshot", async (context) => {
     const command = new Deno.Command("deno", {
-      args: ["run", "--allow-env=IS_SNAPSHOT_RUN", "src/examples/basic/main.ts"],
+      args: [
+        "run",
+        "--allow-env=IS_SNAPSHOT_RUN",
+        "src/examples/basic/main.ts",
+      ],
       env: {
         IS_SNAPSHOT_RUN: "true",
       },
