@@ -1,4 +1,14 @@
-import { gray, magenta, cyan, green, yellow, red, bold, bgRed, italic } from "@std/fmt/colors";
+import {
+  bgRed,
+  bold,
+  cyan,
+  gray,
+  green,
+  italic,
+  magenta,
+  red,
+  yellow,
+} from "@std/fmt/colors";
 import { context, createContext } from "../context.ts";
 import type { Event } from "../event.ts";
 import { Level } from "../level.ts";
@@ -16,13 +26,13 @@ const levelToString: Record<Level, string> = {
 };
 
 const levelToFormatter: Record<Level, (str: string) => string> = {
-  [Level.DISABLED]: str => gray(str),
-  [Level.TRACE]: str => bold(magenta(str)),
-  [Level.DEBUG]: str => bold(cyan(str)),
-  [Level.INFO]: str => bold(green(str)),
-  [Level.WARN]: str => bold(yellow(str)),
-  [Level.ERROR]: str => bold(red(str)),
-  [Level.CRITICAL]: str => bold(bgRed(str)),
+  [Level.DISABLED]: (str) => gray(str),
+  [Level.TRACE]: (str) => bold(magenta(str)),
+  [Level.DEBUG]: (str) => bold(cyan(str)),
+  [Level.INFO]: (str) => bold(green(str)),
+  [Level.WARN]: (str) => bold(yellow(str)),
+  [Level.ERROR]: (str) => bold(red(str)),
+  [Level.CRITICAL]: (str) => bold(bgRed(str)),
 };
 
 /**
@@ -43,7 +53,7 @@ export type FmtSubscriberOptions = {
   timestamp?: boolean;
   /**
    * Log messages in color.
-   * 
+   *
    * Defaults to true if supported by the terminal environment.
    *
    * @default true
@@ -170,7 +180,8 @@ export class FmtSubscriber extends ManagedSubscriber {
     if (!fields.length) return;
 
     const fieldsFmt = this.flattenFields(fields).map(
-      ([key, value]) => `${this.color ? italic(key) : key}=${this.displayValue(value, true)}`,
+      ([key, value]) =>
+        `${this.color ? italic(key) : key}=${this.displayValue(value, true)}`,
     );
     const fieldsStr = `(${fieldsFmt.join(", ")})`;
     return this.color ? gray(fieldsStr) : fieldsStr;
@@ -182,7 +193,8 @@ export class FmtSubscriber extends ManagedSubscriber {
     if (!fields.length) return;
 
     const fieldsFmt = this.flattenFields(fields).map(
-      ([key, value]) => `${this.color ? italic(key) : key}=${this.displayValue(value, true)}`,
+      ([key, value]) =>
+        `${this.color ? italic(key) : key}=${this.displayValue(value, true)}`,
     );
     return `{${fieldsFmt.join(", ")}}`;
   }
@@ -235,7 +247,10 @@ export class FmtSubscriber extends ManagedSubscriber {
     }
 
     if (isFieldValue && this.options.abbreviateLongFieldValues) {
-      const maxLength = typeof this.options.abbreviateLongFieldValues === "number" ? this.options.abbreviateLongFieldValues : 32;
+      const maxLength =
+        typeof this.options.abbreviateLongFieldValues === "number"
+          ? this.options.abbreviateLongFieldValues
+          : 32;
       const charsToRemove = str.length - maxLength;
       if (charsToRemove > 3) {
         const startCut = Math.round((str.length - charsToRemove) / 2);
