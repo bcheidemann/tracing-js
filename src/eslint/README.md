@@ -21,13 +21,13 @@
   using _guard = span(Level.INFO, "my span").enter();
 
   // Do stuff...
-
 } // _guard.exit() automatically called here
 ```
 
 ### Explanation
 
-When manually exiting spans, it is easy to forget to exit spans, which may lead to unexpected results.
+When manually exiting spans, it is easy to forget to exit spans, which may lead
+to unexpected results.
 
 For example:
 
@@ -47,4 +47,5 @@ function doStuff() {
 }
 ```
 
-In the above example, if `someCondition` is truthy, the span will remain entered even after the function has returned.
+In the above example, if `someCondition` is truthy, the span will remain entered
+even after the function has returned.
