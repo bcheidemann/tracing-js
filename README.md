@@ -412,10 +412,15 @@ not universally supported. The below table outlines bundler support by feature.
 
 ### Runtime Support
 
-| Runtime            | Supported | Comment                                                                                                                   |
-| ------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Node               | ✅        | ****-                                                                                                                     |
-| CloudFlare Workers | ✅*       | Untested. Requires [nodejs_compat](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/) flag |
-| Deno               | ✅*       | Untested                                                                                                                  |
-| Bun                | ✅*       | Untested                                                                                                                  |
-| Browser            | ❌        | Requires `AsyncLocalStorage` API                                                                                          |
+`@bcheidemann/tracing` works out of the box with Node, Deno and Bun. It also has
+full support for CloudFlare workers, but requires the use of the
+[nodejs_compat](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/)
+flag.
+
+| Runtime            | Supported | Comment                                                                                                          |
+| ------------------ | --------- | ---------------------------------------------------------------------------------------------------------------- |
+| Node               | ✅        |                                                                                                                  |
+| Deno               | ✅        |                                                                                                                  |
+| Bun                | ✅        |                                                                                                                  |
+| CloudFlare Workers | ✅        | Requires [nodejs_compat](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/) flag. |
+| Browser            | ❌        | Requires `AsyncLocalStorage` API                                                                                 |
