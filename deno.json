@@ -16,8 +16,7 @@
     "./instrument": "./src/instrument.ts",
     "./level": "./src/level.ts",
     "./span": "./src/span.ts",
-    "./subscriber": "./src/subscriber.ts",
-    "./eslint-plugin": "./src/eslint/plugin.ts"
+    "./subscriber": "./src/subscriber.ts"
   },
   "imports": {
     "@bcheidemann/parse-params": "jsr:@bcheidemann/parse-params@^0.2.1",
@@ -25,9 +24,6 @@
     "@std/fmt": "jsr:@std/fmt@^0.225.4",
     "@std/streams": "jsr:@std/streams@^0.224.5",
     "@std/testing": "jsr:@std/testing@^0.225.2",
-    "@types/eslint": "npm:@types/eslint@^8.56.10",
-    "@typescript-eslint/parser": "npm:@typescript-eslint/parser@^7.13.1",
-    "eslint": "npm:eslint@^9.5.0",
     "expect": "npm:expect@29.7.0",
     "jest-mock": "https://esm.sh/jest-mock@29.7.0?pin=v133"
   }
