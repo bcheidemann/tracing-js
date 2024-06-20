@@ -4,8 +4,8 @@
   "tasks": {
     "checks": "deno task test && deno lint && deno fmt --check && deno task example:basic && deno task example:basic-json && deno task example:api-class-instrumentation",
     "check": "deno check src/mod.ts",
-    "test": "deno test --allow-read=. --allow-run=deno",
-    "test:update": "deno test --allow-read=. --allow-run=deno --allow-write=src/__tests__/__snapshots__ -- --update",
+    "test": "deno test --allow-read=. --allow-run=deno --allow-env --allow-sys=cpus",
+    "test:update": "deno task test --allow-write=src/__tests__/__snapshots__ -- --update",
     "example:basic": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/basic/main.ts",
     "example:basic-json": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/basic-json/main.ts",
     "example:api-class-instrumentation": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/api-class-instrumentation/main.ts"
@@ -16,7 +16,8 @@
     "./instrument": "./src/instrument.ts",
     "./level": "./src/level.ts",
     "./span": "./src/span.ts",
-    "./subscriber": "./src/subscriber.ts"
+    "./subscriber": "./src/subscriber.ts",
+    "./eslint-plugin": "./src/eslint/plugin.ts"
   },
   "imports": {
     "@bcheidemann/parse-params": "jsr:@bcheidemann/parse-params@^0.2.1",
@@ -24,6 +25,9 @@
     "@std/fmt": "jsr:@std/fmt@^0.225.4",
     "@std/streams": "jsr:@std/streams@^0.224.5",
     "@std/testing": "jsr:@std/testing@^0.225.2",
+    "@types/eslint": "npm:@types/eslint@^8.56.10",
+    "@typescript-eslint/parser": "npm:@typescript-eslint/parser@^7.13.1",
+    "eslint": "npm:eslint@^9.5.0",
     "expect": "npm:expect@29.7.0",
     "jest-mock": "https://esm.sh/jest-mock@29.7.0?pin=v133"
   }
