@@ -2,11 +2,12 @@
   "name": "@bcheidemann/tracing",
   "version": "0.3.5",
   "tasks": {
-    "checks": "deno task test && deno lint && deno fmt --check && deno task example:basic && deno task example:api-class-instrumentation",
+    "checks": "deno task test && deno lint && deno fmt --check && deno task example:basic && deno task example:basic-json && deno task example:api-class-instrumentation",
     "check": "deno check src/mod.ts",
     "test": "deno test --allow-read=. --allow-run=deno",
     "test:update": "deno test --allow-read=. --allow-run=deno --allow-write=src/__tests__/__snapshots__ -- --update",
     "example:basic": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/basic/main.ts",
+    "example:basic-json": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/basic-json/main.ts",
     "example:api-class-instrumentation": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/api-class-instrumentation/main.ts"
   },
   "exports": {
