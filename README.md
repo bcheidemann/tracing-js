@@ -1,6 +1,4 @@
-<!-- TODO: Add link to examples folder -->
-
-# TracingJS
+# tracing
 
 [![JSR](https://jsr.io/badges/@bcheidemann/tracing)](https://jsr.io/@bcheidemann/tracing)
 [![JSR Score](https://jsr.io/badges/@bcheidemann/tracing/score)](https://jsr.io/@bcheidemann/tracing)
@@ -230,11 +228,17 @@ The following attributes can be applied:
 | logReturnValue | `logReturnValue()`                              | Requires `logExit`. Appends the `returnValue` field to the logged exit event.                                               |
 |                | `logReturnValue((val, args) => val.toString())` | Appends the mapped `returnValue` field to the logged exit event.                                                            |
 
-## Instrumenting Functions
+### Instrumenting Functions
 
-## Subscribers
+<!-- TODO -->
+
+### Subscribers
 
 <!-- TODO: Add docs for subscribers -->
+
+## ESLint Plugin
+
+`@bcheidemann/tracing` comes with an ESLint plugin, which helps catch common issues. See [`@bcheidemann/tracing-eslint`](https://jsr.io/@bcheidemann/tracing-eslint).
 
 ## Usage Considerations
 
