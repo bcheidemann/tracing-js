@@ -4,7 +4,7 @@ import { Level } from "../../level.ts";
 import { infoSpan } from "../../span.ts";
 import { JsonSubscriber } from "../../subscribers/JsonSubscriber.ts";
 
-JsonSubscriber.init({
+JsonSubscriber.setGlobalDefault({
   level: Level.DISABLED,
 });
 

@@ -4,7 +4,7 @@ import { Level } from "../../level.ts";
 import { infoSpan } from "../../span.ts";
 import { FmtSubscriber } from "../../subscriber.ts";
 
-FmtSubscriber.init({
+FmtSubscriber.setGlobalDefault({
   level: Level.DISABLED,
 });
 

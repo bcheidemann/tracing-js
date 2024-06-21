@@ -42,6 +42,9 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
   protected constructor(
     private readonly level: Level = Level.INFO,
     private currentSpan: EnteredSpanNode | undefined = undefined,
+    // TODO: Use a WeakMap to prevent memory leaks.
+    // NOTE: We cannot clone a WeakMap, so the clone implementation will need to be updated to hold a reference
+    //       to the parent subscriber, which can then be traversed as a linked list to find pending spans.
     private readonly pendingSpans: Map<symbol, PendingSpanNode> = new Map(),
   ) {}
 

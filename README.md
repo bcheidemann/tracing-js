@@ -27,8 +27,7 @@ logging, and diagnostic information from JavaScript applications at runtime.
   - [Examples](#examples)
   - [Recording Spans](#recording-spans)
   - [Recording Events](#recording-events)
-  - [Instrumenting Methods](#instrumenting-methods)
-  - [Instrumenting Functions](#instrumenting-functions)
+  - [Instrumenting Methods and Functions](#instrumenting-methods-and-functions)
   - [Subscribers](#subscribers-1)
 - [Usage Considerations](#usage-considerations)
   - [Usage in Asynchronous Code](#usage-in-asynchronous-code)
@@ -205,7 +204,7 @@ event(Level.INFO, "info event with fields", {
 });
 ```
 
-### Instrumenting Methods
+### Instrumenting Methods and Functions
 
 When using classes, you can instument methods as follows:
 
@@ -298,13 +297,18 @@ The following attributes can be applied:
 | logReturnValue | `logReturnValue()`                              | Requires `logExit`. Appends the `returnValue` field to the logged exit event.                                               |
 |                | `logReturnValue((val, args) => val.toString())` | Appends the mapped `returnValue` field to the logged exit event.                                                            |
 
-### Instrumenting Functions
-
-<!-- TODO -->
-
 ### Subscribers
 
-<!-- TODO: Add docs for subscribers -->
+A default global subscriber should be registered when your program starts. This
+can be done as follows:
+
+```ts
+import { FmtSubscriber } from "@bcheidemann/tracing";
+
+FmtSubscriber.setGlobalDefault();
+
+// Rest of program
+```
 
 ## Usage Considerations
 
@@ -403,6 +407,11 @@ working with class methods).
 
 ### Unused Spans
 
+> We intend to fix the memory leak described here in a future version by making
+> use of a `WeakMap` to hold on to pending span references. However, this
+> requires some refactoring and further testing to ensure that it will not
+> interfere with asynchronous context tracking.
+
 Generally, it is recommended not to dynamically create spans which might not be
 entered. This is because subscribers need to hold onto references to these
 spans, as they cannot know that the span will not be entered. Therefore, an
@@ -416,7 +425,7 @@ function leak() {
 }
 
 function createMemoryLeak() {
-  FmtSubscriber.init();
+  FmtSubscriber.setGlobalDefault();
   setInterval(leak, 100);
 }
 ```
@@ -438,7 +447,7 @@ function leak() {
 }
 
 function createMemoryLeak() {
-  FmtSubscriber.init();
+  FmtSubscriber.setGlobalDefault();
   setInterval(instrumentCallback(leak), 100);
 }
 ```

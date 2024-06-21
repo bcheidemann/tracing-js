@@ -22,7 +22,7 @@ describe("JsonSubscriber", () => {
   it("should log the message to the console", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    JsonSubscriber.init();
+    JsonSubscriber.setGlobalDefault();
 
     // Act
     event(Level.INFO, "test");
@@ -49,7 +49,7 @@ describe("JsonSubscriber", () => {
       () => {
         // Arrange
         const spy = spyOn(console, log).mockImplementation(() => {});
-        JsonSubscriber.init({
+        JsonSubscriber.setGlobalDefault({
           level: Level.TRACE,
         });
 
@@ -65,7 +65,7 @@ describe("JsonSubscriber", () => {
   it("should log the message to the console with a field", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    JsonSubscriber.init();
+    JsonSubscriber.setGlobalDefault();
 
     // Act
     event(Level.INFO, "test", {
@@ -82,7 +82,7 @@ describe("JsonSubscriber", () => {
   it("should log the message to the console with object fields", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    JsonSubscriber.init();
+    JsonSubscriber.setGlobalDefault();
 
     // Act
     event(Level.INFO, "test", {
@@ -109,7 +109,7 @@ describe("JsonSubscriber", () => {
   it("should log the message to the console with fields", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    JsonSubscriber.init();
+    JsonSubscriber.setGlobalDefault();
 
     // Act
     event(Level.INFO, "test", {
@@ -127,7 +127,7 @@ describe("JsonSubscriber", () => {
   it("should log the message to the console with a span", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    JsonSubscriber.init();
+    JsonSubscriber.setGlobalDefault();
 
     // Act
     span(Level.INFO, "test span").enter();
@@ -143,7 +143,7 @@ describe("JsonSubscriber", () => {
   it("should log the message to the console with spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    JsonSubscriber.init();
+    JsonSubscriber.setGlobalDefault();
 
     // Act
     span(Level.INFO, "outer span").enter();
@@ -160,7 +160,7 @@ describe("JsonSubscriber", () => {
   it("should log fields from spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    JsonSubscriber.init();
+    JsonSubscriber.setGlobalDefault();
 
     // Act
     span(Level.INFO, "outer span", {
@@ -183,7 +183,7 @@ describe("JsonSubscriber", () => {
   it("should log object fields from spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    JsonSubscriber.init();
+    JsonSubscriber.setGlobalDefault();
 
     // Act
     span(Level.INFO, "Example.test", {

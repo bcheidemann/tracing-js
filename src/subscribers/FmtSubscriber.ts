@@ -78,9 +78,9 @@ export type FmtSubscriberOptions = {
  * ```ts
  * import { FmtSubscriber } from "@bcheidemann/tracing";
  *
- * // Initialize the subscriber and enter it into the current async context
+ * // Initialize the subscriber and set it as the default global subscriber
  * // This should be called at the beginning of your program
- * FmtSubscriber.init();
+ * FmtSubscriber.setGlobalDefault();
  * ```
  */
 export class FmtSubscriber extends ManagedSubscriber {
@@ -98,8 +98,16 @@ export class FmtSubscriber extends ManagedSubscriber {
 
   /**
    * Initialises the FmtSubscriber as the default global subscriber.
+   *
+   * @deprecated Use `FmtSubscriber.setGlobalDefault()` instead
    */
   public static init(options: FmtSubscriberOptions = {}): FmtSubscriber {
+    return this.setGlobalDefault(options);
+  }
+
+  public static setGlobalDefault(
+    options: FmtSubscriberOptions = {},
+  ): FmtSubscriber {
     const subscriber = new FmtSubscriber(options);
     setDefaultGlobalSubscriber(createSubscriberContext(subscriber));
     return subscriber;

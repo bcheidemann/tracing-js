@@ -42,9 +42,9 @@ export type JsonSubscriberOptions = {
  * ```ts
  * import { JsonSubscriber } from "@bcheidemann/tracing";
  *
- * // Initialize the subscriber and enter it into the current async context
+ * // Initialize the subscriber and set it as the default global subscriber
  * // This should be called at the beginning of your program
- * JsonSubscriber.init();
+ * JsonSubscriber.setGlobalDefault();
  * ```
  */
 export class JsonSubscriber extends ManagedSubscriber {
@@ -54,8 +54,16 @@ export class JsonSubscriber extends ManagedSubscriber {
 
   /**
    * Initialises the JsonSubscriber as the default global subscriber.
+   *
+   * @deprecated Use `JsonSubscriber.setGlobalDefault()` instead
    */
   public static init(options: JsonSubscriberOptions = {}): JsonSubscriber {
+    return this.setGlobalDefault(options);
+  }
+
+  public static setGlobalDefault(
+    options: JsonSubscriberOptions = {},
+  ): JsonSubscriber {
     const subscriber = new JsonSubscriber(options);
     setDefaultGlobalSubscriber(createSubscriberContext(subscriber));
     return subscriber;

@@ -8,7 +8,7 @@ import { TokenRepository } from "./repositories/TokenRepository.ts";
 import { UserRepository } from "./repositories/UserRepository.ts";
 import { AuthService } from "./services/AuthService.ts";
 
-FmtSubscriber.init({
+FmtSubscriber.setGlobalDefault({
   level: Level.DEBUG,
   abbreviateLongFieldValues: true,
 });

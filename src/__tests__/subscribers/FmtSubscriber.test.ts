@@ -22,7 +22,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init({ color: false });
+    FmtSubscriber.setGlobalDefault({ color: false });
 
     // Act
     event(Level.INFO, "test");
@@ -47,7 +47,7 @@ describe("FmtSubscriber", () => {
       () => {
         // Arrange
         const spy = spyOn(console, log).mockImplementation(() => {});
-        FmtSubscriber.init({
+        FmtSubscriber.setGlobalDefault({
           level: Level.TRACE,
           color: false,
         });
@@ -64,7 +64,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with a field", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init({ color: false });
+    FmtSubscriber.setGlobalDefault({ color: false });
 
     // Act
     event(Level.INFO, "test", {
@@ -81,7 +81,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with object fields", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init({ color: false });
+    FmtSubscriber.setGlobalDefault({ color: false });
 
     // Act
     event(Level.INFO, "test", {
@@ -108,7 +108,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with fields", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init({ color: false });
+    FmtSubscriber.setGlobalDefault({ color: false });
 
     // Act
     event(Level.INFO, "test", {
@@ -126,7 +126,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with a span", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init({ color: false });
+    FmtSubscriber.setGlobalDefault({ color: false });
 
     // Act
     span(Level.INFO, "test span").enter();
@@ -142,7 +142,7 @@ describe("FmtSubscriber", () => {
   it("should log the message to the console with spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init({ color: false });
+    FmtSubscriber.setGlobalDefault({ color: false });
 
     // Act
     span(Level.INFO, "outer span").enter();
@@ -159,7 +159,7 @@ describe("FmtSubscriber", () => {
   it("should log fields from spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init({ color: false });
+    FmtSubscriber.setGlobalDefault({ color: false });
 
     // Act
     span(Level.INFO, "outer span", {
@@ -182,7 +182,7 @@ describe("FmtSubscriber", () => {
   it("should log object fields from spans", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init({ color: false });
+    FmtSubscriber.setGlobalDefault({ color: false });
 
     // Act
     span(Level.INFO, "Example.test", {
@@ -212,7 +212,7 @@ describe("FmtSubscriber", () => {
   it("should serialize empty objects correctly", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
-    FmtSubscriber.init({ color: false });
+    FmtSubscriber.setGlobalDefault({ color: false });
 
     // Act
     span(Level.INFO, "Example.test", {
