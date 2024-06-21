@@ -238,7 +238,9 @@ The following attributes can be applied:
 
 ## ESLint Plugin
 
-`@bcheidemann/tracing` comes with an ESLint plugin, which helps catch common issues. See [`@bcheidemann/tracing-eslint`](https://jsr.io/@bcheidemann/tracing-eslint).
+`@bcheidemann/tracing` comes with an ESLint plugin, which helps catch common
+issues. See
+[`@bcheidemann/tracing-eslint`](https://jsr.io/@bcheidemann/tracing-eslint).
 
 ## Usage Considerations
 
