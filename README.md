@@ -53,10 +53,10 @@ deno add @bcheidemann/tracing
 
 ### Node
 
-The package is published to [JSR](https://jsr.io/@bcheidemann/tracing), a
-new package registry for TypeScript. To install JSR packages for Node, you need
-to use the `jsr` CLI. After installing it, it will behave just like any other
-Node module.
+The package is published to [JSR](https://jsr.io/@bcheidemann/tracing), a new
+package registry for TypeScript. To install JSR packages for Node, you need to
+use the `jsr` CLI. After installing it, it will behave just like any other Node
+module.
 
 ```sh
 # npm
@@ -482,7 +482,9 @@ not universally supported. The below table outlines bundler support by feature.
 
 #### Vite
 
-Since method instrumentation requires decorator support, you must ensure the Vite is configured to enable decorators if you wish to use the `@instrument` decorator. This can be done by adding the following lines to your Vite config.
+Since method instrumentation requires decorator support, you must ensure the
+Vite is configured to enable decorators if you wish to use the `@instrument`
+decorator. This can be done by adding the following lines to your Vite config.
 
 ```patch
 import { defineConfig } from 'vite'
@@ -496,11 +498,17 @@ export default defineConfig({
 
 #### ESBuild
 
-Since method instrumentation requires decorator support, you must ensure that ESBuild is configured to enable decorators if you wish to use the `@instrument` decorator. This can be done by setting the `--target=es2022` flag.
+Since method instrumentation requires decorator support, you must ensure that
+ESBuild is configured to enable decorators if you wish to use the `@instrument`
+decorator. This can be done by setting the `--target=es2022` flag.
 
 #### SWC
 
-Since method instrumentation requires decorator support, you must ensure that SWC is configured to enable decorators if you wish to use the `@instrument` decorator. Please refer to the [SWC documentation](https://swc.rs/docs/configuration/compilation#jsctransformdecoratorversion) for configuration options.
+Since method instrumentation requires decorator support, you must ensure that
+SWC is configured to enable decorators if you wish to use the `@instrument`
+decorator. Please refer to the
+[SWC documentation](https://swc.rs/docs/configuration/compilation#jsctransformdecoratorversion)
+for configuration options.
 
 ### Runtime Support
 
@@ -525,4 +533,5 @@ issues. See
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/bcheidemann/tracing-js/blob/master/CONTRIBUTING.md)
+See
+[CONTRIBUTING.md](https://github.com/bcheidemann/tracing-js/blob/master/CONTRIBUTING.md)
