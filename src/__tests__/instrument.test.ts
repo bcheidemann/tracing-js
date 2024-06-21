@@ -712,6 +712,68 @@ describe("instrument", () => {
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
 
+    it("should apply the skip attribute by rest param name", async () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(skip("...args"))
+        // deno-lint-ignore no-unused-vars
+        async test(...args: string[]) {
+          await Promise.resolve();
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      await instance.test("arg0", "arg1", "arg2", "arg3");
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {},
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
+
+    it("should apply the skip attribute by rest param name for trailing rest param", async () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(skip("...args"))
+        // deno-lint-ignore no-unused-vars
+        async test(arg0: string, ...args: string[]) {
+          await Promise.resolve();
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      await instance.test("arg0", "arg1", "arg2", "arg3");
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {
+          args: {
+            0: "arg0"
+          }
+        },
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
+
     it("should apply the skip attribute by mask", async () => {
       // Arrange
       const subscriber = createTestSubscriber();

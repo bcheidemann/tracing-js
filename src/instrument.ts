@@ -3,7 +3,7 @@
  * This module provides functions for instrumenting methods and functions.
  */
 
-import { parseParamNamesFromFunction } from "@bcheidemann/parse-params";
+import { parseParamNodesFromFunction, paramNodeToParamName, type ParamNode } from "@bcheidemann/parse-params";
 import { context, getSubscriberContext } from "./context.ts";
 import { event } from "./event.ts";
 import { Level } from "./level.ts";
@@ -1607,8 +1607,24 @@ type Context =
     methodName: string;
   };
 
+type ParamNodeWithMeta = (ParamNode & { paramName: string, index: number });
 // deno-lint-ignore ban-types
-const ParsedFunctionParams = new WeakMap<Function, string[]>();
+const ParsedFunctionParams = new WeakMap<Function, ParamNodeWithMeta[]>();
+
+// deno-lint-ignore no-explicit-any
+function getParsedParamsForFunction(fn: (...args: any[]) => any) {
+  const parsedParams = ParsedFunctionParams.get(fn);
+  if (parsedParams) {
+    return parsedParams;
+  }
+  const params = parseParamNodesFromFunction(fn).map((param, index): ParamNodeWithMeta => ({
+    ...param,
+    paramName: paramNodeToParamName(param, { returnIdentifierForParamAssignmentExpressions: true }),
+    index,
+  }));
+  ParsedFunctionParams.set(fn, params);
+  return params;
+}
 
 function instrumentCallbackImpl<
   TCallback extends AnyFunction,
@@ -1676,11 +1692,21 @@ function instrumentCallbackImpl<
             switch (typeof skip) {
               // deno-lint-ignore no-case-declarations
               case "string":
-                const paramNames = ParsedFunctionParams.get(fn) ??
-                  parseParamNamesFromFunction(fn);
-                ParsedFunctionParams.set(fn, paramNames);
-                const skipIndex = paramNames.indexOf(skip);
-                delete logArgs[skipIndex];
+                const parsedParams = getParsedParamsForFunction(fn);
+                const paramToSkip = parsedParams.find(param => param.paramName === skip);
+                if (!paramToSkip) {
+                  break;
+                }
+                const isLast = paramToSkip.index === (parsedParams.length - 1);
+                if (isLast && paramToSkip.type === "RestElement") {
+                  for (let index = parsedParams.length - 1; index < args.length; index += 1) {
+                    console.log('index: ', index);
+                    delete logArgs[index];
+                  }
+                }
+                else {
+                  delete logArgs[paramToSkip.index];
+                }
                 break;
               case "number":
                 delete logArgs[skip];
