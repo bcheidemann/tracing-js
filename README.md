@@ -1,4 +1,4 @@
-# tracing <!-- omit in toc -->
+# Tracing <!-- omit in toc -->
 
 [![JSR](https://jsr.io/badges/@bcheidemann/tracing)](https://jsr.io/@bcheidemann/tracing)
 [![JSR Score](https://jsr.io/badges/@bcheidemann/tracing/score)](https://jsr.io/@bcheidemann/tracing)
@@ -12,6 +12,10 @@ logging, and diagnostic information from JavaScript applications at runtime.
 ## Table of Contents <!-- omit in toc -->
 
 - [Overview](#overview)
+- [Installation](#installation)
+  - [Deno](#deno)
+  - [Node](#node)
+  - [Bun](#bun)
 - [Motivation](#motivation)
 - [Prior Art](#prior-art)
 - [Core Concepts](#core-concepts)
@@ -38,6 +42,42 @@ logging, and diagnostic information from JavaScript applications at runtime.
   - [Runtime Support](#runtime-support)
 - [ESLint Plugin](#eslint-plugin)
 - [Contributing](#contributing)
+
+## Installation
+
+### Deno
+
+```sh
+deno add @bcheidemann/tracing
+```
+
+### Node
+
+The package is published to [JSR](https://jsr.io/@bcheidemann/tracing), a
+new package registry for TypeScript. To install JSR packages for Node, you need
+to use the `jsr` CLI. After installing it, it will behave just like any other
+Node module.
+
+```sh
+# npm
+npx jsr add @bcheidemann/tracing
+```
+
+```sh
+# yarn
+yarn dlx jsr add @bcheidemann/tracing
+```
+
+```sh
+# pnpm
+pnpm dlx jsr add @bcheidemann/tracing
+```
+
+### Bun
+
+```sh
+bunx jsr add @bcheidemann/tracing
+```
 
 ## Motivation
 
