@@ -3,7 +3,11 @@
  * This module provides functions for instrumenting methods and functions.
  */
 
-import { parseParamNodesFromFunction, paramNodeToParamName, type ParamNode } from "@bcheidemann/parse-params";
+import {
+  type ParamNode,
+  paramNodeToParamName,
+  parseParamNodesFromFunction,
+} from "@bcheidemann/parse-params";
 import { context, getSubscriberContext } from "./context.ts";
 import { event } from "./event.ts";
 import { Level } from "./level.ts";
@@ -1607,7 +1611,7 @@ type Context =
     methodName: string;
   };
 
-type ParamNodeWithMeta = (ParamNode & { paramName: string, index: number });
+type ParamNodeWithMeta = ParamNode & { paramName: string; index: number };
 // deno-lint-ignore ban-types
 const ParsedFunctionParams = new WeakMap<Function, ParamNodeWithMeta[]>();
 
@@ -1617,9 +1621,14 @@ function getParsedParamsForFunction(fn: (...args: any[]) => any) {
   if (parsedParams) {
     return parsedParams;
   }
-  const params = parseParamNodesFromFunction(fn).map((param, index): ParamNodeWithMeta => ({
+  const params = parseParamNodesFromFunction(fn).map((
+    param,
+    index,
+  ): ParamNodeWithMeta => ({
     ...param,
-    paramName: paramNodeToParamName(param, { returnIdentifierForParamAssignmentExpressions: true }),
+    paramName: paramNodeToParamName(param, {
+      returnIdentifierForParamAssignmentExpressions: true,
+    }),
     index,
   }));
   ParsedFunctionParams.set(fn, params);
@@ -1693,18 +1702,23 @@ function instrumentCallbackImpl<
               // deno-lint-ignore no-case-declarations
               case "string":
                 const parsedParams = getParsedParamsForFunction(fn);
-                const paramToSkip = parsedParams.find(param => param.paramName === skip);
+                const paramToSkip = parsedParams.find((param) =>
+                  param.paramName === skip
+                );
                 if (!paramToSkip) {
                   break;
                 }
                 const isLast = paramToSkip.index === (parsedParams.length - 1);
                 if (isLast && paramToSkip.type === "RestElement") {
-                  for (let index = parsedParams.length - 1; index < args.length; index += 1) {
-                    console.log('index: ', index);
+                  for (
+                    let index = parsedParams.length - 1;
+                    index < args.length;
+                    index += 1
+                  ) {
+                    console.log("index: ", index);
                     delete logArgs[index];
                   }
-                }
-                else {
+                } else {
                   delete logArgs[paramToSkip.index];
                 }
                 break;

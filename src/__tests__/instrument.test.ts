@@ -766,8 +766,8 @@ describe("instrument", () => {
         message: "Example.test",
         fields: {
           args: {
-            0: "arg0"
-          }
+            0: "arg0",
+          },
         },
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
