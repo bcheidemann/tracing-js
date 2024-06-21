@@ -1,4 +1,4 @@
-# tracing
+# tracing <!-- omit in toc -->
 
 [![JSR](https://jsr.io/badges/@bcheidemann/tracing)](https://jsr.io/@bcheidemann/tracing)
 [![JSR Score](https://jsr.io/badges/@bcheidemann/tracing/score)](https://jsr.io/@bcheidemann/tracing)
@@ -8,6 +8,36 @@
 
 `@bcheidemann/tracing` is a framework for collecting event based tracing,
 logging, and diagnostic information from JavaScript applications at runtime.
+
+## Table of Contents <!-- omit in toc -->
+
+- [Overview](#overview)
+- [Motivation](#motivation)
+- [Prior Art](#prior-art)
+- [Core Concepts](#core-concepts)
+  - [Spans](#spans)
+  - [Events](#events)
+  - [Subscribers](#subscribers)
+  - [Levels](#levels)
+- [Usage](#usage)
+  - [Examples](#examples)
+  - [Recording Spans](#recording-spans)
+  - [Recording Events](#recording-events)
+  - [Instrumenting Methods](#instrumenting-methods)
+  - [Instrumenting Functions](#instrumenting-functions)
+  - [Subscribers](#subscribers-1)
+- [Usage Considerations](#usage-considerations)
+  - [Usage in Asynchronous Code](#usage-in-asynchronous-code)
+  - [Unused Spans](#unused-spans)
+  - [Performance](#performance)
+  - [Minifiers](#minifiers)
+  - [Bundler Support](#bundler-support)
+    - [Vite](#vite)
+    - [ESBuild](#esbuild)
+    - [SWC](#swc)
+  - [Runtime Support](#runtime-support)
+- [ESLint Plugin](#eslint-plugin)
+- [Contributing](#contributing)
 
 ## Motivation
 
@@ -236,12 +266,6 @@ The following attributes can be applied:
 
 <!-- TODO: Add docs for subscribers -->
 
-## ESLint Plugin
-
-`@bcheidemann/tracing` comes with an ESLint plugin, which helps catch common
-issues. See
-[`@bcheidemann/tracing-eslint`](https://jsr.io/@bcheidemann/tracing-eslint).
-
 ## Usage Considerations
 
 ### Usage in Asynchronous Code
@@ -416,6 +440,28 @@ not universally supported. The below table outlines bundler support by feature.
 | method instrumentation   | ❌              | ✅  | ✅   | ✅      | ✅  |
 | `using` spans            | ❌              | ✅  | ✅   | ✅      | ✅  |
 
+#### Vite
+
+Since method instrumentation requires decorator support, you must ensure the Vite is configured to enable decorators if you wish to use the `@instrument` decorator. This can be done by adding the following lines to your Vite config.
+
+```patch
+import { defineConfig } from 'vite'
+
+export default defineConfig({
++  esbuild: {
++    target: "es2022"
++  }
+})
+```
+
+#### ESBuild
+
+Since method instrumentation requires decorator support, you must ensure that ESBuild is configured to enable decorators if you wish to use the `@instrument` decorator. This can be done by setting the `--target=es2022` flag.
+
+#### SWC
+
+Since method instrumentation requires decorator support, you must ensure that SWC is configured to enable decorators if you wish to use the `@instrument` decorator. Please refer to the [SWC documentation](https://swc.rs/docs/configuration/compilation#jsctransformdecoratorversion) for configuration options.
+
 ### Runtime Support
 
 `@bcheidemann/tracing` works out of the box with Node, Deno and Bun. It also has
@@ -430,3 +476,13 @@ flag.
 | Bun                | ✅        |                                                                                                                  |
 | CloudFlare Workers | ✅        | Requires [nodejs_compat](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/) flag. |
 | Browser            | ❌        | Requires `AsyncLocalStorage` API                                                                                 |
+
+## ESLint Plugin
+
+`@bcheidemann/tracing` comes with an ESLint plugin, which helps catch common
+issues. See
+[`@bcheidemann/tracing-eslint`](https://jsr.io/@bcheidemann/tracing-eslint).
+
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/bcheidemann/tracing-js/blob/master/CONTRIBUTING.md)
