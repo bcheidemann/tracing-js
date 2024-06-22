@@ -4,6 +4,10 @@
 [![JSR Score](https://jsr.io/badges/@bcheidemann/tracing/score)](https://jsr.io/@bcheidemann/tracing)
 ![publish workflow](https://github.com/bcheidemann/tracing-js/actions/workflows/publish.yml/badge.svg)
 
+<a class="github-button" href="https://github.com/bcheidemann/tracing-js" data-color-scheme="no-preference: light; light: light; dark: dark;" data-icon="octicon-star" data-size="large" aria-label="Star bcheidemann/tracing-js on GitHub">
+  Star us on GitHub!
+</a>
+
 ## Overview
 
 `@bcheidemann/tracing` is a framework for collecting event based tracing,
