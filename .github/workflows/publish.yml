@@ -33,6 +33,8 @@ jobs:
       - name: Example (basic)
         run: deno task example:basic
       - name: Example (basic)
+        run: deno task example:basic-json
+      - name: Example (basic)
         run: deno task example:api-class-instrumentation
 
   publish:
