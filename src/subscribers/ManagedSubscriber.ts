@@ -42,7 +42,8 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
   protected constructor(
     private readonly level: Level = Level.INFO,
     private currentSpan: EnteredSpanNode | undefined = undefined,
-    private readonly pendingSpans: WeakMap<symbol, PendingSpanNode> = new WeakMap(),
+    private readonly pendingSpans: WeakMap<symbol, PendingSpanNode> =
+      new WeakMap(),
   ) {}
 
   enabledForLevel(level: Level): boolean {
