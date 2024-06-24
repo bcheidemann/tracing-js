@@ -38,7 +38,6 @@ logging, and diagnostic information from JavaScript applications at runtime.
   - [Subscribers](#subscribers-1)
 - [Usage Considerations](#usage-considerations)
   - [Usage in Asynchronous Code](#usage-in-asynchronous-code)
-  - [Unused Spans](#unused-spans)
   - [Performance](#performance)
   - [Minifiers](#minifiers)
   - [Bundler Support](#bundler-support)
@@ -411,58 +410,6 @@ Because the `first` and `second` function share the same context, "Log from
 first" may be logged in the "second" span, and visa versa. As before, this
 problem can be avoided by using `instrumentCallback` or `@instrument` (if
 working with class methods).
-
-### Unused Spans
-
-> We intend to fix the memory leak described here in a future version by making
-> use of a `WeakMap` to hold on to pending span references. However, this
-> requires some refactoring and further testing to ensure that it will not
-> interfere with asynchronous context tracking.
-
-Generally, it is recommended not to dynamically create spans which might not be
-entered. This is because subscribers need to hold onto references to these
-spans, as they cannot know that the span will not be entered. Therefore, an
-unentered span cannot be garbage collected until the subscriber itself is
-collected. If this is performed in a loop, this can lead to memory leaks if the
-subscriber lives for a long time. Take the following example:
-
-```ts
-function leak() {
-  span(Level.INFO, "memory leak");
-}
-
-function createMemoryLeak() {
-  FmtSubscriber.setGlobalDefault();
-  setInterval(leak, 100);
-}
-```
-
-In the above code, we initialise a format subscriber in the current asynchronous
-context, and then set an interval which creates a span every 100ms. Because the
-subscriber is tied to the asynchronous context of the interval, and because the
-interval lives for the remained of the life of the program, any unused spans
-registered on the subscriber cannot be garbage collected until the program
-exists. Therefore, after calling `createMemoryLeak`, this program will leak
-memory continually.
-
-One way to ensure that memory leaks are not created is to use instrumented
-functions. Consider the following modification of the above program:
-
-```ts
-function leak() {
-  span(Level.INFO, "memory leak");
-}
-
-function createMemoryLeak() {
-  FmtSubscriber.setGlobalDefault();
-  setInterval(instrumentCallback(leak), 100);
-}
-```
-
-This version of the program does not leak because each time the instrumented
-`leak` function is called, it clones the current context. As long as leak does
-not create any asynchronous resources which outlive its execution, then the
-cloned context will eventually be garbage collected after the function exits.
 
 ### Performance
 
