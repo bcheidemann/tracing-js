@@ -1,7 +1,7 @@
 import { Buffer, mergeReadableStreams } from "@std/streams";
 import { assertSnapshot } from "@std/testing/snapshot";
 import { assert } from "@std/assert";
-import { describe, it } from "jsr:@std/testing@^0.225.2/bdd";
+import { describe, it } from "@std/testing/bdd";
 
 example("basic");
 example("basic-json");

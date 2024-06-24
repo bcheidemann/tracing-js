@@ -1715,7 +1715,6 @@ function instrumentCallbackImpl<
                     index < args.length;
                     index += 1
                   ) {
-                    console.log("index: ", index);
                     delete logArgs[index];
                   }
                 } else {

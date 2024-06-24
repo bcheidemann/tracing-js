@@ -42,10 +42,7 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
   protected constructor(
     private readonly level: Level = Level.INFO,
     private currentSpan: EnteredSpanNode | undefined = undefined,
-    // TODO: Use a WeakMap to prevent memory leaks.
-    // NOTE: We cannot clone a WeakMap, so the clone implementation will need to be updated to hold a reference
-    //       to the parent subscriber, which can then be traversed as a linked list to find pending spans.
-    private readonly pendingSpans: Map<symbol, PendingSpanNode> = new Map(),
+    private readonly pendingSpans: WeakMap<symbol, PendingSpanNode> = new WeakMap(),
   ) {}
 
   enabledForLevel(level: Level): boolean {
@@ -108,15 +105,11 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
   }
 
   clone(): ISubscriber<symbol> {
-    const newPendingSpans = new Map<symbol, PendingSpanNode>();
-    for (const [id, span] of this.pendingSpans) {
-      newPendingSpans.set(id, { ...span });
-    }
     return new ClonedManagedSubscriber(
       this.level,
       this.currentSpan,
-      newPendingSpans,
-      this.onEvent.bind(this),
+      this.pendingSpans,
+      (event, spans) => this.onEvent(event, spans),
     );
   }
 
@@ -129,7 +122,7 @@ class ClonedManagedSubscriber extends ManagedSubscriber {
   constructor(
     level: Level,
     currentSpan: EnteredSpanNode | undefined,
-    pendingSpans = new Map<symbol, PendingSpanNode>(),
+    pendingSpans: WeakMap<symbol, PendingSpanNode>,
     protected readonly onEvent: (event: Event, spans: SpanAttributes[]) => void,
   ) {
     super(level, currentSpan, pendingSpans);
