@@ -54,6 +54,6 @@ isolatedTestCase(
     assertLess(heapIncrease, 10_000_000);
   },
   {
-    denoFlags: ["--v8-flags=--expose_gc"],
+    denoFlags: ["--v8-flags=-expose_gc"],
   },
 );
