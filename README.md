@@ -3,6 +3,7 @@
 [![JSR](https://jsr.io/badges/@bcheidemann/tracing)](https://jsr.io/@bcheidemann/tracing)
 [![JSR Score](https://jsr.io/badges/@bcheidemann/tracing/score)](https://jsr.io/@bcheidemann/tracing)
 ![publish workflow](https://github.com/bcheidemann/tracing-js/actions/workflows/publish.yml/badge.svg)
+[![code coverage](https://img.shields.io/codecov/c/gh/bcheidemann/tracing-js)](https://codecov.io/gh/bcheidemann/tracing-js)
 
 <a
   style="height: 16px; padding: 5px 10px; font-size: 12px; line-height: 16px; color: #24292f; background-color: #ebf0f4; border-color: #d0d7de; background-image: linear-gradient(180deg, #f6f8fa, #ebf0f4 90%); border-radius: .25em; position: relative; display: inline-flex; text-decoration: none; outline: 0; font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;"
