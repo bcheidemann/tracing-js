@@ -5,6 +5,7 @@
     "checks": "deno task test && deno lint && deno fmt --check && deno task example:basic && deno task example:basic-json && deno task example:api-class-instrumentation",
     "check": "deno check src/mod.ts",
     "test": "deno test --allow-read=. --allow-run=deno --allow-env --allow-sys=cpus --allow-net",
+    "test:coverage": "rm -rf coverage && deno task test --coverage && deno coverage --exclude=src/utils/stubbable --html",
     "test:update": "deno task test --allow-write=src/__tests__/__snapshots__ -- --update",
     "example:basic": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/basic/main.ts",
     "example:basic-json": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/basic-json/main.ts",
