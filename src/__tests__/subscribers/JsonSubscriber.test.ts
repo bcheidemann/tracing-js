@@ -34,6 +34,21 @@ describe("JsonSubscriber", () => {
     );
   });
 
+  it("should log the message to the console without timestamp when options.timestamp is false", () => {
+    // Arrange
+    using _time = new FakeTime(new Date(0));
+    JsonSubscriber.setGlobalDefault({ timestamp: false });
+
+    // Act
+    event(Level.INFO, "test");
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith(
+      '{"level":"INFO","message":"test","spans":[]}',
+    );
+  });
+
   for (
     const [level, log] of [
       [Level.TRACE, "log"],
