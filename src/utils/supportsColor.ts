@@ -1,6 +1,9 @@
 import { isDeno } from "./platform/deno.ts";
+import { getNodeGlobalThis } from "./platform/node.ts";
 import { isNode } from "./platform/node.ts";
+import { Deno } from "./stubbable/deno.ts";
 
+/** @internal */
 export function supportsColor(): boolean {
   if (isDeno()) {
     return supportsColorDeno();
@@ -11,15 +14,19 @@ export function supportsColor(): boolean {
   return supportsColorUnknownRuntime();
 }
 
-export function supportsColorDeno(): boolean {
-  return Deno.stdin.isTerminal() && !Deno.noColor;
+/** @internal */
+function supportsColorDeno(): boolean {
+  return Deno.stdin.isTerminal() && !Deno.noColor();
 }
 
-export function supportsColorNode(): boolean {
-  return typeof global.process.stdin !== "undefined" &&
-    global.process.stdin.isTTY && !global.process.env.NO_COLOR;
+/** @internal */
+function supportsColorNode(): boolean {
+  const globalThis = getNodeGlobalThis();
+  return typeof globalThis.process.stdin !== "undefined" &&
+    globalThis.process.stdin.isTTY && !globalThis.process.env.NO_COLOR;
 }
 
-export function supportsColorUnknownRuntime(): boolean {
+/** @internal */
+function supportsColorUnknownRuntime(): boolean {
   return false;
 }

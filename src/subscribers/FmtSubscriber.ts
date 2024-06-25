@@ -133,9 +133,7 @@ export class FmtSubscriber extends ManagedSubscriber {
   }
 
   private displayMessage(event: Event, spans: SpanAttributes[]) {
-    let message = `${this.displayTimestamp()} ${
-      this.displayLevel(event.level)
-    }`;
+    let message = `${this.displayTimestamp()}${this.displayLevel(event.level)}`;
 
     const formattedSpans = this.displaySpans(spans);
     if (formattedSpans) {
@@ -158,7 +156,10 @@ export class FmtSubscriber extends ManagedSubscriber {
   }
 
   private displayTimestamp() {
-    const timestamp = `[${this.timestamp}]`;
+    if (this.options?.timestamp === false) {
+      return "";
+    }
+    const timestamp = `[${this.timestamp}] `;
     return this.color ? gray(timestamp) : timestamp;
   }
 

@@ -32,6 +32,21 @@ describe("FmtSubscriber", () => {
     expect(log).toHaveBeenCalledWith("[1970-01-01T00:00:00.000Z] [INFO] test");
   });
 
+  it("should log the message to the console without timestamp when options.timestamp is false", () => {
+    // Arrange
+    using _time = new FakeTime(new Date(0));
+    FmtSubscriber.setGlobalDefault({ timestamp: false, color: false });
+
+    // Act
+    event(Level.INFO, "test");
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith(
+      "[INFO] test",
+    );
+  });
+
   for (
     const [level, log] of [
       [Level.TRACE, "log"],
