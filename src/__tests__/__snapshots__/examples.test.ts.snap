@@ -1,5 +1,33 @@
 export const snapshot = {};
 
+snapshot[`all-features example > should match the snapshot 1`] = `
+"[2024-06-26T14:35:17.831Z] [DEBUG] info span 1{key=value}: this should be logged
+[2024-06-26T14:35:17.832Z] [INFO] info span 1{key=value}: this should be logged with a value (key=value)
+[2024-06-26T14:35:17.832Z] [DEBUG] info span 1{key=value}:error span: this should be logged
+[2024-06-26T14:35:17.832Z] [INFO] info span 1{key=value}:error span: this should be logged with a value (key=value)
+[2024-06-26T14:35:17.833Z] [INFO] Example.basicInstrumention: basic instrumentation
+[2024-06-26T14:35:17.833Z] [INFO] custom message: custom message
+[2024-06-26T14:35:17.833Z] [INFO] Example.field{key=value}: field
+[2024-06-26T14:35:17.833Z] [INFO] Example.log: Entering Example.log
+[2024-06-26T14:35:17.833Z] [INFO] Example.log: log
+[2024-06-26T14:35:17.833Z] [INFO] Example.log: Exiting Example.log
+[2024-06-26T14:35:17.833Z] [INFO] Example.logEnter: Entering Example.logEnter
+[2024-06-26T14:35:17.833Z] [INFO] Example.logEnter: log enter
+[2024-06-26T14:35:17.833Z] [ERROR] Example.logError: Error in Example.logError (error.name=Error, error.message=whoops!, error.stack=Error: whoops!
+    at Example.logError (file:///Users/benheidemann/repos/tracing/src/examples/all-features/main.ts:88:11)
+    at file:///Users/benheidemann/repos/tracing/src/instrument.ts:1772:32
+    at AsyncLocalStorage.run (node:async_hooks:231:13)
+    at Example.instrumentedCallback (file:///Users/benheidemann/repos/tracing/src/instrument.ts:1659:20)
+    at file:///Users/benheidemann/repos/tracing/src/examples/all-features/main.ts:105:11)
+[2024-06-26T14:35:17.835Z] [INFO] Example.logExit: log exit
+[2024-06-26T14:35:17.835Z] [INFO] Example.logExit: Exiting Example.logExit
+[2024-06-26T14:35:17.835Z] [INFO] Example.logReturnValue: log return value
+[2024-06-26T14:35:17.835Z] [INFO] Example.skipAll: skip all
+[2024-06-26T14:35:17.837Z] [INFO] Example.skipByName{args.0=arg0, args.2=arg2}: skip by name
+[2024-06-26T14:35:17.837Z] [INFO] ExampleClass.targetMethod: target
+"
+`;
+
 snapshot[`basic example > should match the snapshot 1`] = `
 "[1970-01-01T00:00:00.000Z] [TRACE] basic-example{dummy=value}: This is a trace message (key=value)
 [1970-01-01T00:00:00.000Z] [DEBUG] basic-example{dummy=value}: This is a debug message (key=value)

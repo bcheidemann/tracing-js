@@ -3,6 +3,7 @@ import { assertSnapshot } from "@std/testing/snapshot";
 import { assert } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 
+example("all-features");
 example("basic");
 example("basic-json");
 example("api-class-instrumentation");
