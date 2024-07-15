@@ -31,7 +31,10 @@ function example(name: string) {
       assert(status.success, `The command failed:\n\n${output}`);
       // TODO: Look into why snapshots are not working on windows
       if (Deno.build.os !== "windows") {
-        await assertSnapshot(context, output.replace(/\sat .+/g, " at <wildcard>"));
+        await assertSnapshot(
+          context,
+          output.replace(/\sat .+/g, " at <wildcard>"),
+        );
       }
     });
   });
