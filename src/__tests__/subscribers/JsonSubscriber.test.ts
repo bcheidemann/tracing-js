@@ -214,4 +214,49 @@ describe("JsonSubscriber", () => {
       '{"timestamp":"1970-01-01T00:00:00.000Z","level":"INFO","message":"test","fields":{"eventKey":"eventValue"},"spans":[{"level":"INFO","message":"Example.test","fields":{"spanKey":"spanValue"}}]}',
     );
   });
+
+  it("should log errors correctly", () => {
+    // Arrange
+    using _time = new FakeTime(new Date(0));
+    JsonSubscriber.setGlobalDefault();
+
+    // Act
+    span(Level.INFO, "Example.test", {
+      spanError: new Error("span error"),
+    }).enter();
+    event(Level.INFO, "test", {
+      eventError: new Error("event error"),
+    });
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    const loggedValue = JSON.parse(log.mock.calls[0][0]);
+    expect(typeof loggedValue.fields.eventError.stack).toBe("string");
+    expect(typeof loggedValue.spans[0].fields.spanError.stack).toBe("string");
+    delete loggedValue.fields.eventError.stack;
+    delete loggedValue.spans[0].fields.spanError.stack;
+    expect(loggedValue).toEqual({
+      fields: {
+        eventError: {
+          message: "event error",
+          name: "Error",
+        },
+      },
+      level: "INFO",
+      message: "test",
+      spans: [
+        {
+          fields: {
+            spanError: {
+              message: "span error",
+              name: "Error",
+            },
+          },
+          level: "INFO",
+          message: "Example.test",
+        },
+      ],
+      timestamp: "1970-01-01T00:00:00.000Z",
+    });
+  });
 });

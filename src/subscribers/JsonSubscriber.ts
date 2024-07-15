@@ -95,7 +95,7 @@ export class JsonSubscriber extends ManagedSubscriber {
       }),
       level: this.displayLevel(event.level),
       message: event.message,
-      fields: event.fields,
+      fields: this.formatFields(event.fields),
       spans: spans.map(this.displaySpan.bind(this)),
     });
   }
@@ -104,8 +104,32 @@ export class JsonSubscriber extends ManagedSubscriber {
     return {
       level: this.displayLevel(span.level),
       message: span.message,
-      fields: span.fields,
+      fields: this.formatFields(span.fields),
     };
+  }
+
+  private formatFields(fields?: Record<string | number | symbol, unknown>) {
+    if (fields === undefined) {
+      return;
+    }
+    for (const key of Object.keys(fields)) {
+      const value = fields[key];
+      if (typeof value === "object" && value !== null) {
+        if (value instanceof Error) {
+          const newValue: { name: string; message: string; stack?: string } = {
+            name: value.name,
+            message: value.message,
+          };
+          if (typeof value.stack === "string") {
+            newValue.stack = value.stack;
+          }
+          fields[key] = newValue;
+        } else {
+          this.formatFields(value as Record<string | number | symbol, unknown>);
+        }
+      }
+    }
+    return fields;
   }
 
   private displayLevel(level: Level) {
