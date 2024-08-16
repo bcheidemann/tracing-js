@@ -24,6 +24,12 @@ snapshot[`all-features example > should match the snapshot 1`] = `
 [1970-01-01T00:00:00.000Z] [INFO] Example.logReturnValue: log return value
 [1970-01-01T00:00:00.000Z] [INFO] Example.skipAll: skip all
 [1970-01-01T00:00:00.000Z] [INFO] Example.skipByName{args.0=arg0, args.2=arg2}: skip by name
+[1970-01-01T00:00:00.000Z] [INFO] Example.redactByName{args.0=[REDACTED], args.1=arg1, args.2=arg2}: redact by name
+[1970-01-01T00:00:00.000Z] [INFO] Example.redactByIndex{args.0=[REDACTED], args.1=arg1, args.2=arg2}: redact by index
+[1970-01-01T00:00:00.000Z] [INFO] Example.redactFieldByName{args.0.username=test, args.0.password=[REDACTED], args.1=arg1, args.2=arg2}: redact field by name
+[1970-01-01T00:00:00.000Z] [INFO] Example.redactFieldByIndex{args.0.username=test, args.0.password=[REDACTED], args.1=arg1, args.2=arg2}: redact field by index
+[1970-01-01T00:00:00.000Z] [INFO] Example.redactDeepFieldByName{args.0.req.credentials.username=test, args.0.req.credentials.password=[REDACTED], args.1=arg1, args.2=arg2}: redact field by name
+[1970-01-01T00:00:00.000Z] [INFO] Example.redactDeepFieldByIndex{args.0.req.credentials.username=test, args.0.req.credentials.password=[REDACTED], args.1=arg1, args.2=arg2}: redact field by index
 [1970-01-01T00:00:00.000Z] [INFO] ExampleClass.targetMethod: target
 "
 `;

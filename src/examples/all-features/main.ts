@@ -14,6 +14,7 @@ import {
   logExit,
   logReturnValue,
   message,
+  redact,
   skip,
   skipAll,
   target,
@@ -61,6 +62,52 @@ class Example {
   @instrument(skipAll)
   skipAll(_arg0: string, _arg1: string, _arg2: string) {
     info("skip all");
+  }
+
+  @instrument(redact(0))
+  redactByIndex(_arg0: string, _arg1: string, _arg2: string) {
+    info("redact by index");
+  }
+
+  @instrument(redact("_arg0"))
+  redactByName(_arg0: string, _arg1: string, _arg2: string) {
+    info("redact by name");
+  }
+
+  @instrument(redact(0, (arg0) => arg0.password))
+  redactFieldByIndex(
+    _arg0: { username: string; password: string },
+    _arg1: string,
+    _arg2: string,
+  ) {
+    info("redact field by index");
+  }
+
+  @instrument(redact("_arg0", (arg0) => arg0.password))
+  redactFieldByName(
+    _arg0: { username: string; password: string },
+    _arg1: string,
+    _arg2: string,
+  ) {
+    info("redact field by name");
+  }
+
+  @instrument(redact(0, (arg0) => arg0.req.credentials.password))
+  redactDeepFieldByIndex(
+    _arg0: { req: { credentials: { username: string; password: string } } },
+    _arg1: string,
+    _arg2: string,
+  ) {
+    info("redact field by index");
+  }
+
+  @instrument(redact("_arg0", (arg0) => arg0.req.credentials.password))
+  redactDeepFieldByName(
+    _arg0: { req: { credentials: { username: string; password: string } } },
+    _arg1: string,
+    _arg2: string,
+  ) {
+    info("redact field by name");
   }
 
   @instrument(field("key", "value"))
@@ -111,4 +158,26 @@ example.logExit();
 example.logReturnValue();
 example.skipAll("arg0", "arg1", "arg2");
 example.skipByName("arg0", "arg1", "arg2");
+example.redactByName("arg0", "arg1", "arg2");
+example.redactByIndex("arg0", "arg1", "arg2");
+example.redactFieldByName(
+  { username: "test", password: "Pa$$word" },
+  "arg1",
+  "arg2",
+);
+example.redactFieldByIndex(
+  { username: "test", password: "Pa$$word" },
+  "arg1",
+  "arg2",
+);
+example.redactDeepFieldByName(
+  { req: { credentials: { username: "test", password: "Pa$$word" } } },
+  "arg1",
+  "arg2",
+);
+example.redactDeepFieldByIndex(
+  { req: { credentials: { username: "test", password: "Pa$$word" } } },
+  "arg1",
+  "arg2",
+);
 example.target();

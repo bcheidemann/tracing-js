@@ -29,6 +29,7 @@ const AttributeKind = {
   LogReturnValue: 8 as const,
   LogError: 9 as const,
   Log: 10 as const,
+  Redact: 11 as const,
 };
 
 type AttributeKind = typeof AttributeKind;
@@ -115,6 +116,16 @@ type LogAttribute = {
   level?: Level;
 };
 
+// TODO: Support array methods
+type RedactProxy = {
+  [key: string | number | symbol]: RedactProxy;
+} & Record<typeof REDACT_PROXY_PATH_SYMBOL, (string | symbol)[]>;
+type RedactAttribute = {
+  kind: AttributeKind["Redact"];
+  param: string | number;
+  redact?: (param: RedactProxy) => RedactProxy | RedactProxy[];
+};
+
 // deno-lint-ignore no-explicit-any
 type Attributes<TArgs extends any[], TReturn> =
   | MessageAttribute
@@ -127,7 +138,8 @@ type Attributes<TArgs extends any[], TReturn> =
   | LogExitAttribute<TArgs>
   | LogReturnValueAttribute<TArgs, TReturn>
   | LogErrorAttribute<TArgs>
-  | LogAttribute;
+  | LogAttribute
+  | RedactAttribute;
 
 type InstrumentDecorator<TMethod extends AnyFunction> = (
   target: TMethod,
@@ -199,10 +211,7 @@ export function message(message: string): MessageAttribute {
  * @param method The method name to use for the target field
  * @returns The target attribute
  */
-export function target(
-  className: string,
-  method: string,
-): TargetAttribute;
+export function target(className: string, method: string): TargetAttribute;
 /**
  * The target attribute is used to override the target of the span created by the instrumented method or function.
  *
@@ -1376,6 +1385,115 @@ export function log(level?: Level): LogAttribute {
 }
 
 /**
+ * The redact attribute is used to redact all or part of a parameter. It acts similarly to the skip attribute, but the
+ * parameter (or field) is replaced with the string "[REDACTED]" in the logs.
+ *
+ * @example Instrument a method and redact a sensitive field
+ * ```ts
+ * import { instrument, redact } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(redact("credentials", credentials => credentials.password))
+ *   login(credentials) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a method and redact multiple sensitive fields
+ * ```ts
+ * import { instrument, redact } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(redact(
+ *     "credentials",
+ *     credentials => [credentials.email, credentials.password],
+ *   ))
+ *   login(credentials) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a method and redact a parameter
+ * ```ts
+ * import { instrument, redact } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(redact("credentials"))
+ *   login(credentials) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @param param The parameter name or index to skip.
+ * @param redact Used to specify one or more fields to redact. If omitted, the whole parameter will be redacted.
+ */
+export function redact(
+  param: string | number,
+  redact?: (param: RedactProxy) => RedactProxy | RedactProxy[],
+): RedactAttribute {
+  return { kind: AttributeKind.Redact, param, redact };
+}
+
+const REDACT_PROXY_PATH_SYMBOL = Symbol.for("tracing:redactProxyPath");
+const REDACT_PROXY_TARGET = {} as RedactProxy;
+function createRedactProxy(
+  path: (string | number | symbol)[] = [],
+): RedactProxy {
+  return new Proxy<RedactProxy>(REDACT_PROXY_TARGET, {
+    apply() {
+      throw new Error("Cannot apply RedactProxy");
+    },
+    construct() {
+      throw new Error("Cannot construct RedactProxy");
+    },
+    defineProperty() {
+      throw new Error("Cannot define property on RedactProxy");
+    },
+    deleteProperty() {
+      throw new Error("Cannot delete property on RedactProxy");
+    },
+    get(_, key) {
+      if (key === REDACT_PROXY_PATH_SYMBOL) {
+        return path;
+      }
+      return createRedactProxy([...path, key]);
+    },
+    getOwnPropertyDescriptor() {
+      throw new Error(
+        "Cannot call Object.getOwnPropertyDescriptor on RedactProxy",
+      );
+    },
+    getPrototypeOf() {
+      throw new Error("Cannot get prototype of RedactProxy");
+    },
+    has() {
+      throw new Error(
+        "Cannot use 'in' operator on RedactProxy (properties should be accessed unconditionally)",
+      );
+    },
+    isExtensible() {
+      throw new Error("Cannot call Object.isExtensible on RedactProxy");
+    },
+    ownKeys() {
+      throw new Error("Cannot call Reflect.ownKeys on RedactProxy");
+    },
+    preventExtensions() {
+      throw new Error("Cannot call Object.preventExtensions on RedactProxy");
+    },
+    set() {
+      throw new Error("Cannot set property on RedactProxy");
+    },
+    setPrototypeOf() {
+      throw new Error("Cannot call Object.setPrototypeOf on RedactProxy");
+    },
+  });
+}
+const REDACT_PROXY: RedactProxy = createRedactProxy();
+
+/**
  * The instrument decorator is used to instrument a class method. This will create a span when the method
  * is entered. By default, the span message will be the name of the method, and the arguments will be included
  * in the fields. This behaviour can be customised using attributes.
@@ -1450,9 +1568,9 @@ export function instrument<TMethod extends AnyFunction>(
  * @param fn The function to instrument
  * @returns The instrumented function
  */
-export function instrumentCallback<
-  TCallback extends AnyFunction,
->(fn: TCallback): TCallback;
+export function instrumentCallback<TCallback extends AnyFunction>(
+  fn: TCallback,
+): TCallback;
 /**
  * The instrumentCallback function is used to instrument a function. This will create a span when the function
  * is entered. By default, the span message will be the name of the function, and the arguments will be included
@@ -1483,19 +1601,14 @@ export function instrumentCallback<
  * @param fn The function to instrument
  * @returns The instrumented function
  */
-export function instrumentCallback<
-  TCallback extends AnyFunction,
->(
+export function instrumentCallback<TCallback extends AnyFunction>(
   attributes: Attributes<Parameters<TCallback>, ReturnType<TCallback>>[],
   fn: TCallback,
 ): TCallback;
-export function instrumentCallback<
-  TCallback extends AnyFunction,
->(
-  attributesOrFn: TCallback | Attributes<
-    Parameters<TCallback>,
-    ReturnType<TCallback>
-  >[],
+export function instrumentCallback<TCallback extends AnyFunction>(
+  attributesOrFn:
+    | TCallback
+    | Attributes<Parameters<TCallback>, ReturnType<TCallback>>[],
   fn?: TCallback,
 ): TCallback {
   if (fn) {
@@ -1534,6 +1647,7 @@ function collectAttributes<TArgs extends any[], TReturnType>(
   [AttributeKind.LogReturnValue]?: LogReturnValueAttribute<TArgs, TReturnType>;
   [AttributeKind.LogError]?: LogErrorAttribute<TArgs>;
   [AttributeKind.Log]?: LogAttribute;
+  [AttributeKind.Redact]: RedactAttribute[];
 } {
   const attributesByKind: ReturnType<
     typeof collectAttributes<TArgs, TReturnType>
@@ -1549,6 +1663,7 @@ function collectAttributes<TArgs extends any[], TReturnType>(
     [AttributeKind.LogReturnValue]: undefined,
     [AttributeKind.LogError]: undefined,
     [AttributeKind.Log]: undefined,
+    [AttributeKind.Redact]: [],
   };
 
   for (const attribute of attributes) {
@@ -1586,6 +1701,9 @@ function collectAttributes<TArgs extends any[], TReturnType>(
       case AttributeKind.Log:
         attributesByKind[AttributeKind.Log] = attribute;
         break;
+      case AttributeKind.Redact:
+        attributesByKind[AttributeKind.Redact].push(attribute);
+        break;
       // deno-lint-ignore no-case-declarations
       default:
         const _: never = attribute;
@@ -1621,23 +1739,20 @@ function getParsedParamsForFunction(fn: (...args: any[]) => any) {
   if (parsedParams) {
     return parsedParams;
   }
-  const params = parseParamNodesFromFunction(fn).map((
-    param,
-    index,
-  ): ParamNodeWithMeta => ({
-    ...param,
-    paramName: paramNodeToParamName(param, {
-      returnIdentifierForParamAssignmentExpressions: true,
+  const params = parseParamNodesFromFunction(fn).map(
+    (param, index): ParamNodeWithMeta => ({
+      ...param,
+      paramName: paramNodeToParamName(param, {
+        returnIdentifierForParamAssignmentExpressions: true,
+      }),
+      index,
     }),
-    index,
-  }));
+  );
   ParsedFunctionParams.set(fn, params);
   return params;
 }
 
-function instrumentCallbackImpl<
-  TCallback extends AnyFunction,
->(
+function instrumentCallbackImpl<TCallback extends AnyFunction>(
   fn: TCallback,
   attributes: Attributes<Parameters<TCallback>, ReturnType<TCallback>>[],
   instrumentCtx: Context,
@@ -1699,16 +1814,15 @@ function instrumentCallbackImpl<
         for (const skipAttribute of attributesByKind[AttributeKind.Skip]) {
           skipAttribute.skip.forEach((skip, index) => {
             switch (typeof skip) {
-              // deno-lint-ignore no-case-declarations
-              case "string":
+              case "string": {
                 const parsedParams = getParsedParamsForFunction(fn);
-                const paramToSkip = parsedParams.find((param) =>
-                  param.paramName === skip
+                const paramToSkip = parsedParams.find(
+                  (param) => param.paramName === skip,
                 );
                 if (!paramToSkip) {
                   break;
                 }
-                const isLast = paramToSkip.index === (parsedParams.length - 1);
+                const isLast = paramToSkip.index === parsedParams.length - 1;
                 if (isLast && paramToSkip.type === "RestElement") {
                   for (
                     let index = parsedParams.length - 1;
@@ -1721,6 +1835,7 @@ function instrumentCallbackImpl<
                   delete logArgs[paramToSkip.index];
                 }
                 break;
+              }
               case "number":
                 delete logArgs[skip];
                 break;
@@ -1735,6 +1850,41 @@ function instrumentCallbackImpl<
                 );
             }
           });
+        }
+        for (const redactAttribute of attributesByKind[AttributeKind.Redact]) {
+          // TODO: Implement redact attribute
+          switch (typeof redactAttribute.param) {
+            case "string": {
+              const parsedParams = getParsedParamsForFunction(fn);
+              const paramToRedact = parsedParams.find(
+                (param) => param.paramName === redactAttribute.param,
+              );
+              if (!paramToRedact) {
+                break;
+              }
+              const isLast = paramToRedact.index === parsedParams.length - 1;
+              if (isLast && paramToRedact.type === "RestElement") {
+                for (
+                  let index = parsedParams.length - 1;
+                  index < args.length;
+                  index += 1
+                ) {
+                  redactArg(logArgs, index, redactAttribute);
+                }
+              } else {
+                redactArg(logArgs, paramToRedact.index, redactAttribute);
+              }
+              break;
+            }
+            case "number":
+              redactArg(logArgs, redactAttribute.param, redactAttribute);
+              break;
+            default:
+              throw new AssertionError(
+                `Invalid type for redact attribute value. Received "${typeof redactAttribute
+                  .param}" but expected "string | number".`,
+              );
+          }
         }
         return Object.keys(logArgs).length === 0 ? undefined : logArgs;
       })();
@@ -1759,7 +1909,8 @@ function instrumentCallbackImpl<
       try {
         if (logEnter) {
           if (
-            "message" in logEnter && typeof logEnter.message !== "undefined"
+            "message" in logEnter &&
+            typeof logEnter.message !== "undefined"
           ) {
             const message = typeof logEnter.message === "function"
               ? logEnter.message(args)
@@ -1803,7 +1954,8 @@ function instrumentCallbackImpl<
                     : returnValue,
                 };
                 if (
-                  "message" in logExit && typeof logExit.message !== "undefined"
+                  "message" in logExit &&
+                  typeof logExit.message !== "undefined"
                 ) {
                   const message = typeof logExit.message === "function"
                     ? logExit.message(args)
@@ -1830,9 +1982,7 @@ function instrumentCallbackImpl<
               ? logReturnValue.map(returnValue, args)
               : returnValue,
           };
-          if (
-            "message" in logExit && typeof logExit.message !== "undefined"
-          ) {
+          if ("message" in logExit && typeof logExit.message !== "undefined") {
             const message = typeof logExit.message === "function"
               ? logExit.message(args)
               : logExit.message;
@@ -1869,4 +2019,52 @@ function instrumentCallbackImpl<
       }
     });
   } as TCallback;
+}
+
+function redactArg(
+  args: Record<number, unknown>,
+  idx: number,
+  redactAttribute: RedactAttribute,
+) {
+  if (!redactAttribute.redact) {
+    args[idx] = "[REDACTED]";
+    return;
+  }
+
+  const redactedPaths = (() => {
+    const maybeArray = redactAttribute.redact(REDACT_PROXY);
+    return Array.isArray(maybeArray) ? maybeArray : [maybeArray];
+  })().map((redacted) => redacted[REDACT_PROXY_PATH_SYMBOL]);
+
+  if (redactedPaths.some((path) => path.length === 0)) {
+    args[idx] = "[REDACTED]";
+    return;
+  }
+
+  args[idx] = structuredClone(args[idx]);
+
+  nextPath: for (const redactPath of redactedPaths) {
+    const lastKey = redactPath.pop()!;
+    let current = args[idx];
+
+    if (!isNotNullObject(current)) {
+      continue nextPath;
+    }
+
+    for (const key of redactPath) {
+      current = current[key];
+
+      if (!isNotNullObject(current)) {
+        continue nextPath;
+      }
+    }
+
+    current[lastKey] = "[REDACTED]";
+  }
+}
+
+function isNotNullObject(
+  maybeObj: unknown,
+): maybeObj is Record<string | symbol, unknown> {
+  return typeof maybeObj === "object" && maybeObj !== null;
 }
