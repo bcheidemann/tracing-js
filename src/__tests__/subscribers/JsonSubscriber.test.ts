@@ -59,22 +59,19 @@ describe("JsonSubscriber", () => {
       [Level.CRITICAL, "error"],
     ] satisfies [Level, keyof typeof console][]
   ) {
-    it(
-      "should log the message to the console for level %s with console.%s",
-      () => {
-        // Arrange
-        const spy = spyOn(console, log).mockImplementation(() => {});
-        JsonSubscriber.setGlobalDefault({
-          level: Level.TRACE,
-        });
+    it("should log the message to the console for level %s with console.%s", () => {
+      // Arrange
+      const spy = spyOn(console, log).mockImplementation(() => {});
+      JsonSubscriber.setGlobalDefault({
+        level: Level.TRACE,
+      });
 
-        // Act
-        event(level, "test");
+      // Act
+      event(level, "test");
 
-        // Assert
-        expect(spy).toHaveBeenCalled();
-      },
-    );
+      // Assert
+      expect(spy).toHaveBeenCalled();
+    });
   }
 
   it("should log the message to the console with a field", () => {
@@ -233,13 +230,12 @@ describe("JsonSubscriber", () => {
     const loggedValue = JSON.parse(log.mock.calls[0][0]);
     expect(typeof loggedValue.fields.eventError.stack).toBe("string");
     expect(typeof loggedValue.spans[0].fields.spanError.stack).toBe("string");
-    delete loggedValue.fields.eventError.stack;
-    delete loggedValue.spans[0].fields.spanError.stack;
     expect(loggedValue).toEqual({
       fields: {
         eventError: {
           message: "event error",
           name: "Error",
+          stack: expect.any(String),
         },
       },
       level: "INFO",
@@ -250,6 +246,7 @@ describe("JsonSubscriber", () => {
             spanError: {
               message: "span error",
               name: "Error",
+              stack: expect.any(String),
             },
           },
           level: "INFO",
