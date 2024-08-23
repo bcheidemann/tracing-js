@@ -13,6 +13,7 @@ function example(name: string) {
   describe(`${name} example`, () => {
     it("should match the snapshot", async (context) => {
       const cache = await new Deno.Command("deno", {
+        cwd: `src/examples/${name}`,
         args: ["cache", `src/examples/${name}/main.ts`],
       }).output();
       assert(
