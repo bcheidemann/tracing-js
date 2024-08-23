@@ -12,6 +12,19 @@ example("legacy-decorators");
 function example(name: string) {
   describe(`${name} example`, () => {
     it("should match the snapshot", async (context) => {
+      const cache = await new Deno.Command("deno", {
+        args: ["cache", `src/examples/${name}/main.ts`],
+      }).output();
+      assert(
+        cache.success,
+        [
+          "Caching dependencies failed.",
+          "---stdout---",
+          new TextDecoder().decode(cache.stdout),
+          "---stderr---",
+          new TextDecoder().decode(cache.stderr),
+        ].join("\n"),
+      );
       const command = new Deno.Command("deno", {
         args: [
           "run",
