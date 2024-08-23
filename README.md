@@ -452,7 +452,7 @@ not universally supported. The below table outlines bundler support by feature.
 
 #### Vite
 
-Since method instrumentation requires decorator support, you must ensure the
+Since method instrumentation requires decorator support, you must ensure that
 Vite is configured to enable decorators if you wish to use the `@instrument`
 decorator. This can be done by adding the following lines to your Vite config.
 
@@ -471,6 +471,11 @@ export default defineConfig({
 Since method instrumentation requires decorator support, you must ensure that
 ESBuild is configured to enable decorators if you wish to use the `@instrument`
 decorator. This can be done by setting the `--target=es2022` flag.
+
+NOTE: If you're using an older version of ESBuild (before 0.21.3) which doesn't
+support TC39 decorators, or your project is already using legacy decorators, you
+can use the `@instrument` decorator by enabling the `experimentalDecorators`
+option in your TypeScript config.
 
 #### SWC
 
@@ -494,6 +499,13 @@ flag.
 | Bun                | ✅        |                                                                                                                  |
 | CloudFlare Workers | ✅        | Requires [nodejs_compat](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/) flag. |
 | Browser            | ❌        | Requires `AsyncLocalStorage` API                                                                                 |
+
+### ES Decorators vs Legacy Decorators
+
+As of TypeScript v5, support has been added for the stage 3 decorators proposal,
+while still maintaining support for the legacy experimental decorators behind
+the `experimentalDecorators` option. The instrument decorator is agnostic of the
+type of decorator your project uses.
 
 ## ESLint Plugin
 

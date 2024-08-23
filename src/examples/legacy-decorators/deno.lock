@@ -1,0 +1,59 @@
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@bcheidemann/parse-params@^0.5.0": "jsr:@bcheidemann/parse-params@0.5.0",
+      "jsr:@std/assert@0.226.0": "jsr:@std/assert@0.226.0",
+      "jsr:@std/assert@^0.226.0": "jsr:@std/assert@0.226.0",
+      "jsr:@std/data-structures@^1.0.0-rc.1": "jsr:@std/data-structures@1.0.0-rc.1",
+      "jsr:@std/fmt@^0.225.4": "jsr:@std/fmt@0.225.4",
+      "jsr:@std/internal@^1.0.0": "jsr:@std/internal@1.0.1",
+      "jsr:@std/testing@^0.225.2": "jsr:@std/testing@0.225.3",
+      "npm:acorn@8.12.0": "npm:acorn@8.12.0"
+    },
+    "jsr": {
+      "@bcheidemann/parse-params@0.5.0": {
+        "integrity": "a13a95163fad0cbd34890cb5d43df3466cc96e97e76674052592a90bbf56bbab",
+        "dependencies": [
+          "jsr:@std/assert@0.226.0",
+          "npm:acorn@8.12.0"
+        ]
+      },
+      "@std/assert@0.226.0": {
+        "integrity": "0dfb5f7c7723c18cec118e080fec76ce15b4c31154b15ad2bd74822603ef75b3",
+        "dependencies": [
+          "jsr:@std/internal@^1.0.0"
+        ]
+      },
+      "@std/data-structures@1.0.0-rc.1": {
+        "integrity": "d8852b64a13d00deb1027363fa3ab71bbbced0720fa2233e77cac23eb76bfb87"
+      },
+      "@std/fmt@0.225.4": {
+        "integrity": "584c681cf422b70e28959b57e59012823609c087384cbf12d05f67814797fda3"
+      },
+      "@std/internal@1.0.1": {
+        "integrity": "6f8c7544d06a11dd256c8d6ba54b11ed870aac6c5aeafff499892662c57673e6"
+      },
+      "@std/testing@0.225.3": {
+        "integrity": "348c24d0479d44ab3dbb4f26170f242e19f24051b45935d4a9e7ca0ab7e37780",
+        "dependencies": [
+          "jsr:@std/data-structures@^1.0.0-rc.1"
+        ]
+      }
+    },
+    "npm": {
+      "acorn@8.12.0": {
+        "integrity": "sha512-RTvkC4w+KNXrM39/lWCUaG0IbRkWdCv7W/IOW9oU6SawyxulvkQy5HQPVTKxEjczcUvapcrw3cFx/60VN/NRNw==",
+        "dependencies": {}
+      }
+    }
+  },
+  "remote": {},
+  "workspace": {
+    "dependencies": [
+      "jsr:@bcheidemann/parse-params@^0.5.0",
+      "jsr:@std/assert@^0.226.0",
+      "jsr:@std/fmt@^0.225.4"
+    ]
+  }
+}

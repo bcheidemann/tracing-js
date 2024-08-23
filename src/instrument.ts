@@ -141,11 +141,6 @@ type Attributes<TArgs extends any[], TReturn> =
   | LogAttribute
   | RedactAttribute;
 
-type InstrumentDecorator<TMethod extends AnyFunction> = (
-  target: TMethod,
-  context: ClassMethodDecoratorContext<ThisParameterType<TMethod>, TMethod>,
-) => TMethod;
-
 /**
  * The message attribute is used to override the message of the span created by the instrumented method or function.
  *
@@ -1493,6 +1488,18 @@ function createRedactProxy(
 }
 const REDACT_PROXY: RedactProxy = createRedactProxy();
 
+interface InstrumentDecorator<TMethod extends AnyFunction> {
+  (
+    target: TMethod,
+    context: ClassMethodDecoratorContext<ThisParameterType<TMethod>, TMethod>,
+  ): TMethod;
+  (
+    target: unknown,
+    propertyKey: string | symbol,
+    descriptor: TypedPropertyDescriptor<TMethod>,
+  ): TypedPropertyDescriptor<TMethod>;
+}
+
 /**
  * The instrument decorator is used to instrument a class method. This will create a span when the method
  * is entered. By default, the span message will be the name of the method, and the arguments will be included
@@ -1528,15 +1535,44 @@ const REDACT_PROXY: RedactProxy = createRedactProxy();
 export function instrument<TMethod extends AnyFunction>(
   ...attributes: Attributes<Parameters<TMethod>, ReturnType<TMethod>>[]
 ): InstrumentDecorator<TMethod> {
-  return function instrumentDecorator(
-    target: TMethod,
-    ctx: ClassMethodDecoratorContext<ThisParameterType<TMethod>, TMethod>,
+  function instrumentDecorator(
+    targetOrClass: unknown,
+    ctxOrPropertyKey:
+      | ClassMethodDecoratorContext<ThisParameterType<TMethod>, TMethod>
+      | (string | symbol),
+    descriptor?: TypedPropertyDescriptor<TMethod>,
   ) {
-    return instrumentCallbackImpl(target, attributes, {
-      kind: "method",
-      methodName: typeof ctx.name === "symbol" ? ctx.name.toString() : ctx.name,
-    });
-  };
+    // ES Decorator
+    if (typeof ctxOrPropertyKey === "object") {
+      const ctx = ctxOrPropertyKey;
+      return instrumentCallbackImpl(targetOrClass as TMethod, attributes, {
+        kind: "method",
+        methodName: typeof ctx.name === "symbol"
+          ? ctx.name.toString()
+          : ctx.name,
+      });
+    } // Legacy Decorator
+    else {
+      const propertyKey = ctxOrPropertyKey;
+      const target = descriptor!.value;
+      const methodName = typeof propertyKey === "symbol"
+        ? propertyKey.toString()
+        : propertyKey;
+
+      if (!target) {
+        throw new AssertionError(`Failed to decorate method: ${methodName}`);
+      }
+
+      descriptor!.value = instrumentCallbackImpl(target, attributes, {
+        kind: "method",
+        methodName,
+      });
+
+      return descriptor!;
+    }
+  }
+
+  return instrumentDecorator as InstrumentDecorator<TMethod>;
 }
 
 /**

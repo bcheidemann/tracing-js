@@ -4,9 +4,10 @@ import { assert } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 
 example("all-features");
+example("api-class-instrumentation");
 example("basic");
 example("basic-json");
-example("api-class-instrumentation");
+example("legacy-decorators");
 
 function example(name: string) {
   describe(`${name} example`, () => {
