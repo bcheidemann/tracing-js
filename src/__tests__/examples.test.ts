@@ -14,7 +14,7 @@ function example(name: string) {
     it("should match the snapshot", async (context) => {
       const cache = await new Deno.Command("deno", {
         cwd: `src/examples/${name}`,
-        args: ["cache", `src/examples/${name}/main.ts`],
+        args: ["cache", "main.ts"],
       }).output();
       assert(
         cache.success,

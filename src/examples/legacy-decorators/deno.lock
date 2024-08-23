@@ -5,6 +5,7 @@
       "jsr:@bcheidemann/parse-params@^0.5.0": "jsr:@bcheidemann/parse-params@0.5.0",
       "jsr:@std/assert@0.226.0": "jsr:@std/assert@0.226.0",
       "jsr:@std/assert@^0.226.0": "jsr:@std/assert@0.226.0",
+      "jsr:@std/async@^1.0.0-rc.2": "jsr:@std/async@1.0.0-rc.2",
       "jsr:@std/data-structures@^1.0.0-rc.1": "jsr:@std/data-structures@1.0.0-rc.1",
       "jsr:@std/fmt@^0.225.4": "jsr:@std/fmt@0.225.4",
       "jsr:@std/internal@^1.0.0": "jsr:@std/internal@1.0.1",
@@ -25,6 +26,9 @@
           "jsr:@std/internal@^1.0.0"
         ]
       },
+      "@std/async@1.0.0-rc.2": {
+        "integrity": "f3fe96c78e85c180fe31c3248da2e32d17f7e90ce5fe2765eb7c18861eaf13e1"
+      },
       "@std/data-structures@1.0.0-rc.1": {
         "integrity": "d8852b64a13d00deb1027363fa3ab71bbbced0720fa2233e77cac23eb76bfb87"
       },
@@ -37,6 +41,7 @@
       "@std/testing@0.225.3": {
         "integrity": "348c24d0479d44ab3dbb4f26170f242e19f24051b45935d4a9e7ca0ab7e37780",
         "dependencies": [
+          "jsr:@std/async@^1.0.0-rc.2",
           "jsr:@std/data-structures@^1.0.0-rc.1"
         ]
       }
