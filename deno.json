@@ -1,6 +1,6 @@
 {
   "name": "@bcheidemann/tracing",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "tasks": {
     "checks": "deno task test && deno lint && deno fmt --check && deno task example:all-features && deno task example:basic && deno task example:basic-json && deno task example:api-class-instrumentation",
     "check": "deno check src/mod.ts",
