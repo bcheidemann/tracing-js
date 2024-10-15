@@ -46,6 +46,7 @@ logging, and diagnostic information from JavaScript applications at runtime.
     - [ESBuild](#esbuild)
     - [SWC](#swc)
   - [Runtime Support](#runtime-support)
+  - [ES Decorators vs Legacy Decorators](#es-decorators-vs-legacy-decorators)
 - [ESLint Plugin](#eslint-plugin)
 - [Contributing](#contributing)
 
@@ -278,7 +279,7 @@ The following attributes can be applied:
 | skip           | `skip("paramName")`                             | Omits the named parameter from the instrumented spans `args` field.                                                         |
 |                | `skip(0)`                                       | Omits the indexed parameter from the instrumented spans `args` field.                                                       |
 |                | `skip(true, false)`                             | Applies a positional mask to the parameters to omit from the instrumented spans `args` field.                               |
-| skip           | `redact("paramName")`                           | Replaces the named parameter with "[REDACTED]" in the instrumented spans `args` field.                                      |
+| redact         | `redact("paramName")`                           | Replaces the named parameter with "[REDACTED]" in the instrumented spans `args` field.                                      |
 |                | `redact(0)`                                     | Replaces the indexed parameter with "[REDACTED]" in the instrumented spans `args` field.                                    |
 |                | `redact("param", param => param.field)`         | Replaces a field on the named parameter with "[REDACTED]" in the instrumented spans `args` field.                           |
 |                | `redact(0, param => param.field)`               | Replaces a field on the indexed parameter with "[REDACTED]" in the instrumented spans `args` field.                         |
