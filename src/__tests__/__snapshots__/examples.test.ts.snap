@@ -64,6 +64,7 @@ snapshot[`basic-json example > should match the snapshot 1`] = `
 `;
 
 snapshot[`legacy-decorators example > should match the snapshot 1`] = `
-"[1970-01-01T00:00:00.000Z] [INFO] Example.basicInstrumention: basic instrumentation
+"Warning experimentalDecorators compiler option is deprecated and may be removed at <wildcard>
+[1970-01-01T00:00:00.000Z] [INFO] Example.basicInstrumention: basic instrumentation
 "
 `;
