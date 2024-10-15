@@ -233,6 +233,8 @@ export class FmtSubscriber extends ManagedSubscriber {
               [`${outerKey}.stack`, value.stack],
             );
           }
+        } else if (value instanceof Date) {
+          entries.push([`${outerKey}`, value.toISOString()]);
         } else if (
           !entries.length && "constructor" in value
         ) {

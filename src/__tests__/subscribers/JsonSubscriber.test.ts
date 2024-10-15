@@ -256,4 +256,39 @@ describe("JsonSubscriber", () => {
       timestamp: "1970-01-01T00:00:00.000Z",
     });
   });
+
+  it("should log dates correctly", () => {
+    // Arrange
+    using _time = new FakeTime(new Date(0));
+    JsonSubscriber.setGlobalDefault();
+
+    // Act
+    span(Level.INFO, "Example.test", {
+      spanDate: new Date(0),
+    }).enter();
+    event(Level.INFO, "test", {
+      eventDate: new Date(0),
+    });
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    const loggedValue = JSON.parse(log.mock.calls[0][0]);
+    expect(loggedValue).toEqual({
+      fields: {
+        eventDate: "1970-01-01T00:00:00.000Z",
+      },
+      level: "INFO",
+      message: "test",
+      spans: [
+        {
+          fields: {
+            spanDate: "1970-01-01T00:00:00.000Z",
+          },
+          level: "INFO",
+          message: "Example.test",
+        },
+      ],
+      timestamp: "1970-01-01T00:00:00.000Z",
+    });
+  });
 });

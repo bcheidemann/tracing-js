@@ -243,4 +243,50 @@ describe("FmtSubscriber", () => {
       "[1970-01-01T00:00:00.000Z] [INFO] Example.test{emptyObject={}}: test (emptyObject={})",
     );
   });
+
+  it("should serialize errors correctly", () => {
+    // Arrange
+    using _time = new FakeTime(new Date(0));
+    FmtSubscriber.setGlobalDefault({ color: false });
+
+    function makeError(message: string) {
+      const error = new Error(message);
+      error.stack = "[stack]";
+      return error;
+    }
+
+    // Act
+    span(Level.INFO, "Example.test", {
+      error: makeError("span error"),
+    }).enter();
+    event(Level.INFO, "test", {
+      error: makeError("event error"),
+    });
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith(
+      "[1970-01-01T00:00:00.000Z] [INFO] Example.test{error.name=Error, error.message=span error, error.stack=[stack]}: test (error.name=Error, error.message=event error, error.stack=[stack])",
+    );
+  });
+
+  it("should serialize dates correctly", () => {
+    // Arrange
+    using _time = new FakeTime(new Date(0));
+    FmtSubscriber.setGlobalDefault({ color: false });
+
+    // Act
+    span(Level.INFO, "Example.test", {
+      date: new Date(0),
+    }).enter();
+    event(Level.INFO, "test", {
+      date: new Date(0),
+    });
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith(
+      "[1970-01-01T00:00:00.000Z] [INFO] Example.test{date=1970-01-01T00:00:00.000Z}: test (date=1970-01-01T00:00:00.000Z)",
+    );
+  });
 });
