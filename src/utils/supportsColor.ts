@@ -1,6 +1,5 @@
 import { isDeno } from "./platform/deno.ts";
-import { getNodeGlobalThis } from "./platform/node.ts";
-import { isNode } from "./platform/node.ts";
+import { isNodeCompatible } from "./platform/node.ts";
 import { Deno } from "./stubbable/deno.ts";
 
 /** @internal */
@@ -8,7 +7,7 @@ export function supportsColor(): boolean {
   if (isDeno()) {
     return supportsColorDeno();
   }
-  if (isNode()) {
+  if (isNodeCompatible()) {
     return supportsColorNode();
   }
   return supportsColorUnknownRuntime();
@@ -21,7 +20,6 @@ function supportsColorDeno(): boolean {
 
 /** @internal */
 function supportsColorNode(): boolean {
-  const globalThis = getNodeGlobalThis();
   return typeof globalThis.process.stdin !== "undefined" &&
     globalThis.process.stdin.isTTY && !globalThis.process.env.NO_COLOR;
 }

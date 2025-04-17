@@ -1,4 +1,3 @@
-import nodeProcess from "node:process";
 import { describe, it } from "@std/testing/bdd";
 import { returnsNext, stub } from "@std/testing/mock";
 import { supportsColor } from "../../utils/supportsColor.ts";
@@ -79,8 +78,9 @@ describe("supportsColor", () => {
         const Deno = globalThis.Deno;
         // @ts-expect-error -- intentionally deleting Deno global
         delete globalThis.Deno;
+        const process = globalThis.process;
         globalThis.process = {
-          ...nodeProcess,
+          ...process,
           stdin: stdin as ReadStream & { fd: 0; },
           env: {
             NO_COLOR,
@@ -89,8 +89,7 @@ describe("supportsColor", () => {
         using _restore = {
           [Symbol.dispose]() {
             globalThis.Deno = Deno;
-            // @ts-expect-error -- process is known to be set
-            delete globalThis.process;
+            globalThis.process = process;
           },
         };
 
@@ -107,11 +106,15 @@ describe("supportsColor", () => {
     it("should return false", () => {
       // Arrange
       const Deno = globalThis.Deno;
+      const process = globalThis.process;
       // @ts-expect-error -- intentionally deleting Deno global
       delete globalThis.Deno;
+      // @ts-expect-error -- intentionally setting process global to undefined
+      globalThis.process = undefined;
       using _restore = {
         [Symbol.dispose]() {
           globalThis.Deno = Deno;
+          globalThis.process = process;
         },
       };
 
