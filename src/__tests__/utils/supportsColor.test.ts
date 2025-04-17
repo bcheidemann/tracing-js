@@ -1,8 +1,10 @@
+import nodeProcess from "node:process";
 import { describe, it } from "@std/testing/bdd";
 import { returnsNext, stub } from "@std/testing/mock";
 import { supportsColor } from "../../utils/supportsColor.ts";
 import { assertEquals } from "@std/assert";
 import { Deno } from "../../utils/stubbable/deno.ts";
+import type { ReadStream } from "node:tty";
 
 describe("supportsColor", () => {
   describe("Deno", () => {
@@ -42,7 +44,7 @@ describe("supportsColor", () => {
   describe("Node", () => {
     const testCases: [
       name: string,
-      stdin: unknown,
+      stdin: (Partial<ReadStream & { fd: 0; }>) | undefined,
       NO_COLOR: string | undefined,
       expectedResult: boolean,
     ][] = [
@@ -77,9 +79,9 @@ describe("supportsColor", () => {
         const Deno = globalThis.Deno;
         // @ts-expect-error -- intentionally deleting Deno global
         delete globalThis.Deno;
-        // @ts-expect-error -- intentionally setting process
         globalThis.process = {
-          stdin,
+          ...nodeProcess,
+          stdin: stdin as ReadStream & { fd: 0; },
           env: {
             NO_COLOR,
           },
