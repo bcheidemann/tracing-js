@@ -55,5 +55,11 @@ isolatedTestCase(
   },
   {
     denoFlags: ["--v8-flags=-expose_gc"],
+    // TODO: Fix this test
+    // EXPLANATION: This test is currently broken due to https://github.com/denoland/deno/issues/28948.
+    //              Since Deno offers no stability gurantees for the v8 `gc` function, we can't rely on
+    //              this to be fixed. We might need to look for another way to assert an absence of
+    //              memory leaks.
+    ignore: true,
   },
 );
