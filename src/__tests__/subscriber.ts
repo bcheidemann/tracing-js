@@ -11,6 +11,7 @@ export function createTestSubscriber({
   enter = fn(),
   exit = fn(),
   record = fn(),
+  currentSpan = fn(),
   clone = undefined,
 }: {
   enabledForLevel?: Mock;
@@ -20,6 +21,7 @@ export function createTestSubscriber({
   enter?: Mock;
   exit?: Mock;
   record?: Mock;
+  currentSpan?: Mock;
   clone?: Mock;
 } = {}) {
   const subscriber = {
@@ -30,6 +32,7 @@ export function createTestSubscriber({
     enter,
     exit,
     record,
+    currentSpan,
     clone: clone ?? fn(),
   } satisfies ISubscriber<unknown>;
 

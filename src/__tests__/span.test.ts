@@ -3,6 +3,7 @@ import { createTestSubscriber } from "./subscriber.ts";
 import { context, createSubscriberContext } from "../context.ts";
 import {
   criticalSpan,
+  currentSpan,
   debugSpan,
   errorSpan,
   infoSpan,
@@ -11,6 +12,7 @@ import {
 } from "../span.ts";
 import { Level } from "../level.ts";
 import { expect } from "expect";
+import { fn } from "jest-mock";
 
 describe("span", () => {
   const testCases: [spanFunction: typeof infoSpan, expectedLevel: Level][] = [
@@ -42,4 +44,36 @@ describe("span", () => {
       });
     });
   }
+});
+
+describe("currentSpan", () => {
+  it("should return the current span", () => {
+    // Arrange
+    const subscriber = createTestSubscriber({
+      currentSpan: fn().mockReturnValue("spanId"),
+    });
+    const ctx = createSubscriberContext(subscriber);
+    context.enterWith(ctx);
+
+    // Act
+    const span = currentSpan();
+
+    // Assert
+    expect(span).toBeDefined();
+  });
+
+  it("should return undefined when no span is entered", () => {
+    // Arrange
+    const subscriber = createTestSubscriber({
+      currentSpan: fn().mockReturnValue(undefined),
+    });
+    const ctx = createSubscriberContext(subscriber);
+    context.enterWith(ctx);
+
+    // Act
+    const span = currentSpan();
+
+    // Assert
+    expect(span).toBeUndefined();
+  });
 });

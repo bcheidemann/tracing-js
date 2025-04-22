@@ -34,9 +34,11 @@ logging, and diagnostic information from JavaScript applications at runtime.
 - [Usage](#usage)
   - [Examples](#examples)
   - [Recording Spans](#recording-spans)
+  - [Recording Fields on Spans](#recording-fields-on-spans)
   - [Recording Events](#recording-events)
   - [Instrumenting Methods and Functions](#instrumenting-methods-and-functions)
   - [Subscribers](#subscribers-1)
+  - [Accessing the Current Span](#accessing-the-current-span)
 - [Usage Considerations](#usage-considerations)
   - [Usage in Asynchronous Code](#usage-in-asynchronous-code)
   - [Performance](#performance)
@@ -183,6 +185,20 @@ span(Level.INFO, "info span with fields", {
 This can be used to capture arbitrary context about the span, for example, a web
 server may use this to capture the request ID.
 
+### Recording Fields on Spans
+
+It is possible to record fields on spans after they have been created.
+
+```ts
+const mySpan = infoSpan("info span without fields");
+mySpan.record("key", "value");
+
+// Or...
+
+using mySpan = infoSpan("info span without fields").enter();
+mySpan.record("key", "value");
+```
+
 ### Recording Events
 
 Events can be emitted like this:
@@ -323,6 +339,27 @@ FmtSubscriber.setGlobalDefault();
 
 // Rest of program
 ```
+
+### Accessing the Current Span
+
+Sometimes, it may be necessary to access the current span when there is no
+direct reference to it. For example, when within an instrumented method or
+function, no reference to the span is normally available.
+
+In such cases, the current span can be accessed using the `currentSpan`
+function.
+
+```ts
+class Example {
+  @instrument()
+  public exampleMethod() {
+    currentSpan()?.record("key", "value");
+  }
+}
+```
+
+Note that the `currentSpan` function may return `undefined` if no span is
+currently entered.
 
 ## Usage Considerations
 

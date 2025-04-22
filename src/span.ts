@@ -255,3 +255,41 @@ export function criticalSpan(
     fields,
   );
 }
+
+/**
+ * Returns the current entered span. If no span is currently entered, `undefined` is returned.
+ *
+ * @returns The current entered span or `undefined`
+ */
+export function currentSpan(): EnteredSpan | undefined {
+  const maybeCtx = getSubscriberContext();
+
+  if (!maybeCtx) {
+    return undefined;
+  }
+
+  const ctx = maybeCtx;
+
+  const currentSpanId = ctx.subscriber.currentSpan();
+
+  if (!currentSpanId) {
+    return undefined;
+  }
+
+  const enteredSpan: EnteredSpan = {
+    exit,
+    record,
+    [Symbol.dispose]: exit,
+  };
+
+  return enteredSpan;
+
+  function exit() {
+    ctx.subscriber.exit(currentSpanId);
+  }
+
+  function record(key: string, value: unknown): EnteredSpan {
+    ctx.subscriber.record(currentSpanId, key, value);
+    return enteredSpan;
+  }
+}

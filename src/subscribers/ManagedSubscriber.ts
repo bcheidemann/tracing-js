@@ -40,14 +40,14 @@ type EnteredSpanNode = SpanNode & {
  */
 export abstract class ManagedSubscriber implements ISubscriber<symbol> {
   protected constructor(
-    private readonly level: Level = Level.INFO,
-    private currentSpan: EnteredSpanNode | undefined = undefined,
-    private readonly pendingSpans: WeakMap<symbol, PendingSpanNode> =
+    private readonly _level: Level = Level.INFO,
+    private _currentSpan: EnteredSpanNode | undefined = undefined,
+    private readonly _pendingSpans: WeakMap<symbol, PendingSpanNode> =
       new WeakMap(),
   ) {}
 
   enabledForLevel(level: Level): boolean {
-    return level >= this.level;
+    return level >= this._level;
   }
 
   enabled(_metadata: Event | SpanAttributes): boolean {
@@ -61,13 +61,13 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
       attributes,
     };
 
-    this.pendingSpans.set(span.id, span);
+    this._pendingSpans.set(span.id, span);
 
     return span.id;
   }
 
   event(event: Event): void {
-    const spans = this.currentSpan ? [this.currentSpan] : [];
+    const spans = this._currentSpan ? [this._currentSpan] : [];
     let next: EnteredSpanNode | undefined;
     while ((next = spans.at(-1)?.parent)) {
       spans.push(next);
@@ -76,25 +76,25 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
   }
 
   enter(span: symbol): void {
-    const pendingSpan = this.pendingSpans.get(span);
+    const pendingSpan = this._pendingSpans.get(span);
     if (!pendingSpan) {
       throw new Error("Invalid span");
     }
 
-    (pendingSpan as EnteredSpanNode).parent = this.currentSpan;
+    (pendingSpan as EnteredSpanNode).parent = this._currentSpan;
 
-    this.currentSpan = pendingSpan;
+    this._currentSpan = pendingSpan;
   }
 
   exit(span: symbol): void {
     const exitSpan = (node: EnteredSpanNode | undefined) => {
       if (!node) {
-        this.currentSpan = undefined;
+        this._currentSpan = undefined;
         return;
       }
 
       if (node.id === span) {
-        this.currentSpan = node.parent;
+        this._currentSpan = node.parent;
         return;
       }
 
@@ -102,11 +102,11 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
 
       exitSpan(node.parent);
     };
-    exitSpan(this.currentSpan);
+    exitSpan(this._currentSpan);
   }
 
   record(spanId: symbol, key: string, value: unknown): void {
-    const span = this.pendingSpans.get(spanId);
+    const span = this._pendingSpans.get(spanId);
 
     if (!span) {
       return;
@@ -119,11 +119,15 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
     }
   }
 
+  currentSpan(): symbol | undefined {
+    return this._currentSpan?.id;
+  }
+
   clone(): ISubscriber<symbol> {
     return new ClonedManagedSubscriber(
-      this.level,
-      this.currentSpan,
-      this.pendingSpans,
+      this._level,
+      this._currentSpan,
+      this._pendingSpans,
       (event, spans) => this.onEvent(event, spans),
     );
   }

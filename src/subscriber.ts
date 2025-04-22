@@ -52,6 +52,10 @@ export interface ISubscriber<TSpanId> {
    */
   record(span: TSpanId, key: string, value: unknown): void;
   /**
+   * Returns the current entered span. If no span is entered, `undefined` is returned.
+   */
+  currentSpan(): TSpanId | undefined;
+  /**
    * Called when a new async context is created. A user may choose to
    * enter a new async context at any point. This can be useful when
    * executing async code in parallel (e.g. with `Promise.all`) as it
