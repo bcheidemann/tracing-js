@@ -48,6 +48,10 @@ export interface ISubscriber<TSpanId> {
    */
   exit(span: TSpanId): void;
   /**
+   * Record a field on the span.
+   */
+  record(span: TSpanId, key: string, value: unknown): void;
+  /**
    * Called when a new async context is created. A user may choose to
    * enter a new async context at any point. This can be useful when
    * executing async code in parallel (e.g. with `Promise.all`) as it

@@ -105,6 +105,20 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
     exitSpan(this.currentSpan);
   }
 
+  record(spanId: symbol, key: string, value: unknown): void {
+    const span = this.pendingSpans.get(spanId);
+
+    if (!span) {
+      return;
+    }
+
+    if (span.attributes.fields) {
+      span.attributes.fields[key] = value;
+    } else {
+      span.attributes.fields = { [key]: value };
+    }
+  }
+
   clone(): ISubscriber<symbol> {
     return new ClonedManagedSubscriber(
       this.level,

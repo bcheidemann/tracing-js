@@ -10,6 +10,7 @@ export function createTestSubscriber({
   event = fn(),
   enter = fn(),
   exit = fn(),
+  record = fn(),
   clone = undefined,
 }: {
   enabledForLevel?: Mock;
@@ -18,6 +19,7 @@ export function createTestSubscriber({
   event?: Mock;
   enter?: Mock;
   exit?: Mock;
+  record?: Mock;
   clone?: Mock;
 } = {}) {
   const subscriber = {
@@ -27,6 +29,7 @@ export function createTestSubscriber({
     event,
     enter,
     exit,
+    record,
     clone: clone ?? fn(),
   } satisfies ISubscriber<unknown>;
 

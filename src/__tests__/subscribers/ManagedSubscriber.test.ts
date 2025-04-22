@@ -117,6 +117,96 @@ describe("ManagedSubscriber", () => {
     );
   });
 
+  it("should record fields on the span before it is entered", () => {
+    // Arrange
+    const subscriber = TestSubscriber.init();
+    const newSpan = span(Level.INFO, "test span");
+
+    // Act
+    newSpan.record("test1", "testA").record("test2", "testB").enter();
+    event(Level.WARN, "test");
+
+    // Assert
+    expect(subscriber.onEvent).toHaveBeenCalled();
+    expect(subscriber.onEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        level: Level.WARN,
+        message: "test",
+        fields: undefined,
+      }),
+      [
+        expect.objectContaining({
+          level: Level.INFO,
+          message: "test span",
+          fields: {
+            test1: "testA",
+            test2: "testB",
+          },
+        }),
+      ],
+    );
+  });
+
+  it("should record fields on the span after it is entered", () => {
+    // Arrange
+    const subscriber = TestSubscriber.init();
+    const newSpan = span(Level.INFO, "test span").enter();
+
+    // Act
+    newSpan.record("test1", "testA").record("test2", "testB");
+    event(Level.WARN, "test");
+
+    // Assert
+    expect(subscriber.onEvent).toHaveBeenCalled();
+    expect(subscriber.onEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        level: Level.WARN,
+        message: "test",
+        fields: undefined,
+      }),
+      [
+        expect.objectContaining({
+          level: Level.INFO,
+          message: "test span",
+          fields: {
+            test1: "testA",
+            test2: "testB",
+          },
+        }),
+      ],
+    );
+  });
+
+  it("should record fields on the span before and after it is entered", () => {
+    // Arrange
+    const subscriber = TestSubscriber.init();
+    const newSpan = span(Level.INFO, "test span");
+
+    // Act
+    newSpan.record("test1", "testA").enter().record("test2", "testB");
+    event(Level.WARN, "test");
+
+    // Assert
+    expect(subscriber.onEvent).toHaveBeenCalled();
+    expect(subscriber.onEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        level: Level.WARN,
+        message: "test",
+        fields: undefined,
+      }),
+      [
+        expect.objectContaining({
+          level: Level.INFO,
+          message: "test span",
+          fields: {
+            test1: "testA",
+            test2: "testB",
+          },
+        }),
+      ],
+    );
+  });
+
   it("should handle nested spans", () => {
     // Arrange
     const subscriber = TestSubscriber.init();

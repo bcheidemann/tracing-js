@@ -33,6 +33,10 @@ export type EnteredSpan = {
    * Exits the span.
    */
   exit: () => void;
+  /**
+   * Record a field on the span.
+   */
+  record(key: string, value: unknown): EnteredSpan;
   [Symbol.dispose]: () => void;
 };
 
@@ -41,13 +45,18 @@ export type EnteredSpan = {
  */
 export type Span<TSpanId> = {
   /**
+   * @internal
    * The ID of the span. This is an opaque value which is used by the subscriber to identify the span.
    */
-  id?: TSpanId;
+  _id?: TSpanId;
   /**
    * Enters the span.
    */
   enter(): EnteredSpan;
+  /**
+   * Record a field on the span.
+   */
+  record(key: string, value: unknown): Span<TSpanId>;
 };
 
 /**
@@ -64,9 +73,10 @@ export function span(
   fields?: Record<string, unknown>,
 ): Span<AnonymousSpanId> {
   const ctx = getSubscriberContext();
+  const span: Span<AnonymousSpanId> = { enter, record };
 
   if (!ctx) {
-    return { enter };
+    return span;
   }
 
   let enabled = true;
@@ -76,7 +86,7 @@ export function span(
   }
 
   if (!enabled) {
-    return { enter };
+    return span;
   }
 
   const attributes: SpanAttributes = {
@@ -91,35 +101,50 @@ export function span(
   }
 
   if (!enabled) {
-    return { enter };
+    return span;
   }
 
-  const spanId = ctx.subscriber.newSpan(attributes);
+  const spanId = ctx.subscriber.newSpan(attributes) as AnonymousSpanId;
+  span._id = spanId;
 
-  return {
-    id: spanId as AnonymousSpanId,
-    enter,
-  };
+  return span;
 
-  function enter() {
-    if (!ctx) {
-      return { exit, [Symbol.dispose]: exit };
-    }
-
-    if (enabled) {
-      ctx.subscriber.enter(spanId);
-    }
-
-    return {
+  function enter(): EnteredSpan {
+    const enteredSpan = {
       exit,
+      record,
       [Symbol.dispose]: exit,
     };
 
+    const ctxEnabled = ctx && enabled;
+
+    if (ctxEnabled) {
+      ctx.subscriber.enter(span._id);
+    }
+
+    return enteredSpan;
+
     function exit() {
-      if (ctx && enabled) {
+      if (ctxEnabled) {
         ctx.subscriber.exit(spanId);
       }
     }
+
+    function record(key: string, value: unknown) {
+      if (ctxEnabled) {
+        ctx.subscriber.record(spanId, key, value);
+      }
+
+      return enteredSpan;
+    }
+  }
+
+  function record(key: string, value: unknown) {
+    if (ctx && enabled) {
+      ctx.subscriber.record(spanId, key, value);
+    }
+
+    return span;
   }
 }
 
