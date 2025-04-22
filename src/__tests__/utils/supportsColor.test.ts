@@ -43,7 +43,7 @@ describe("supportsColor", () => {
   describe("Node", () => {
     const testCases: [
       name: string,
-      stdin: (Partial<ReadStream & { fd: 0; }>) | undefined,
+      stdin: (Partial<ReadStream & { fd: 0 }>) | undefined,
       NO_COLOR: string | undefined,
       expectedResult: boolean,
     ][] = [
@@ -81,7 +81,7 @@ describe("supportsColor", () => {
         const process = globalThis.process;
         globalThis.process = {
           ...process,
-          stdin: stdin as ReadStream & { fd: 0; },
+          stdin: stdin as ReadStream & { fd: 0 },
           env: {
             NO_COLOR,
           },
