@@ -49,7 +49,7 @@ logging, and diagnostic information from JavaScript applications at runtime.
     - [SWC](#swc)
   - [Runtime Support](#runtime-support)
   - [ES Decorators vs Legacy Decorators](#es-decorators-vs-legacy-decorators)
-- [ESLint Plugin](#eslint-plugin)
+- [ESLint Plugin (experimental)](#eslint-plugin-experimental)
 - [Contributing](#contributing)
 
 ## Installation
@@ -477,7 +477,7 @@ Instead, skip function parameters by index, using the skip by mask
 Some features `@bcheidemann/tracing` make use of TypeScript features which are
 not universally supported. The below table outlines bundler support by feature.
 
-> Last updated: 15th June 2024
+> Last updated: 17th May 2025
 
 | Feature                  | JS (no bundler) | TSC | Vite | ESBuild | SWC |
 | ------------------------ | --------------- | --- | ---- | ------- | --- |
@@ -485,8 +485,10 @@ not universally supported. The below table outlines bundler support by feature.
 | events                   | ✅              | ✅  | ✅   | ✅      | ✅  |
 | subscribers              | ✅              | ✅  | ✅   | ✅      | ✅  |
 | function instrumentation | ✅              | ✅  | ✅   | ✅      | ✅  |
+| `using` spans            | 🚧*             | ✅  | ✅   | ✅      | ✅  |
 | method instrumentation   | ❌              | ✅  | ✅   | ✅      | ✅  |
-| `using` spans            | ❌              | ✅  | ✅   | ✅      | ✅  |
+
+\* See https://caniuse.com/mdn-javascript_statements_using
 
 #### Vite
 
@@ -545,11 +547,12 @@ while still maintaining support for the legacy experimental decorators behind
 the `experimentalDecorators` option. The instrument decorator is agnostic of the
 type of decorator your project uses.
 
-## ESLint Plugin
+## ESLint Plugin (experimental)
 
 `@bcheidemann/tracing` comes with an ESLint plugin, which helps catch common
-issues. See
-[`@bcheidemann/tracing-eslint`](https://jsr.io/@bcheidemann/tracing-eslint).
+issues. See [`@bcheidemann/tracing-eslint`](https://jsr.io/@bcheidemann/tracing-eslint).
+
+We are also working on a Deno lint plugin, which may replace the ESLint plugin.
 
 ## Contributing
 
