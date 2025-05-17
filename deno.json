@@ -11,7 +11,8 @@
     "example:api-class-instrumentation": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/api-class-instrumentation/main.ts",
     "example:basic": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/basic/main.ts",
     "example:basic-json": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/basic-json/main.ts",
-    "example:legacy-decorators": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/legacy-decorators/main.ts"
+    "example:legacy-decorators": "deno run --allow-env=IS_SNAPSHOT_RUN src/examples/legacy-decorators/main.ts",
+    "build:npm": "deno run -A scripts/build_npm.ts"
   },
   "exports": {
     ".": "./src/mod.ts",
@@ -28,6 +29,7 @@
     "@bcheidemann/tracing": "./src/mod.ts",
     "@bcheidemann/deno-isolated-test-case": "jsr:@bcheidemann/deno-isolated-test-case@^0.3.0",
     "@bcheidemann/parse-params": "jsr:@bcheidemann/parse-params@^0.5.0",
+    "@deno/dnt": "jsr:@deno/dnt@^0.42.1",
     "@std/assert": "jsr:@std/assert@^0.226.0",
     "@std/fmt": "jsr:@std/fmt@^0.225.4",
     "@std/streams": "jsr:@std/streams@^0.224.5",
