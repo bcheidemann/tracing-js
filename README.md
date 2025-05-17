@@ -550,7 +550,8 @@ type of decorator your project uses.
 ## ESLint Plugin (experimental)
 
 `@bcheidemann/tracing` comes with an ESLint plugin, which helps catch common
-issues. See [`@bcheidemann/tracing-eslint`](https://jsr.io/@bcheidemann/tracing-eslint).
+issues. See
+[`@bcheidemann/tracing-eslint`](https://jsr.io/@bcheidemann/tracing-eslint).
 
 We are also working on a Deno lint plugin, which may replace the ESLint plugin.
 

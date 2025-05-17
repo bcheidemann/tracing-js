@@ -12,7 +12,6 @@ import { context, getSubscriberContext } from "./context.ts";
 import { event } from "./event.ts";
 import { Level } from "./level.ts";
 import { span } from "./span.ts";
-import { AssertionError } from "@std/assert";
 
 // deno-lint-ignore no-explicit-any
 type AnyFunction = (this: any, ...args: any[]) => any;
@@ -761,7 +760,7 @@ export function logEnter<TArgs extends any[]>(
     // deno-lint-ignore no-case-declarations
     default:
       const _: never = levelOrMessage;
-      throw new AssertionError(
+      throw new Error(
         `Invalid type for logEnter attribute value. Received "${typeof levelOrMessage}" but expected: "string | number | function | undefined"`,
       );
   }
@@ -1007,7 +1006,7 @@ export function logExit<TArgs extends any[]>(
     // deno-lint-ignore no-case-declarations
     default:
       const _: never = levelOrMessage;
-      throw new AssertionError(
+      throw new Error(
         `Invalid type for logExit attribute value. Received "${typeof levelOrMessage}" but expected "string | number | function | undefined".`,
       );
   }
@@ -1319,7 +1318,7 @@ export function logError<TArgs extends any[]>(
     // deno-lint-ignore no-case-declarations
     default:
       const _: never = levelOrMessage;
-      throw new AssertionError(
+      throw new Error(
         `Invalid type for logError attribute value. Received "${typeof levelOrMessage}" but expected "string | number | function | undefined".`,
       );
   }
@@ -1560,7 +1559,7 @@ export function instrument<TMethod extends AnyFunction>(
         : propertyKey;
 
       if (!target) {
-        throw new AssertionError(`Failed to decorate method: ${methodName}`);
+        throw new Error(`Failed to decorate method: ${methodName}`);
       }
 
       descriptor!.value = instrumentCallbackImpl(target, attributes, {
@@ -1743,7 +1742,7 @@ function collectAttributes<TArgs extends any[], TReturnType>(
       // deno-lint-ignore no-case-declarations
       default:
         const _: never = attribute;
-        throw new AssertionError(
+        throw new Error(
           `Invalid attribute kind. Received "${
             // deno-lint-ignore no-explicit-any
             (attribute as any).kind}" but expected "${
@@ -1881,7 +1880,7 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
                 }
                 break;
               default:
-                throw new AssertionError(
+                throw new Error(
                   `Invalid type for skip attribute value. Received "${typeof skip}" but expected "string | number | boolean".`,
                 );
             }
@@ -1916,7 +1915,7 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
               redactArg(logArgs, redactAttribute.param, redactAttribute);
               break;
             default:
-              throw new AssertionError(
+              throw new Error(
                 `Invalid type for redact attribute value. Received "${typeof redactAttribute
                   .param}" but expected "string | number".`,
               );
