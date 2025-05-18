@@ -2,6 +2,7 @@
 
 [![JSR](https://jsr.io/badges/@bcheidemann/tracing)](https://jsr.io/@bcheidemann/tracing)
 [![JSR Score](https://jsr.io/badges/@bcheidemann/tracing/score)](https://jsr.io/@bcheidemann/tracing)
+[![NPM](https://img.shields.io/npm/v/%40tracing-js%2Ftracing)](https://www.npmjs.com/package/@tracing-js/tracing)
 ![publish workflow](https://github.com/bcheidemann/tracing-js/actions/workflows/publish.yml/badge.svg)
 [![codecov](https://codecov.io/gh/bcheidemann/tracing-js/graph/badge.svg?token=3GGM1M48D8)](https://codecov.io/gh/bcheidemann/tracing-js)
 
