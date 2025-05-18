@@ -324,7 +324,7 @@ The following attributes can be applied:
 |                | `logError(Level.TRACE, args => args[0])`        | Logs an event with a message produced from args at the provided level when the function or method throws an error.          |
 | log            | `log()`                                         | Shorthand for `logEnter`, `logExit`, and `logError`. Logs an event when the function or method is entered, exist or throws. |
 |                | `log(Level.TRACE)`                              | Logs an event at the provided level when the function or method is entered or exist. Logs at error level on throw.          |
-| logReturnValue | `logReturnValue()`                              | Requires `logExit`. Appends the `returnValue` field to the logged exit event.                                               |
+| logReturnValue | `logReturnValue()`                              | Appends the `returnValue` field to the logged exit event.                                                                   |
 |                | `logReturnValue((val, args) => val.toString())` | Appends the mapped `returnValue` field to the logged exit event.                                                            |
 
 ### Subscribers

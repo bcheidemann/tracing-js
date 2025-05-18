@@ -9,6 +9,7 @@ import {
   level,
   log,
   logEnter,
+  logReturnValue,
   logError,
   logExit,
   message,
@@ -382,7 +383,6 @@ describe("instrument", () => {
     });
 
     // TODO: Add tests for different logExit syntaxes
-    // TODO: Add tests for logReturnValue
     it("should apply the logExit attribute", () => {
       // Arrange
       const subscriber = createTestSubscriber();
@@ -406,6 +406,118 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Exiting Example.test",
         fields: undefined,
+      });
+    });
+
+    it("should apply the logReturnValue attribute", () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(logReturnValue())
+        test() {
+          return 42;
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      instance.test();
+
+      // Assert
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
+      expect(subscriber.event).toHaveBeenCalledWith({
+        isEvent: true,
+        level: Level.INFO,
+        message: "Exiting Example.test",
+        fields: {
+          returnValue: 42,
+        },
+      });
+    });
+
+    it("should apply the logReturnValue attribute with map function", () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(logReturnValue((returnValue) => `[${typeof returnValue}] ${returnValue}`))
+        test() {
+          return 42;
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      instance.test();
+
+      // Assert
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
+      expect(subscriber.event).toHaveBeenCalledWith({
+        isEvent: true,
+        level: Level.INFO,
+        message: "Exiting Example.test",
+        fields: {
+          returnValue: "[number] 42",
+        },
+      });
+    });
+
+    it("should apply the logReturnValue attribute async", async () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(logReturnValue())
+        async test() {
+          return await Promise.resolve(42);
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      await instance.test();
+
+      // Assert
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
+      expect(subscriber.event).toHaveBeenCalledWith({
+        isEvent: true,
+        level: Level.INFO,
+        message: "Exiting Example.test",
+        fields: {
+          returnValue: 42,
+        },
+      });
+    });
+
+    it("should apply the logReturnValue attribute with map function async", async () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(logReturnValue((returnValue) => `[${typeof returnValue}] ${returnValue}`))
+        async test() {
+          return await Promise.resolve(42);
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      await instance.test();
+
+      // Assert
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
+      expect(subscriber.event).toHaveBeenCalledWith({
+        isEvent: true,
+        level: Level.INFO,
+        message: "Exiting Example.test",
+        fields: {
+          returnValue: "[number] 42",
+        },
       });
     });
 

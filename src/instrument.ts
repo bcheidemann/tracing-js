@@ -1990,14 +1990,14 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
               throw error;
             })
             .then((returnValue) => {
-              if (logExit) {
+              if (logExit || logReturnValue) {
                 const fields = logReturnValue && {
                   returnValue: logReturnValue.map
                     ? logReturnValue.map(returnValue, args)
                     : returnValue,
                 };
                 if (
-                  "message" in logExit &&
+                  logExit && "message" in logExit &&
                   typeof logExit.message !== "undefined"
                 ) {
                   const message = typeof logExit.message === "function"
@@ -2006,7 +2006,7 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
                   event(logExit.level ?? Level.ERROR, message, fields);
                 } else {
                   event(
-                    logExit.level ?? defaultEventLevel,
+                    logExit?.level ?? defaultEventLevel,
                     `Exiting ${fmtTarget}`,
                     fields,
                   );
@@ -2019,20 +2019,20 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
 
         // Handle sync success
         // TODO: Tidy up duplicate code
-        if (logExit) {
+        if (logExit || logReturnValue) {
           const fields = logReturnValue && {
             returnValue: logReturnValue.map
               ? logReturnValue.map(returnValue, args)
               : returnValue,
           };
-          if ("message" in logExit && typeof logExit.message !== "undefined") {
+          if (logExit && "message" in logExit && typeof logExit.message !== "undefined") {
             const message = typeof logExit.message === "function"
               ? logExit.message(args)
               : logExit.message;
             event(logExit.level ?? Level.ERROR, message, fields);
           } else {
             event(
-              logExit.level ?? defaultEventLevel,
+              logExit?.level ?? defaultEventLevel,
               `Exiting ${fmtTarget}`,
               fields,
             );
