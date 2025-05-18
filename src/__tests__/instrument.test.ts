@@ -9,10 +9,11 @@ import {
   level,
   log,
   logEnter,
-  logReturnValue,
   logError,
   logExit,
+  logReturnValue,
   message,
+  redact,
   skip,
   skipAll,
   target,
@@ -443,7 +444,11 @@ describe("instrument", () => {
       const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(logReturnValue((returnValue) => `[${typeof returnValue}] ${returnValue}`))
+        @instrument(
+          logReturnValue((returnValue) =>
+            `[${typeof returnValue}] ${returnValue}`
+          ),
+        )
         test() {
           return 42;
         }
@@ -499,7 +504,11 @@ describe("instrument", () => {
       const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
       class Example {
-        @instrument(logReturnValue((returnValue) => `[${typeof returnValue}] ${returnValue}`))
+        @instrument(
+          logReturnValue((returnValue) =>
+            `[${typeof returnValue}] ${returnValue}`
+          ),
+        )
         async test() {
           return await Promise.resolve(42);
         }
@@ -982,6 +991,378 @@ describe("instrument", () => {
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
     });
+
+    it("should apply the redact attribute", () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(redact("arg0"))
+        // deno-lint-ignore no-unused-vars
+        test(arg0: string, arg1: string) {}
+      }
+      const instance = new Example();
+
+      // Act
+      instance.test("arg0", "arg1");
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {
+          args: {
+            0: "[REDACTED]",
+            1: "arg1",
+          },
+        },
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
+
+    it("should apply the redact attribute async", async () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(redact("arg0"))
+        // deno-lint-ignore no-unused-vars
+        async test(arg0: string, arg1: string) {
+          await Promise.resolve();
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      await instance.test("arg0", "arg1");
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {
+          args: {
+            0: "[REDACTED]",
+            1: "arg1",
+          },
+        },
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
+
+    it("should apply the redact attribute by index", () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(redact(0))
+        // deno-lint-ignore no-unused-vars
+        test(arg0: string, arg1: string) {}
+      }
+      const instance = new Example();
+
+      // Act
+      instance.test("arg0", "arg1");
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {
+          args: {
+            0: "[REDACTED]",
+            1: "arg1",
+          },
+        },
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
+
+    it("should apply the redact attribute by index async", async () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(redact(0))
+        // deno-lint-ignore no-unused-vars
+        async test(arg0: string, arg1: string) {
+          await Promise.resolve();
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      await instance.test("arg0", "arg1");
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {
+          args: {
+            0: "[REDACTED]",
+            1: "arg1",
+          },
+        },
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
+
+    it("should apply the redact attribute and redact a field", () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(redact(0, (param) => param.secret))
+        // deno-lint-ignore no-unused-vars
+        test(arg0: { secret: string; visible: string }, arg1: string) {}
+      }
+      const instance = new Example();
+
+      // Act
+      instance.test({ secret: "secret", visible: "visible" }, "arg1");
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {
+          args: {
+            0: {
+              secret: "[REDACTED]",
+              visible: "visible",
+            },
+            1: "arg1",
+          },
+        },
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
+
+    it("should apply the redact attribute and redact a field async", async () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(redact(0, (param) => param.secret))
+        // deno-lint-ignore no-unused-vars
+        async test(arg0: { secret: string; visible: string }, arg1: string) {
+          await Promise.resolve();
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      await instance.test({ secret: "secret", visible: "visible" }, "arg1");
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {
+          args: {
+            0: {
+              secret: "[REDACTED]",
+              visible: "visible",
+            },
+            1: "arg1",
+          },
+        },
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
+
+    it("should apply the redact attribute and redact multiple fields", () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(redact(0, (param) => [param.secret1, param.secret2]))
+        // deno-lint-ignore no-unused-vars
+        test(arg0: { secret1: string; secret2: string }, arg1: string) {}
+      }
+      const instance = new Example();
+
+      // Act
+      instance.test({ secret1: "secret", secret2: "secret" }, "arg1");
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {
+          args: {
+            0: {
+              secret1: "[REDACTED]",
+              secret2: "[REDACTED]",
+            },
+            1: "arg1",
+          },
+        },
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
+
+    it("should apply the redact attribute and redact multiple fields async", async () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(redact(0, (param) => [param.secret1, param.secret2]))
+        // deno-lint-ignore no-unused-vars
+        async test(arg0: { secret1: string; secret2: string }, arg1: string) {
+          await Promise.resolve();
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      await instance.test({ secret1: "secret", secret2: "secret" }, "arg1");
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {
+          args: {
+            0: {
+              secret1: "[REDACTED]",
+              secret2: "[REDACTED]",
+            },
+            1: "arg1",
+          },
+        },
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
+
+    const invalidOperations: ({
+      name: string;
+      // deno-lint-ignore no-explicit-any
+      operation: (redactProxy: any) => any;
+      error: string;
+    })[] = [
+      {
+        name: "apply",
+        operation: (redactProxy) => redactProxy(),
+        error: "redactProxy is not a function",
+      },
+      {
+        name: "construct",
+        operation: (redactProxy) => new redactProxy(),
+        error: "redactProxy is not a constructor",
+      },
+      {
+        name: "define a property on",
+        operation: (redactProxy) =>
+          Object.defineProperty(redactProxy, "prop", {}),
+        error: "Cannot define property on RedactProxy",
+      },
+      {
+        name: "delete a property on",
+        operation: (redactProxy) => {
+          delete redactProxy.prop;
+        },
+        error: "Cannot delete property on RedactProxy",
+      },
+      {
+        name: "get own property descriptor on",
+        operation: (redactProxy) =>
+          Object.getOwnPropertyDescriptor(redactProxy, "prop"),
+        error: "Cannot call Object.getOwnPropertyDescriptor on RedactProxy",
+      },
+      {
+        name: "get the prototype of",
+        operation: (redactProxy) => Object.getPrototypeOf(redactProxy),
+        error: "Cannot get prototype of RedactProxy",
+      },
+      {
+        name: "use the 'in' keyword on",
+        operation: (redactProxy) => "prop" in redactProxy,
+        error:
+          "Cannot use 'in' operator on RedactProxy (properties should be accessed unconditionally)",
+      },
+      {
+        name: "call Object.isExtensible on",
+        operation: (redactProxy) => Object.isExtensible(redactProxy),
+        error: "Cannot call Object.isExtensible on RedactProxy",
+      },
+      {
+        name: "call Object.getOwnPropertyNames on",
+        operation: (redactProxy) => Object.getOwnPropertyNames(redactProxy),
+        error: "Cannot call Object.getOwnPropertyNames on RedactProxy",
+      },
+      {
+        name: "call Object.preventExtensions on",
+        operation: (redactProxy) => Object.preventExtensions(redactProxy),
+        error: "Cannot call Object.preventExtensions on RedactProxy",
+      },
+      {
+        name: "set a property on",
+        operation: (redactProxy) => {
+          redactProxy.prop = 42;
+        },
+        error: "Cannot set property on RedactProxy",
+      },
+      {
+        name: "call Object.setPrototypeOf on",
+        operation: (redactProxy) => Object.setPrototypeOf(redactProxy, null),
+        error: "Cannot call Object.setPrototypeOf on RedactProxy",
+      },
+    ];
+
+    for (const invalidOperation of invalidOperations) {
+      it(`cannot ${invalidOperation.name} the redact proxy`, () => {
+        // Arrange
+        const subscriber = createTestSubscriber();
+        const ctx = createSubscriberContext(subscriber);
+        context.enterWith(ctx);
+        class Example {
+          @instrument(redact(0, invalidOperation.operation))
+          // deno-lint-ignore no-unused-vars
+          test(arg0: string) {}
+        }
+        const instance = new Example();
+
+        // Act
+        const act = () => instance.test("arg0");
+
+        // Assert
+        expect(act).toThrowError(invalidOperation.error);
+      });
+    }
 
     it("should apply the field attribute with literal value", async () => {
       // Arrange

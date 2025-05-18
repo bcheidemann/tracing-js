@@ -295,13 +295,13 @@ The following attributes can be applied:
 | skip           | `skip("paramName")`                             | Omits the named parameter from the instrumented spans `args` field.                                                         |
 |                | `skip(0)`                                       | Omits the indexed parameter from the instrumented spans `args` field.                                                       |
 |                | `skip(true, false)`                             | Applies a positional mask to the parameters to omit from the instrumented spans `args` field.                               |
+| skipAll        | `skipAll`                                       | Omits all parameters from the instrumented spans `args` field.                                                              |
 | redact         | `redact("paramName")`                           | Replaces the named parameter with "[REDACTED]" in the instrumented spans `args` field.                                      |
 |                | `redact(0)`                                     | Replaces the indexed parameter with "[REDACTED]" in the instrumented spans `args` field.                                    |
 |                | `redact("param", param => param.field)`         | Replaces a field on the named parameter with "[REDACTED]" in the instrumented spans `args` field.                           |
 |                | `redact(0, param => param.field)`               | Replaces a field on the indexed parameter with "[REDACTED]" in the instrumented spans `args` field.                         |
 |                | `redact("param", param => [param.a, param.b])`  | Replaces multiple fields on the named parameter with "[REDACTED]" in the instrumented spans `args` field.                   |
 |                | `redact(0, param => [param.a, param.b])`        | Replaces multiple fields on the indexed parameter with "[REDACTED]" in the instrumented spans `args` field.                 |
-| skipAll        | `skipAll`                                       | Omits all parameters from the instrumented spans `args` field.                                                              |
 | field          | `field("key", "value")`                         | Adds the specified key and value to the instrumented spans fields.                                                          |
 |                | `field("key", func)`                            | Adds the specified field to the instrumented spans fields. The provided func will map the arguments to the field value.     |
 | logEnter       | `logEnter()`                                    | Logs an event when the function or method is entered.                                                                       |

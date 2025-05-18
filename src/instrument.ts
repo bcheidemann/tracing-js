@@ -1443,12 +1443,16 @@ function createRedactProxy(
   path: (string | number | symbol)[] = [],
 ): RedactProxy {
   return new Proxy<RedactProxy>(REDACT_PROXY_TARGET, {
+    // deno-coverage-ignore-start -- not reachable unless target is a function
     apply() {
       throw new Error("Cannot apply RedactProxy");
     },
+    // deno-coverage-ignore-stop
+    // deno-coverage-ignore-start -- not reachable unless target is a constructor
     construct() {
       throw new Error("Cannot construct RedactProxy");
     },
+    // deno-coverage-ignore-stop
     defineProperty() {
       throw new Error("Cannot define property on RedactProxy");
     },
@@ -1478,7 +1482,7 @@ function createRedactProxy(
       throw new Error("Cannot call Object.isExtensible on RedactProxy");
     },
     ownKeys() {
-      throw new Error("Cannot call Reflect.ownKeys on RedactProxy");
+      throw new Error("Cannot call Object.getOwnPropertyNames on RedactProxy");
     },
     preventExtensions() {
       throw new Error("Cannot call Object.preventExtensions on RedactProxy");
@@ -1895,7 +1899,6 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
           });
         }
         for (const redactAttribute of attributesByKind[AttributeKind.Redact]) {
-          // TODO: Implement redact attribute
           switch (typeof redactAttribute.param) {
             case "string": {
               const parsedParams = getParsedParamsForFunction(fn);
@@ -2025,7 +2028,10 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
               ? logReturnValue.map(returnValue, args)
               : returnValue,
           };
-          if (logExit && "message" in logExit && typeof logExit.message !== "undefined") {
+          if (
+            logExit && "message" in logExit &&
+            typeof logExit.message !== "undefined"
+          ) {
             const message = typeof logExit.message === "function"
               ? logExit.message(args)
               : logExit.message;
