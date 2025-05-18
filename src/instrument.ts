@@ -757,12 +757,14 @@ export function logEnter<TArgs extends any[]>(
       return { kind: AttributeKind.LogEnter, level: levelOrMessage, message };
     case "undefined":
       return { kind: AttributeKind.LogEnter };
+    // deno-coverage-ignore-start
     // deno-lint-ignore no-case-declarations
     default:
       const _: never = levelOrMessage;
       throw new Error(
         `Invalid type for logEnter attribute value. Received "${typeof levelOrMessage}" but expected: "string | number | function | undefined"`,
       );
+      // deno-coverage-ignore-stop
   }
 }
 
@@ -1003,12 +1005,14 @@ export function logExit<TArgs extends any[]>(
       return { kind: AttributeKind.LogExit, level: levelOrMessage, message };
     case "undefined":
       return { kind: AttributeKind.LogExit };
+    // deno-coverage-ignore-start
     // deno-lint-ignore no-case-declarations
     default:
       const _: never = levelOrMessage;
       throw new Error(
         `Invalid type for logExit attribute value. Received "${typeof levelOrMessage}" but expected "string | number | function | undefined".`,
       );
+      // deno-coverage-ignore-stop
   }
 }
 
@@ -1315,12 +1319,14 @@ export function logError<TArgs extends any[]>(
       return { kind: AttributeKind.LogError, level: levelOrMessage, message };
     case "undefined":
       return { kind: AttributeKind.LogError };
+    // deno-coverage-ignore-start
     // deno-lint-ignore no-case-declarations
     default:
       const _: never = levelOrMessage;
       throw new Error(
         `Invalid type for logError attribute value. Received "${typeof levelOrMessage}" but expected "string | number | function | undefined".`,
       );
+      // deno-coverage-ignore-stop
   }
 }
 
@@ -1739,6 +1745,7 @@ function collectAttributes<TArgs extends any[], TReturnType>(
       case AttributeKind.Redact:
         attributesByKind[AttributeKind.Redact].push(attribute);
         break;
+      // deno-coverage-ignore-start
       // deno-lint-ignore no-case-declarations
       default:
         const _: never = attribute;
@@ -1749,6 +1756,7 @@ function collectAttributes<TArgs extends any[], TReturnType>(
             Object.keys(AttributeKind).join(" | ")
           }".`,
         );
+        // deno-coverage-ignore-stop
     }
   }
 

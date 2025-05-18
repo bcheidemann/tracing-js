@@ -96,6 +96,7 @@ export class FmtSubscriber extends ManagedSubscriber {
     }
   }
 
+  // deno-coverage-ignore-start -- deprecated
   /**
    * Initialises the FmtSubscriber as the default global subscriber.
    *
@@ -104,6 +105,7 @@ export class FmtSubscriber extends ManagedSubscriber {
   public static init(options: FmtSubscriberOptions = {}): FmtSubscriber {
     return this.setGlobalDefault(options);
   }
+  // deno-coverage-ignore-stop
 
   public static setGlobalDefault(
     options: FmtSubscriberOptions = {},
