@@ -1891,10 +1891,12 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
                   delete logArgs[index];
                 }
                 break;
+              // deno-coverage-ignore-start - unreachable unless called incorrectly
               default:
                 throw new Error(
                   `Invalid type for skip attribute value. Received "${typeof skip}" but expected "string | number | boolean".`,
                 );
+              // deno-coverage-ignore-stop
             }
           });
         }
