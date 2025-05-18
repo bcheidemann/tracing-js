@@ -133,6 +133,7 @@ class Example {
 
   @instrument(logError())
   logError() {
+    info("log error");
     throw new Error("whoops!");
   }
 
