@@ -1896,7 +1896,7 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
                 throw new Error(
                   `Invalid type for skip attribute value. Received "${typeof skip}" but expected "string | number | boolean".`,
                 );
-              // deno-coverage-ignore-stop
+                // deno-coverage-ignore-stop
             }
           });
         }
