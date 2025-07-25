@@ -65,6 +65,11 @@ describe("OpenTelemetrySubscriber", () => {
           text: "Hello World!",
         },
       },
+      mixedArrayAttr: ["example string", 42, true, null],
+      emptyArrayAttr: [],
+      stringArrayAttr: [null, "1", "2", "3"],
+      numberArrayAttr: [null, 1, 2, 3],
+      booleanArrayAttr: [null, true, false, true],
     }).enter();
     guard.exit();
 
@@ -92,6 +97,11 @@ describe("OpenTelemetrySubscriber", () => {
       "nestedObjectAttr.type": "email",
       "nestedObjectAttr.content.html": "<h1>Hello World!</h1>",
       "nestedObjectAttr.content.text": "Hello World!",
+      mixedArrayAttr: ["example string", "42", "true", null],
+      emptyArrayAttr: [],
+      stringArrayAttr: [null, "1", "2", "3"],
+      numberArrayAttr: [null, 1, 2, 3],
+      booleanArrayAttr: [null, true, false, true],
     });
     expect(spans[0].events).toHaveLength(0);
   });
@@ -165,6 +175,11 @@ describe("OpenTelemetrySubscriber", () => {
           text: "Hello World!",
         },
       },
+      mixedArrayAttr: ["example string", 42, true, null],
+      emptyArrayAttr: [],
+      stringArrayAttr: [null, "1", "2", "3"],
+      numberArrayAttr: [null, 1, 2, 3],
+      booleanArrayAttr: [null, true, false, true],
     });
     guard.exit();
 
@@ -193,6 +208,11 @@ describe("OpenTelemetrySubscriber", () => {
       "nestedObjectAttr.type": "email",
       "nestedObjectAttr.content.html": "<h1>Hello World!</h1>",
       "nestedObjectAttr.content.text": "Hello World!",
+      mixedArrayAttr: ["example string", "42", "true", null],
+      emptyArrayAttr: [],
+      stringArrayAttr: [null, "1", "2", "3"],
+      numberArrayAttr: [null, 1, 2, 3],
+      booleanArrayAttr: [null, true, false, true],
     });
   });
 
