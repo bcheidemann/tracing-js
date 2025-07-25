@@ -9,6 +9,7 @@
     "jsr:@std/fmt@~0.225.4": "0.225.4",
     "jsr:@std/internal@1": "1.0.1",
     "jsr:@std/testing@~0.225.2": "0.225.3",
+    "npm:@opentelemetry/api@^1.9.0": "1.9.0",
     "npm:@types/node@*": "22.15.15",
     "npm:acorn@8.12.0": "8.12.0"
   },
@@ -47,6 +48,9 @@
     }
   },
   "npm": {
+    "@opentelemetry/api@1.9.0": {
+      "integrity": "sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg=="
+    },
     "@types/node@22.15.15": {
       "integrity": "sha512-R5muMcZob3/Jjchn5LcO8jdKwSCbzqmPB6ruBxMcf9kbxtniZHP327s6C37iOfuw8mbKK3cAQa7sEl7afLrQ8A==",
       "dependencies": [
@@ -65,7 +69,8 @@
     "dependencies": [
       "jsr:@bcheidemann/parse-params@0.5",
       "jsr:@std/assert@0.226",
-      "jsr:@std/fmt@~0.225.4"
+      "jsr:@std/fmt@~0.225.4",
+      "npm:@opentelemetry/api@^1.9.0"
     ]
   }
 }

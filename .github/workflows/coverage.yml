@@ -17,6 +17,8 @@ jobs:
         with:
           deno-version: v2.x
       - name: Create coverage files
+        env:
+          IS_COVERAGE_RUN: true
         run: deno task test --coverage
       - name: Create coverage report
         run: deno coverage --lcov > coverage.lcov
