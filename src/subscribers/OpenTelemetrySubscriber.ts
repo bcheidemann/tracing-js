@@ -254,6 +254,10 @@ export class OpenTelemetrySubscriber implements ISubscriber<symbol> {
     } else {
       span.attributes.fields = { [key]: value };
     }
+
+    span.otelSpan?.setAttributes(
+      this.#preprocessAttributes({ [key]: value }) ?? {},
+    );
   }
 
   currentSpan(): symbol | undefined {
