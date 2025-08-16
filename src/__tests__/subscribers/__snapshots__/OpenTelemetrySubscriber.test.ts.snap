@@ -65,3 +65,16 @@ snapshot[`OpenTelemetrySubscriber > should log warnings for incorrectly exited s
           }
 "
 `;
+
+snapshot[`OpenTelemetrySubscriber > should log warnings for exiting a span which does not belong to the current subscriber context 1`] = `
+"[WARNING] (OpenTelemetrySubscriber) A span was exited which does not
+          belong to the current subscribers context. This probably means
+          that one of the following happened:
+
+          [1] The spans _id property was mutated. This is an invalid
+              operation.
+
+          [2] The OpenTelemetrySubscriber.exit method was called
+              manually with an invalid span ID.
+"
+`;

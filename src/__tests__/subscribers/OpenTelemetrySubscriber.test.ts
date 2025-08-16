@@ -434,4 +434,18 @@ describe("OpenTelemetrySubscriber", () => {
     await assertSnapshot(context, outerSpanWarning);
     await assertSnapshot(context, innerSpanWarning);
   });
+
+  it("should log warnings for exiting a span which does not belong to the current subscriber context", async (context) => {
+    // Arrange
+    const subscriber = OpenTelemetrySubscriber.setGlobalDefault({ tracer });
+    using consoleLogMock = consoleMock("warn");
+
+    // Act
+    subscriber.exit(Symbol.for("invalid span ID"));
+
+    // Assert
+    expect(consoleLogMock.mockedFn).toHaveBeenCalledTimes(1);
+    const warning = consoleLogMock.mockedFn.mock.calls.at(0)?.at(0);
+    await assertSnapshot(context, warning);
+  });
 });
