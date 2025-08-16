@@ -11,7 +11,7 @@ import {
 import { context, getSubscriberContext } from "./context.ts";
 import { event } from "./event.ts";
 import { Level } from "./level.ts";
-import { span } from "./span.ts";
+import { span, type SubscriberData } from "./span.ts";
 
 // deno-lint-ignore no-explicit-any
 type AnyFunction = (this: any, ...args: any[]) => any;
@@ -29,6 +29,7 @@ const AttributeKind = {
   LogError: 9 as const,
   Log: 10 as const,
   Redact: 11 as const,
+  SubscriberData: 12 as const,
 };
 
 type AttributeKind = typeof AttributeKind;
@@ -125,8 +126,27 @@ type RedactAttribute = {
   redact?: (param: RedactProxy) => RedactProxy | RedactProxy[];
 };
 
-// deno-lint-ignore no-explicit-any
-type Attributes<TArgs extends any[], TReturn> =
+/**
+ * Attribute containing additional subscriber specific data.
+ *
+ * This can be used to wrap the `subscriberData` attribute e.g.:
+ *
+ * ```ts
+ * export function exampleSubscriberData(data: Mydata): SubscriberDataAttribute {
+ *   return subscriberData({ example: data });
+ * }
+ * ```
+ */
+export type SubscriberDataAttribute = {
+  kind: AttributeKind["SubscriberData"];
+  subscriberData: SubscriberData;
+};
+
+type Attributes<
+  // deno-lint-ignore no-explicit-any
+  TArgs extends any[],
+  TReturn,
+> =
   | MessageAttribute
   | TargetAttribute
   | LevelAttribute
@@ -138,7 +158,8 @@ type Attributes<TArgs extends any[], TReturn> =
   | LogReturnValueAttribute<TArgs, TReturn>
   | LogErrorAttribute<TArgs>
   | LogAttribute
-  | RedactAttribute;
+  | RedactAttribute
+  | SubscriberDataAttribute;
 
 /**
  * The message attribute is used to override the message of the span created by the instrumented method or function.
@@ -1497,6 +1518,58 @@ function createRedactProxy(
 }
 const REDACT_PROXY: RedactProxy = createRedactProxy();
 
+/**
+ * The redact attribute is used to redact all or part of a parameter. It acts similarly to the skip attribute, but the
+ * parameter (or field) is replaced with the string "[REDACTED]" in the logs.
+ *
+ * @example Instrument a method and redact a sensitive field
+ * ```ts
+ * import { instrument, redact } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(redact("credentials", credentials => credentials.password))
+ *   login(credentials) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a method and redact multiple sensitive fields
+ * ```ts
+ * import { instrument, redact } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(redact(
+ *     "credentials",
+ *     credentials => [credentials.email, credentials.password],
+ *   ))
+ *   login(credentials) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @example Instrument a method and redact a parameter
+ * ```ts
+ * import { instrument, redact } from "@bcheidemann/tracing";
+ *
+ * class Example {
+ *   @instrument(redact("credentials"))
+ *   login(credentials) {
+ *     // ...
+ *   }
+ * }
+ * ```
+ *
+ * @param param The parameter name or index to skip.
+ * @param redact Used to specify one or more fields to redact. If omitted, the whole parameter will be redacted.
+ */
+export function subscriberData<TSubscriberData extends SubscriberData>(
+  subscriberData: TSubscriberData,
+): SubscriberDataAttribute {
+  return { kind: AttributeKind.SubscriberData, subscriberData };
+}
+
 interface InstrumentDecorator<TMethod extends AnyFunction> {
   (
     target: TMethod,
@@ -1541,8 +1614,13 @@ interface InstrumentDecorator<TMethod extends AnyFunction> {
  * @param attributes The attributes to use for the instrumented method
  * @returns The instrument decorator
  */
-export function instrument<TMethod extends AnyFunction>(
-  ...attributes: Attributes<Parameters<TMethod>, ReturnType<TMethod>>[]
+export function instrument<
+  TMethod extends AnyFunction,
+>(
+  ...attributes: Attributes<
+    Parameters<TMethod>,
+    ReturnType<TMethod>
+  >[]
 ): InstrumentDecorator<TMethod> {
   function instrumentDecorator(
     targetOrClass: unknown,
@@ -1646,14 +1724,26 @@ export function instrumentCallback<TCallback extends AnyFunction>(
  * @param fn The function to instrument
  * @returns The instrumented function
  */
-export function instrumentCallback<TCallback extends AnyFunction>(
-  attributes: Attributes<Parameters<TCallback>, ReturnType<TCallback>>[],
+export function instrumentCallback<
+  TCallback extends AnyFunction,
+  TSubscriberData extends SubscriberData,
+>(
+  attributes: Attributes<
+    Parameters<TCallback>,
+    ReturnType<TCallback>
+  >[],
   fn: TCallback,
 ): TCallback;
-export function instrumentCallback<TCallback extends AnyFunction>(
+export function instrumentCallback<
+  TCallback extends AnyFunction,
+  TSubscriberData extends SubscriberData,
+>(
   attributesOrFn:
     | TCallback
-    | Attributes<Parameters<TCallback>, ReturnType<TCallback>>[],
+    | Attributes<
+      Parameters<TCallback>,
+      ReturnType<TCallback>
+    >[],
   fn?: TCallback,
 ): TCallback {
   if (fn) {
@@ -1676,8 +1766,11 @@ type Defaults = {
   [AttributeKind.Level]: LevelAttribute;
 };
 
-// deno-lint-ignore no-explicit-any
-function collectAttributes<TArgs extends any[], TReturnType>(
+function collectAttributes<
+  // deno-lint-ignore no-explicit-any
+  TArgs extends any[],
+  TReturnType,
+>(
   attributes: Attributes<TArgs, TReturnType>[],
   defaults: Defaults,
 ): {
@@ -1693,6 +1786,7 @@ function collectAttributes<TArgs extends any[], TReturnType>(
   [AttributeKind.LogError]?: LogErrorAttribute<TArgs>;
   [AttributeKind.Log]?: LogAttribute;
   [AttributeKind.Redact]: RedactAttribute[];
+  [AttributeKind.SubscriberData]: SubscriberDataAttribute[];
 } {
   const attributesByKind: ReturnType<
     typeof collectAttributes<TArgs, TReturnType>
@@ -1709,6 +1803,7 @@ function collectAttributes<TArgs extends any[], TReturnType>(
     [AttributeKind.LogError]: undefined,
     [AttributeKind.Log]: undefined,
     [AttributeKind.Redact]: [],
+    [AttributeKind.SubscriberData]: [],
   };
 
   for (const attribute of attributes) {
@@ -1748,6 +1843,9 @@ function collectAttributes<TArgs extends any[], TReturnType>(
         break;
       case AttributeKind.Redact:
         attributesByKind[AttributeKind.Redact].push(attribute);
+        break;
+      case AttributeKind.SubscriberData:
+        attributesByKind[AttributeKind.SubscriberData].push(attribute);
         break;
       // deno-coverage-ignore-start
       // deno-lint-ignore no-case-declarations
@@ -1799,9 +1897,15 @@ function getParsedParamsForFunction(fn: (...args: any[]) => any) {
   return params;
 }
 
-function instrumentCallbackImpl<TCallback extends AnyFunction>(
+function instrumentCallbackImpl<
+  TCallback extends AnyFunction,
+  TSubscriberData extends SubscriberData,
+>(
   fn: TCallback,
-  attributes: Attributes<Parameters<TCallback>, ReturnType<TCallback>>[],
+  attributes: Attributes<
+    Parameters<TCallback>,
+    ReturnType<TCallback>
+  >[],
   instrumentCtx: Context,
 ): TCallback {
   return function instrumentedCallback(
@@ -1950,10 +2054,20 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
         },
         {} as Record<string, unknown>,
       );
+      const subscriberData = attributesByKind[AttributeKind.SubscriberData]
+        .reduce(
+          (acc, attr) => {
+            return {
+              ...acc,
+              ...attr.subscriberData,
+            };
+          },
+          {} as TSubscriberData,
+        );
       if (logArgs) {
         fields.args = logArgs;
       }
-      const guard = span(spanLevel, message, fields).enter();
+      const guard = span(spanLevel, message, fields, subscriberData).enter();
       try {
         if (logEnter) {
           if (

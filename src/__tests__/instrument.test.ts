@@ -16,6 +16,7 @@ import {
   redact,
   skip,
   skipAll,
+  subscriberData,
   target,
 } from "../instrument.ts";
 import { expect } from "expect";
@@ -60,6 +61,7 @@ describe("instrument", () => {
             0: "arg0",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -86,6 +88,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test message",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -112,6 +115,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "SomeClass.someMethod",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -138,6 +142,7 @@ describe("instrument", () => {
         level: Level.TRACE,
         message: "Example.test",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -164,6 +169,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "someFunction",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -196,6 +202,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -228,6 +235,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -260,6 +268,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -287,6 +296,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -320,6 +330,7 @@ describe("instrument", () => {
           },
           fieldKey: "fieldValue",
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -353,6 +364,7 @@ describe("instrument", () => {
           },
           sum: 42,
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -682,6 +694,7 @@ describe("instrument", () => {
             0: "arg0",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -710,6 +723,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test message",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -738,6 +752,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "SomeClass.someMethod",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -766,6 +781,7 @@ describe("instrument", () => {
         level: Level.TRACE,
         message: "Example.test",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -794,6 +810,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "someFunction",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -828,6 +845,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -857,6 +875,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -890,6 +909,7 @@ describe("instrument", () => {
             0: "arg0",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -924,6 +944,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -958,6 +979,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -987,6 +1009,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "Example.test",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1019,6 +1042,7 @@ describe("instrument", () => {
             1: "arg1",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1053,6 +1077,7 @@ describe("instrument", () => {
             1: "arg1",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1085,6 +1110,7 @@ describe("instrument", () => {
             1: "arg1",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1119,6 +1145,7 @@ describe("instrument", () => {
             1: "arg1",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1154,6 +1181,7 @@ describe("instrument", () => {
             1: "arg1",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1191,6 +1219,7 @@ describe("instrument", () => {
             1: "arg1",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1226,6 +1255,7 @@ describe("instrument", () => {
             1: "arg1",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1263,6 +1293,7 @@ describe("instrument", () => {
             1: "arg1",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1394,6 +1425,7 @@ describe("instrument", () => {
           },
           fieldKey: "fieldValue",
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1429,6 +1461,7 @@ describe("instrument", () => {
           },
           sum: 42,
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1628,6 +1661,7 @@ describe("instrument", () => {
             0: "arg0",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1653,6 +1687,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test message",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1678,6 +1713,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "SomeClass.someMethod",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1703,6 +1739,7 @@ describe("instrument", () => {
         level: Level.TRACE,
         message: "test",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1728,6 +1765,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "someFunction",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1767,6 +1805,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1806,6 +1845,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1845,6 +1885,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1871,6 +1912,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1903,6 +1945,7 @@ describe("instrument", () => {
           },
           fieldKey: "fieldValue",
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -1935,6 +1978,7 @@ describe("instrument", () => {
           },
           sum: 42,
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -2073,6 +2117,75 @@ describe("instrument", () => {
         },
       });
     });
+
+    it("should apply the subscriberData attribute", () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(subscriberData({ test: { data: 42 } }))
+        test() {}
+      }
+      const instance = new Example();
+
+      // Act
+      instance.test();
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {},
+        subscriberData: {
+          test: {
+            data: 42,
+          },
+        },
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
+
+    it("should apply the subscriberData attribute multiple times", () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(
+          subscriberData({ test1: { data: "original" } }),
+          subscriberData({ test2: { data: "original" } }),
+          subscriberData({ test1: { data: "override" } }),
+        )
+        test() {}
+      }
+      const instance = new Example();
+
+      // Act
+      instance.test();
+
+      // Assert
+      expect(subscriber.newSpan).toHaveBeenCalledTimes(1);
+      expect(subscriber.newSpan).toHaveBeenCalledWith({
+        isSpan: true,
+        level: Level.INFO,
+        message: "Example.test",
+        fields: {},
+        subscriberData: {
+          test1: {
+            data: "override",
+          },
+          test2: {
+            data: "original",
+          },
+        },
+      });
+      expect(subscriber.enter).toHaveBeenCalledTimes(1);
+      expect(subscriber.exit).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("async function decorator", () => {
@@ -2110,6 +2223,7 @@ describe("instrument", () => {
             0: "arg0",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -2137,6 +2251,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test message",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -2164,6 +2279,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "SomeClass.someMethod",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -2191,6 +2307,7 @@ describe("instrument", () => {
         level: Level.TRACE,
         message: "test",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -2216,6 +2333,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "someFunction",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -2257,6 +2375,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -2298,6 +2417,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -2337,6 +2457,7 @@ describe("instrument", () => {
             3: "arg3",
           },
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -2365,6 +2486,7 @@ describe("instrument", () => {
         level: Level.INFO,
         message: "test",
         fields: {},
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -2399,6 +2521,7 @@ describe("instrument", () => {
           },
           fieldKey: "fieldValue",
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
@@ -2433,6 +2556,7 @@ describe("instrument", () => {
           },
           sum: 42,
         },
+        subscriberData: {},
       });
       expect(subscriber.enter).toHaveBeenCalledTimes(1);
       expect(subscriber.exit).toHaveBeenCalledTimes(1);
