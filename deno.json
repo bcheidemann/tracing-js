@@ -4,7 +4,7 @@
   "tasks": {
     "checks": "deno task test && deno lint && deno fmt --check && deno task check && deno task example:all-features && deno task example:basic && deno task example:basic-json && deno task example:api-class-instrumentation",
     "check": "deno check src/mod.ts",
-    "test": "deno test --allow-read=. --allow-run=deno --allow-env --allow-sys=cpus --allow-net --allow-write=src/__tests__/__snapshots__",
+    "test": "deno test --allow-read=. --allow-run=deno --allow-env --allow-sys=cpus --allow-net --allow-write=src/__tests__/__snapshots__ --allow-write=src/__tests__/subscribers/__snapshots__",
     "test:coverage": "IS_COVERAGE_RUN=true deno task test --coverage --clean",
     "test:update": "deno task test -- --update",
     "lgtm:run": "pwd && ./scripts/lgtm_run.sh",

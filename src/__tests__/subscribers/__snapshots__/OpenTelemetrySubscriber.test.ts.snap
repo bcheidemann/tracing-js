@@ -1,0 +1,67 @@
+export const snapshot = {};
+
+snapshot[`OpenTelemetrySubscriber > should log warnings for incorrectly exited spans 1`] = `
+"[WARNING] (OpenTelemetrySubscriber) A span was exited before its child.
+
+          [EXITED]
+          name = outer
+          level = 3
+
+          [ORPHANS]
+          0: name = inner
+             level = 3
+
+          This probably means that a function was called asynchronously
+          but was not properly instrumented.
+
+          To fix this error, ensure that asynchronously executed
+          functions are properly instrumented.
+
+          For example:
+
+          setTimeout(instrumentCallback(() => { ... }));
+                     +++++++++++++++++++             +
+
+          const myFunc = instrumentCallback(async function myFync() { ... });
+          ++++++++++++++++++++++++++++++++++                               ++
+
+          class Example {
+            @instrument()
+            +++++++++++++
+            myMethod() { ... }
+          }
+"
+`;
+
+snapshot[`OpenTelemetrySubscriber > should log warnings for incorrectly exited spans 2`] = `
+"[WARNING] (OpenTelemetrySubscriber) A span was exited before its child.
+
+          [EXITED]
+          name = outer
+          level = 3
+
+          [ORPHANS]
+          0: name = inner
+             level = 3
+
+          This probably means that a function was called asynchronously
+          but was not properly instrumented.
+
+          To fix this error, ensure that asynchronously executed
+          functions are properly instrumented.
+
+          For example:
+
+          setTimeout(instrumentCallback(() => { ... }));
+                     +++++++++++++++++++             +
+
+          const myFunc = instrumentCallback(async function myFync() { ... });
+          ++++++++++++++++++++++++++++++++++                               ++
+
+          class Example {
+            @instrument()
+            +++++++++++++
+            myMethod() { ... }
+          }
+"
+`;

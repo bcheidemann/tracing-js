@@ -1,4 +1,5 @@
 import { beforeEach, describe, it } from "@std/testing/bdd";
+import { assertSnapshot } from "@std/testing/snapshot";
 import { expect } from "expect";
 import { event } from "../../event.ts";
 import { span } from "../../span.ts";
@@ -10,6 +11,7 @@ import { InMemorySpanProcessor } from "../otel.ts";
 import { context } from "../../context.ts";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { trace } from "@opentelemetry/api";
+import { consoleMock } from "../console.ts";
 
 describe("OpenTelemetrySubscriber", () => {
   const spanProcessor = new InMemorySpanProcessor();
@@ -411,5 +413,24 @@ describe("OpenTelemetrySubscriber", () => {
     expect(spans[2].parentSpanContext?.spanId).toEqual(
       spans[0].spanContext().spanId,
     );
+  });
+
+  it("should log warnings for incorrectly exited spans", async (context) => {
+    // Arrange
+    OpenTelemetrySubscriber.setGlobalDefault({ tracer });
+    using consoleLogMock = consoleMock("warn");
+
+    // Act
+    const outerSpan = span(Level.INFO, "outer").enter();
+    const innerSpan = span(Level.INFO, "inner").enter();
+    outerSpan.exit();
+    innerSpan.exit();
+
+    // Assert
+    expect(consoleLogMock.mockedFn).toHaveBeenCalledTimes(2);
+    const outerSpanWarning = consoleLogMock.mockedFn.mock.calls.at(0)?.at(0);
+    const innerSpanWarning = consoleLogMock.mockedFn.mock.calls.at(0)?.at(0);
+    await assertSnapshot(context, outerSpanWarning);
+    await assertSnapshot(context, innerSpanWarning);
   });
 });
