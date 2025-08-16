@@ -1,4 +1,4 @@
-import {spyOn } from "jest-mock";
+import { spyOn } from "jest-mock";
 
 type ConsoleMethod = "debug" | "info" | "log" | "warn" | "error";
 // deno-lint-ignore no-explicit-any

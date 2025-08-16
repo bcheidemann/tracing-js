@@ -385,10 +385,11 @@ describe("OpenTelemetrySubscriber", () => {
 
     const main = instrumentCallback(function main() {
       const clonedSubscriberCtx = getSubscriberContextOrThrow().clone();
-      setTimeout(() => context.run(
-        clonedSubscriberCtx,
-        delayedFn,
-      ), 10);
+      setTimeout(() =>
+        context.run(
+          clonedSubscriberCtx,
+          delayedFn,
+        ), 10);
     });
 
     // Act

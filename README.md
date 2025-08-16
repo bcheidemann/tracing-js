@@ -487,9 +487,9 @@ Currently, the soluton is to modify the above code as follows:
 
 ```ts
 import {
-  instrumentCallback,
-  getSubscriberContextOrThrow,
   context,
+  getSubscriberContextOrThrow,
+  instrumentCallback,
 } from "@bcheidemann/tracing";
 
 const delayedFunction = instrumentCallback(
