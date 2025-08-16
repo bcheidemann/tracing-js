@@ -7,7 +7,14 @@ example("all-features");
 example("api-class-instrumentation");
 example("basic");
 example("basic-json");
-example("legacy-decorators");
+// EXPLANATION: The legacy-decorators test results in an error when generating
+//              a coverage report: Error generating coverage report: Missing
+//              transpiled source code for: "file:///Users/benheidemann/repos/tracing/src/examples/__utils__/snapshotHelper.ts".
+//              It's not clear why, so for now we'll omit this from the coverage
+//              tests.
+if (Deno.env.get("IS_COVERAGE_RUN") === undefined) {
+  example("legacy-decorators");
+}
 
 function example(name: string) {
   describe(`${name} example`, () => {

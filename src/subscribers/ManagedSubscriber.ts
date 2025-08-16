@@ -132,6 +132,14 @@ export abstract class ManagedSubscriber implements ISubscriber<symbol> {
     );
   }
 
+  runInContext<TThis, TArgs extends unknown[], TReturn>(
+    callback: (this: TThis, ...args: TArgs) => TReturn,
+    thisArg: TThis,
+    args: TArgs,
+  ): TReturn {
+    return callback.call(thisArg, ...args);
+  }
+
   // Abstract methods
 
   protected abstract onEvent(event: Event, spans: SpanAttributes[]): void;

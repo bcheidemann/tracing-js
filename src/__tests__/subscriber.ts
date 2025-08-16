@@ -3,6 +3,14 @@ import type { ISubscriber } from "../subscriber.ts";
 
 type Mock = ReturnType<typeof fn>;
 
+function defaultRunInContext<TThis, TArgs extends unknown[], TReturn>(
+  callback: (this: TThis, ...args: TArgs) => TReturn,
+  thisArg: TThis,
+  args: TArgs,
+): TReturn {
+  return callback.call(thisArg, ...args);
+}
+
 export function createTestSubscriber({
   enabledForLevel = undefined,
   enabled = undefined,
@@ -13,6 +21,9 @@ export function createTestSubscriber({
   record = fn(),
   currentSpan = fn(),
   clone = undefined,
+  instrumentCallback = fn<typeof defaultRunInContext>().mockImplementation(
+    defaultRunInContext,
+  ),
 }: {
   enabledForLevel?: Mock;
   enabled?: Mock;
@@ -23,6 +34,7 @@ export function createTestSubscriber({
   record?: Mock;
   currentSpan?: Mock;
   clone?: Mock;
+  instrumentCallback?: Mock;
 } = {}) {
   const subscriber = {
     enabledForLevel,
@@ -34,6 +46,7 @@ export function createTestSubscriber({
     record,
     currentSpan,
     clone: clone ?? fn(),
+    runInContext: instrumentCallback,
   } satisfies ISubscriber<unknown>;
 
   if (!clone) {

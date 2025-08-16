@@ -69,4 +69,18 @@ export interface ISubscriber<TSpanId> {
    * awaited).
    */
   clone(): ISubscriber<TSpanId>;
+  /**
+   * Called when a function might need to be instrumented by the currnet
+   * subscriber before immediately running it. For example, the
+   * `OpenTelemetrySubscriber` uses this to set the OpenTelemetry context for
+   * the instrumented function, ensuring that third party code emitting
+   * OpenTelemetry spans and events works as expected. If the subscriber does
+   * not needed to instrument the callback, this method should simply call the
+   * provided callback with the provided arguments and return the result.
+   */
+  runInContext<TThis, TArgs extends unknown[], TReturn>(
+    callback: (this: TThis, ...args: TArgs) => TReturn,
+    thisArg: TThis,
+    args: TArgs,
+  ): TReturn;
 }

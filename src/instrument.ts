@@ -1818,7 +1818,7 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
       [AttributeKind.Level]: level(Level.INFO),
     };
     const attributesByKind = collectAttributes(attributes, defaults);
-    return context.run(ctx, () => {
+    const cb = () => {
       const spanLevel = attributesByKind[AttributeKind.Level].level;
       const defaultEventLevel = attributesByKind[AttributeKind.Log]?.level ??
         Level.INFO;
@@ -1846,7 +1846,7 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
         }
         const fnName = fn.name || "[unknown function]";
         return instrumentCtx.kind === "function"
-          ? fn.name
+          ? fnName
           : `${this?.constructor?.name ?? "[unknown class]"}.${fnName}`;
       })();
       const message = attributesByKind[AttributeKind.Message]?.message ||
@@ -2068,7 +2068,12 @@ function instrumentCallbackImpl<TCallback extends AnyFunction>(
         guard.exit();
         throw error;
       }
-    });
+    };
+
+    return context.run(
+      ctx,
+      () => ctx.subscriber.runInContext(cb, this, []),
+    );
   } as TCallback;
 }
 
