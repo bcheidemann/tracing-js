@@ -3,10 +3,11 @@ import { expect } from "expect";
 import { event } from "../../event.ts";
 import { span } from "../../span.ts";
 import { Level } from "../../level.ts";
-import { getSubscriberContext } from "../../context.ts";
+import { getSubscriberContextOrThrow } from "../../context.ts";
 import { instrumentCallback, message } from "../../instrument.ts";
 import { OpenTelemetrySubscriber } from "../../subscribers/OpenTelemetrySubscriber.ts";
 import { InMemorySpanProcessor } from "../otel.ts";
+import { context } from "../../context.ts";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { trace } from "@opentelemetry/api";
 
@@ -362,7 +363,7 @@ describe("OpenTelemetrySubscriber", () => {
     );
   });
 
-  it.skip("should handle delayed execution on inner spans", async () => {
+  it("should handle delayed execution on inner spans", async () => {
     // Arrange
     OpenTelemetrySubscriber.setGlobalDefault({ tracer });
 
@@ -385,13 +386,11 @@ describe("OpenTelemetrySubscriber", () => {
       //       heirarchy... We need to provide some API with which to bind a
       //       callback to the current tracing span, even if the current span
       //       exits before the callback executes.
-      getSubscriberContext()!.subscriber.runInContext(
-        () => {
-          setTimeout(() => delayedFn(), 10);
-        },
-        null,
-        [],
-      );
+      const clonedSubscriberCtx = getSubscriberContextOrThrow().clone();
+      setTimeout(() => context.run(
+        clonedSubscriberCtx,
+        delayedFn,
+      ), 10);
     });
 
     // Act
@@ -400,12 +399,6 @@ describe("OpenTelemetrySubscriber", () => {
 
     // Assert
     const spans = spanProcessor.getFinishedSpans();
-    const processedSpans = spans.map((span) => ({
-      name: span.name,
-      id: span.spanContext().spanId,
-      parentId: span.parentSpanContext?.spanId,
-    }));
-    console.error(JSON.stringify(processedSpans, null, 2));
     expect(spans).toHaveLength(3);
 
     expect(spans[0].name).toEqual("main");
