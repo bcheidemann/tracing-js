@@ -58,16 +58,89 @@ export type OpenTelemetrySubscriberOptions = {
 };
 
 /**
- * The JsonSubscriber class is a subscriber which logs events to the console in JSON format.
+ * The OpenTelemetrySubscriber class is a subscriber which emits OpenTelemetry
+ * spans and events.
  *
  * @example
  * ```ts
- * import { JsonSubscriber } from "@bcheidemann/tracing";
+ * import { OpenTelemetrySubscriber } from "@bcheidemann/tracing";
  *
  * // Initialize the subscriber and set it as the default global subscriber
  * // This should be called at the beginning of your program
- * JsonSubscriber.setGlobalDefault();
+ * OpenTelemetrySubscriber.setGlobalDefault();
  * ```
+ *
+ * ## Usage Considerations
+ *
+ * ### OpenTelemetry Configuration
+ *
+ * The `OpenTelemetrySubscriber` will not automatically set up the OpenTelemetry
+ * SDK. Ensure you have correctly set up OpenTelemetry correctly for your
+ * runtime.
+ *
+ * - [Guidance for Node.js (and other Node.js compatible runtimes)](https://opentelemetry.io/docs/languages/js/getting-started/nodejs/)
+ * - [Guidance for Deno (built in OpenTelemetry support)](https://docs.deno.com/runtime/fundamentals/open_telemetry/)
+ *
+ * ### Interfacing with OpenTelemetry Directly
+ *
+ * Due to the way span propogation works in OpenTelemetry, manually created
+ * spans will not automatically propogate the current OpenTelemetry span to
+ * code which interfaces directly with OpenTelemetry.
+ *
+ * ```ts
+ * function main() {
+ *   using _ = infoSpan("main");
+ *   trace.getActiveSpan()?.addEvent("Oops!");
+ * }
+ * ```
+ *
+ * The above code does not work. Although "main" is considered the active span
+ * by tracing, it has not been set as the active OpenTelemetry span. This is
+ * not currently possible due to limitations of the OpenTelemetry JavaScript
+ * API.
+ *
+ * To work around this limitation, it is recommended to use instrumented
+ * callbacks and methods wherever possible:
+ *
+ * ```ts
+ * const main = instrumentCallback(function main() {
+ *   trace.getActiveSpan()?.addEvent("Success!");
+ * });
+ *
+ * // Or...
+ *
+ * class App { @instrument() main() {
+ *   trace.getActiveSpan()?.addEvent("Success!");
+ * } }
+ * ```
+ *
+ * Additionally, prefer to emit tracing events, instead of interfacing with
+ * OpenTelemetry directly:
+ *
+ * ```ts
+ * function main() {
+ *   using _ = infoSpan("main");
+ *   info("Success!");
+ * }
+ * ```
+ *
+ * The above code will ensure that the event is emitted for the correct span.
+ *
+ * If neither is possible, you must ensure that you use the `runInContext`
+ * method, to explicitly set the current OpenTelemetry span.
+ *
+ * ```ts
+ * function main() {
+ *   using _ = infoSpan("main");
+ *   getSubscriberContextOrThrow().subscriber.runInContext(function () {
+ *     trace.getActiveSpan()?.addEvent("Success!");
+ *   }, this, []);
+ * }
+ * ```
+ *
+ * The above code is automatically called when executing an instrumented method
+ * or function. That's why it's recommended to avoid creating spans manually,
+ * and instead rely on instrumentation wherever possible.
  */
 export class OpenTelemetrySubscriber implements ISubscriber<symbol> {
   protected constructor(
