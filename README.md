@@ -42,6 +42,7 @@ logging, and diagnostic information from JavaScript applications at runtime.
   - [Accessing the Current Span](#accessing-the-current-span)
 - [Usage Considerations](#usage-considerations)
   - [Usage in Asynchronous Code](#usage-in-asynchronous-code)
+  - [Delayed Execution](#delayed-execution)
   - [Performance](#performance)
   - [Minifiers](#minifiers)
   - [Bundler Support](#bundler-support)
@@ -456,6 +457,57 @@ Because the `first` and `second` function share the same context, "Log from
 first" may be logged in the "second" span, and visa versa. As before, this
 problem can be avoided by using `instrumentCallback` or `@instrument` (if
 working with class methods).
+
+### Delayed Execution
+
+Sometimes, you will want to delay the execution of some code, while retaining
+the relationship to the current entered span. Consider the following example:
+
+```ts
+import { instrumentCallback } from "@bcheidemann/tracing";
+
+const delayedFunction = instrumentCallback(
+  function delayedFunction() {
+    using _ = span(Level.INFO, "delayed");
+    // Do something
+  },
+);
+
+{
+  using _ = span(Level.INFO, "outer");
+  setTimeout(delayedFunction, 500);
+}
+```
+
+You might expect that the "delayed" span would be a child of the "outer" span.
+However, because the "outer" span exits before `delayedFunction` is invoked, the
+"delayed" span will not have a parent span.
+
+Currently, the soluton is to modify the above code as follows:
+
+```ts
+import {
+  instrumentCallback,
+  getSubscriberContextOrThrow,
+  context,
+} from "@bcheidemann/tracing";
+
+const delayedFunction = instrumentCallback(
+  function delayedFunction() {
+    using _ = span(Level.INFO, "delayed");
+    // Do something
+  },
+);
+
+{
+  using _ = span(Level.INFO, "outer");
+  // Clone the current subscriber context to preserve the active span
+  const clonedSubscriberCtx = getSubscriberContextOrThrow().clone();
+  setTimeout(() => context.run(clonedSubscriberCtx, delayedFunction), 500);
+}
+```
+
+This is a little verbose, and an API is planned to simplify this process.
 
 ### Performance
 
