@@ -12,6 +12,7 @@ import {
   context,
   context as otelContext,
   type Span,
+  SpanKind,
   trace,
   type Tracer,
 } from "@opentelemetry/api";
@@ -121,7 +122,8 @@ export class OpenTelemetrySubscriber implements ISubscriber<symbol> {
     enteredSpan.otelSpan = this.#otelTracer().startSpan(
       enteredSpan.attributes.message,
       {
-        // kind: TODO
+        kind: enteredSpan.attributes.subscriberData?.otel?.kind ??
+          SpanKind.INTERNAL,
         attributes: this.#preprocessAttributes(enteredSpan.attributes.fields),
       },
       this.#otelContext(),
