@@ -1519,50 +1519,23 @@ function createRedactProxy(
 const REDACT_PROXY: RedactProxy = createRedactProxy();
 
 /**
- * The redact attribute is used to redact all or part of a parameter. It acts similarly to the skip attribute, but the
- * parameter (or field) is replaced with the string "[REDACTED]" in the logs.
+ * The subscriber data attribute is used to attach subscriber specific data to
+ * a span.
  *
  * @example Instrument a method and redact a sensitive field
  * ```ts
  * import { instrument, redact } from "@bcheidemann/tracing";
+ * import type { SpanKind } from "@opentelemetry/api";
  *
- * class Example {
- *   @instrument(redact("credentials", credentials => credentials.password))
- *   login(credentials) {
+ * class Controller {
+ *   @instrument(subscriberData({ otel: { kind: SpanKind.SERVER } }))
+ *   index() {
  *     // ...
  *   }
  * }
  * ```
  *
- * @example Instrument a method and redact multiple sensitive fields
- * ```ts
- * import { instrument, redact } from "@bcheidemann/tracing";
- *
- * class Example {
- *   @instrument(redact(
- *     "credentials",
- *     credentials => [credentials.email, credentials.password],
- *   ))
- *   login(credentials) {
- *     // ...
- *   }
- * }
- * ```
- *
- * @example Instrument a method and redact a parameter
- * ```ts
- * import { instrument, redact } from "@bcheidemann/tracing";
- *
- * class Example {
- *   @instrument(redact("credentials"))
- *   login(credentials) {
- *     // ...
- *   }
- * }
- * ```
- *
- * @param param The parameter name or index to skip.
- * @param redact Used to specify one or more fields to redact. If omitted, the whole parameter will be redacted.
+ * @param subscriberData The subscriber specific data to set on the span.
  */
 export function subscriberData<TSubscriberData extends SubscriberData>(
   subscriberData: TSubscriberData,

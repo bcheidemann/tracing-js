@@ -109,9 +109,11 @@ export type OpenTelemetrySubscriberOptions = {
  *
  * // Or...
  *
- * class App { @instrument() main() {
- *   trace.getActiveSpan()?.addEvent("Success!");
- * } }
+ * class App {
+ *   @instrument() main() {
+ *     trace.getActiveSpan()?.addEvent("Success!");
+ *   }
+ * }
  * ```
  *
  * Additionally, prefer to emit tracing events, instead of interfacing with
