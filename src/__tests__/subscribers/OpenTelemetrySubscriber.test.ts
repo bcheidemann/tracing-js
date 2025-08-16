@@ -382,10 +382,6 @@ describe("OpenTelemetrySubscriber", () => {
     });
 
     const main = instrumentCallback(function main() {
-      // TODO: This is a bit of a hack and only preserves the OTEL span
-      //       heirarchy... We need to provide some API with which to bind a
-      //       callback to the current tracing span, even if the current span
-      //       exits before the callback executes.
       const clonedSubscriberCtx = getSubscriberContextOrThrow().clone();
       setTimeout(() => context.run(
         clonedSubscriberCtx,
