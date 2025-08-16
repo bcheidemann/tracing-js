@@ -5,12 +5,15 @@ import { event } from "../../event.ts";
 import { span } from "../../span.ts";
 import { Level } from "../../level.ts";
 import { getSubscriberContextOrThrow } from "../../context.ts";
-import { instrumentCallback, message } from "../../instrument.ts";
-import { OpenTelemetrySubscriber } from "../../subscribers/OpenTelemetrySubscriber.ts";
+import { instrument, instrumentCallback, message } from "../../instrument.ts";
+import {
+  OpenTelemetrySubscriber,
+  otel,
+} from "../../subscribers/OpenTelemetrySubscriber.ts";
 import { InMemorySpanProcessor } from "../otel.ts";
 import { context } from "../../context.ts";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
-import { trace } from "@opentelemetry/api";
+import { SpanKind, trace } from "@opentelemetry/api";
 import { consoleMock } from "../console.ts";
 
 describe("OpenTelemetrySubscriber", () => {
@@ -38,6 +41,7 @@ describe("OpenTelemetrySubscriber", () => {
     const spans = spanProcessor.getFinishedSpans();
     expect(spans).toHaveLength(1);
     expect(spans[0].name).toEqual("test span");
+    expect(spans[0].kind).toEqual(SpanKind.INTERNAL);
     expect(spans[0].events).toHaveLength(0);
   });
 
@@ -447,5 +451,46 @@ describe("OpenTelemetrySubscriber", () => {
     expect(consoleLogMock.mockedFn).toHaveBeenCalledTimes(1);
     const warning = consoleLogMock.mockedFn.mock.calls.at(0)?.at(0);
     await assertSnapshot(context, warning);
+  });
+
+  it("should correctly handle the `kind` subscriber data field", () => {
+    // Arrange
+    OpenTelemetrySubscriber.setGlobalDefault({ tracer });
+
+    // Act
+    const guard = span(Level.INFO, "test span", {}, {
+      otel: {
+        kind: SpanKind.SERVER,
+      },
+    }).enter();
+    guard.exit();
+
+    // Assert
+    const spans = spanProcessor.getFinishedSpans();
+    expect(spans).toHaveLength(1);
+    expect(spans[0].name).toEqual("test span");
+    expect(spans[0].kind).toEqual(SpanKind.SERVER);
+    expect(spans[0].events).toHaveLength(0);
+  });
+
+  it("should apply the otel attribute correctly", () => {
+    // Arrange
+    OpenTelemetrySubscriber.setGlobalDefault({ tracer });
+
+    class Example {
+      @instrument(otel({ kind: SpanKind.SERVER }))
+      test() {}
+    }
+    const instance = new Example();
+
+    // Act
+    instance.test();
+
+    // Assert
+    const spans = spanProcessor.getFinishedSpans();
+    expect(spans).toHaveLength(1);
+    expect(spans[0].name).toEqual("Example.test");
+    expect(spans[0].kind).toEqual(SpanKind.SERVER);
+    expect(spans[0].events).toHaveLength(0);
   });
 });

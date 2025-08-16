@@ -3,8 +3,9 @@ import {
   setDefaultGlobalSubscriber,
 } from "../context.ts";
 import type { Event } from "../event.ts";
+import { subscriberData, type SubscriberDataAttribute } from "../instrument.ts";
 import { Level } from "../level.ts";
-import type { SpanAttributes } from "../span.ts";
+import type { OpenTelemetrySubscriberData, SpanAttributes } from "../span.ts";
 import type { ISubscriber } from "../subscriber.ts";
 import {
   type Attributes,
@@ -12,9 +13,16 @@ import {
   context,
   context as otelContext,
   type Span,
+  SpanKind,
   trace,
   type Tracer,
 } from "@opentelemetry/api";
+
+export function otel(
+  data: OpenTelemetrySubscriberData,
+): SubscriberDataAttribute {
+  return subscriberData({ otel: data });
+}
 
 type SpanNode = {
   id: symbol;
@@ -121,7 +129,8 @@ export class OpenTelemetrySubscriber implements ISubscriber<symbol> {
     enteredSpan.otelSpan = this.#otelTracer().startSpan(
       enteredSpan.attributes.message,
       {
-        // kind: TODO
+        kind: enteredSpan.attributes.subscriberData?.otel?.kind ??
+          SpanKind.INTERNAL,
         attributes: this.#preprocessAttributes(enteredSpan.attributes.fields),
       },
       this.#otelContext(),

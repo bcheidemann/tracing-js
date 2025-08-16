@@ -3,6 +3,7 @@
  * This module provides functions for creating spans.
  */
 
+import type { SpanKind } from "@opentelemetry/api";
 import { getSubscriberContext } from "./context.ts";
 import { Level } from "./level.ts";
 
@@ -15,6 +16,39 @@ export type AnonymousSpanId = {
 };
 
 /**
+ * Additional span data can be passed to the `OpenTelemetrySubscriber`.
+ */
+export type OpenTelemetrySubscriberData = {
+  /**
+   * The [OpenTelemetry Span Kind](https://opentelemetry.io/docs/concepts/signals/traces/#span-kind)
+   */
+  kind?: SpanKind;
+};
+
+/**
+ * Additional subscriber specific span data.
+ */
+export interface SubscriberData extends Record<string, unknown> {
+  // First party subscribers can be added here. For third party subscribers, the
+  // generic argument on event should be used.
+
+  /**
+   * Additional span data for the `FmtSubscriber`
+   */
+  fmt?: never;
+
+  /**
+   * Additional span data for the `JsonSubscriber`
+   */
+  json?: never;
+
+  /**
+   * Additional span data for the `OpenTelemetrySubscriber`
+   */
+  otel?: OpenTelemetrySubscriberData;
+}
+
+/**
  * The SpanAttributes type represents the information which is passed to subscribers when a span is created.
  */
 export type SpanAttributes = {
@@ -22,6 +56,7 @@ export type SpanAttributes = {
   level: Level;
   message: string;
   fields?: Record<string, unknown>;
+  subscriberData?: SubscriberData;
 };
 
 /**
@@ -65,12 +100,14 @@ export type Span<TSpanId> = {
  * @param level The level of the span
  * @param message The message of the span
  * @param fields The fields of the span (optional additional information)
+ * @param subscriberData Optional subscriber specific data relating to the span.
  * @returns An unentered span
  */
-export function span(
+export function span<TSubscriberData extends SubscriberData>(
   level: Level,
   message: string,
   fields?: Record<string, unknown>,
+  subscriberData?: TSubscriberData,
 ): Span<AnonymousSpanId> {
   const ctx = getSubscriberContext();
   const span: Span<AnonymousSpanId> = { enter, record };
@@ -94,6 +131,7 @@ export function span(
     level,
     message,
     fields,
+    subscriberData,
   };
 
   if (ctx.subscriber.enabled) {
@@ -153,16 +191,19 @@ export function span(
  *
  * @param message The message of the span
  * @param fields The fields of the span (optional additional information)
+ * @param subscriberData Optional subscriber specific data relating to the span.
  * @returns An unentered span
  */
-export function traceSpan(
+export function traceSpan<TSubscriberData extends SubscriberData>(
   message: string,
   fields?: Record<string, unknown>,
+  subscriberData?: TSubscriberData,
 ): Span<AnonymousSpanId> {
   return span(
     Level.TRACE,
     message,
     fields,
+    subscriberData,
   );
 }
 
@@ -171,16 +212,19 @@ export function traceSpan(
  *
  * @param message The message of the span
  * @param fields The fields of the span (optional additional information)
+ * @param subscriberData Optional subscriber specific data relating to the span.
  * @returns An unentered span
  */
-export function debugSpan(
+export function debugSpan<TSubscriberData extends SubscriberData>(
   message: string,
   fields?: Record<string, unknown>,
+  subscriberData?: TSubscriberData,
 ): Span<AnonymousSpanId> {
   return span(
     Level.DEBUG,
     message,
     fields,
+    subscriberData,
   );
 }
 
@@ -189,16 +233,19 @@ export function debugSpan(
  *
  * @param message The message of the span
  * @param fields The fields of the span (optional additional information)
+ * @param subscriberData Optional subscriber specific data relating to the span.
  * @returns An unentered span
  */
-export function infoSpan(
+export function infoSpan<TSubscriberData extends SubscriberData>(
   message: string,
   fields?: Record<string, unknown>,
+  subscriberData?: TSubscriberData,
 ): Span<AnonymousSpanId> {
   return span(
     Level.INFO,
     message,
     fields,
+    subscriberData,
   );
 }
 
@@ -207,16 +254,19 @@ export function infoSpan(
  *
  * @param message The message of the span
  * @param fields The fields of the span (optional additional information)
+ * @param subscriberData Optional subscriber specific data relating to the span.
  * @returns An unentered span
  */
-export function warnSpan(
+export function warnSpan<TSubscriberData extends SubscriberData>(
   message: string,
   fields?: Record<string, unknown>,
+  subscriberData?: TSubscriberData,
 ): Span<AnonymousSpanId> {
   return span(
     Level.WARN,
     message,
     fields,
+    subscriberData,
   );
 }
 
@@ -225,16 +275,19 @@ export function warnSpan(
  *
  * @param message The message of the span
  * @param fields The fields of the span (optional additional information)
+ * @param subscriberData Optional subscriber specific data relating to the span.
  * @returns An unentered span
  */
-export function errorSpan(
+export function errorSpan<TSubscriberData extends SubscriberData>(
   message: string,
   fields?: Record<string, unknown>,
+  subscriberData?: TSubscriberData,
 ): Span<AnonymousSpanId> {
   return span(
     Level.ERROR,
     message,
     fields,
+    subscriberData,
   );
 }
 
@@ -243,16 +296,19 @@ export function errorSpan(
  *
  * @param message The message of the span
  * @param fields The fields of the span (optional additional information)
+ * @param subscriberData Optional subscriber specific data relating to the span.
  * @returns An unentered span
  */
-export function criticalSpan(
+export function criticalSpan<TSubscriberData extends SubscriberData>(
   message: string,
   fields?: Record<string, unknown>,
+  subscriberData?: TSubscriberData,
 ): Span<AnonymousSpanId> {
   return span(
     Level.CRITICAL,
     message,
     fields,
+    subscriberData,
   );
 }
 
