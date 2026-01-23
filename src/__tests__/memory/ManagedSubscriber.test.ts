@@ -55,7 +55,7 @@ isolatedTestCase(
     await wait(100);
 
     // Act
-    let samples = [Deno.memoryUsage().heapUsed];
+    const samples = [Deno.memoryUsage().heapUsed];
     for (let i = 0; i < TOTAL_ITERATIONS; i++) {
       leak();
       if (i % ITERATIONS_PER_SAMPLE === 0) {
