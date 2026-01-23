@@ -18,6 +18,7 @@ import { Level } from "../level.ts";
 import type { SpanAttributes } from "../span.ts";
 import { ManagedSubscriber } from "./ManagedSubscriber.ts";
 import { supportsColor } from "../utils/supportsColor.ts";
+import { decycle } from "../vendor/cycle.js";
 
 const levelToString: Record<Level, string> = {
   [Level.DISABLED]: "DISABLED",
@@ -195,7 +196,7 @@ export class FmtSubscriber extends ManagedSubscriber {
   }
 
   private displayEventFields(event: Event) {
-    const fields = Object.entries(event.fields ?? {});
+    const fields = Object.entries(decycle(event.fields, errorReplacer) ?? {});
 
     if (!fields.length) return;
 
@@ -208,7 +209,7 @@ export class FmtSubscriber extends ManagedSubscriber {
   }
 
   private displaySpanFields(span: SpanAttributes) {
-    const fields = Object.entries(span.fields ?? {});
+    const fields = Object.entries(decycle(span.fields, errorReplacer) ?? {});
 
     if (!fields.length) return;
 
@@ -222,20 +223,13 @@ export class FmtSubscriber extends ManagedSubscriber {
   private flattenFields(fields: [unknown, unknown][]): [string, unknown][] {
     return fields.flatMap(([outerKey, value]) => {
       if (typeof value === "object" && value !== null) {
+        if ("$ref" in value) {
+          return [[`${outerKey}`, `(Circular ${value["$ref"]})`]];
+        }
         const entries: [string, unknown][] = Object.entries(value).map(
           ([innerKey, value]) => [`${outerKey}.${innerKey}`, value],
         );
-        if (value instanceof Error) {
-          entries.push(
-            [`${outerKey}.name`, value.name],
-            [`${outerKey}.message`, value.message],
-          );
-          if (typeof value.stack === "string") {
-            entries.push(
-              [`${outerKey}.stack`, value.stack],
-            );
-          }
-        } else if (value instanceof Date) {
+        if (value instanceof Date) {
           entries.push([`${outerKey}`, value.toISOString()]);
         } else if (
           !entries.length && "constructor" in value
@@ -291,4 +285,24 @@ export class FmtSubscriber extends ManagedSubscriber {
 
     return str;
   }
+}
+
+function errorReplacer(value: unknown) {
+  if (value instanceof Error) {
+    if (typeof value.stack === "string") {
+      return {
+        ...value,
+        name: value.name,
+        message: value.message,
+        stack: value.stack,
+      };
+    } else {
+      return {
+        ...value,
+        name: value.name,
+        message: value.message,
+      };
+    }
+  }
+  return value;
 }

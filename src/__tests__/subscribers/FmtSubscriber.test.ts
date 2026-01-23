@@ -289,4 +289,31 @@ describe("FmtSubscriber", () => {
       "[1970-01-01T00:00:00.000Z] [INFO] Example.test{date=1970-01-01T00:00:00.000Z}: test (date=1970-01-01T00:00:00.000Z)",
     );
   });
+
+  it("should correctly handle objects with circular references", () => {
+    // Arrange
+    using _time = new FakeTime(new Date(0));
+    FmtSubscriber.setGlobalDefault({ color: false });
+    const circularArray: unknown[] = [];
+    circularArray.push("non-circular");
+    circularArray.push(circularArray);
+    const objWithCircularReferences: {
+      key1: string;
+      key2: Record<string, unknown>;
+      circularArray: unknown[];
+      circularReference?: unknown;
+    } = { key1: "value", key2: {}, circularArray };
+    objWithCircularReferences.circularReference = objWithCircularReferences;
+    objWithCircularReferences.key2.circularReference =
+      objWithCircularReferences;
+
+    // Act
+    event(Level.INFO, "test", { objWithCircularReferences });
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith(
+      '[1970-01-01T00:00:00.000Z] [INFO] test (objWithCircularReferences.key1=value, objWithCircularReferences.key2.circularReference=(Circular $["objWithCircularReferences"]), objWithCircularReferences.circularArray.0=non-circular, objWithCircularReferences.circularArray.1=(Circular $["objWithCircularReferences"]["circularArray"]), objWithCircularReferences.circularReference=(Circular $["objWithCircularReferences"]))',
+    );
+  });
 });
