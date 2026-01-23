@@ -575,6 +575,38 @@ describe("instrument", () => {
       });
     });
 
+    it("should apply the logError attribute with a custom message", () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(logError("my message"))
+        test() {
+          throw 42;
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      try {
+        instance.test();
+      } catch {
+        // Do nothing
+      }
+
+      // Assert
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
+      expect(subscriber.event).toHaveBeenCalledWith({
+        isEvent: true,
+        level: Level.ERROR,
+        message: "my message",
+        fields: {
+          error: 42,
+        },
+      });
+    });
+
     // TODO: Add tests for different log syntaxes
     it("should apply the log attribute", () => {
       // Arrange
@@ -1553,6 +1585,39 @@ describe("instrument", () => {
       });
     });
 
+    it("should apply the logError attribute with a custom message", async () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      class Example {
+        @instrument(logError("my message"))
+        async test() {
+          await Promise.resolve();
+          throw 42;
+        }
+      }
+      const instance = new Example();
+
+      // Act
+      try {
+        await instance.test();
+      } catch {
+        // Do nothing
+      }
+
+      // Assert
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
+      expect(subscriber.event).toHaveBeenCalledWith({
+        isEvent: true,
+        level: Level.ERROR,
+        message: "my message",
+        fields: {
+          error: 42,
+        },
+      });
+    });
+
     it("should apply the log attribute", async () => {
       // Arrange
       const subscriber = createTestSubscriber();
@@ -2030,9 +2095,12 @@ describe("instrument", () => {
       const subscriber = createTestSubscriber();
       const ctx = createSubscriberContext(subscriber);
       context.enterWith(ctx);
-      const testFn = instrumentCallback([logError()], function test() {
-        throw 42;
-      });
+      const testFn = instrumentCallback(
+        [logError()],
+        function test() {
+          throw 42;
+        },
+      );
 
       // Act
       try {
@@ -2047,6 +2115,37 @@ describe("instrument", () => {
         isEvent: true,
         level: Level.ERROR,
         message: "Error in test",
+        fields: {
+          error: 42,
+        },
+      });
+    });
+
+    it("should apply the logError attribute with a custom message", () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      const testFn = instrumentCallback(
+        [logError("my message")],
+        function test() {
+          throw 42;
+        },
+      );
+
+      // Act
+      try {
+        testFn();
+      } catch {
+        // Do nothing
+      }
+
+      // Assert
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
+      expect(subscriber.event).toHaveBeenCalledWith({
+        isEvent: true,
+        level: Level.ERROR,
+        message: "my message",
         fields: {
           error: 42,
         },
@@ -2630,6 +2729,38 @@ describe("instrument", () => {
         isEvent: true,
         level: Level.ERROR,
         message: "Error in test",
+        fields: {
+          error: 42,
+        },
+      });
+    });
+
+    it("should apply the logError attribute with a custom message", async () => {
+      // Arrange
+      const subscriber = createTestSubscriber();
+      const ctx = createSubscriberContext(subscriber);
+      context.enterWith(ctx);
+      const testFn = instrumentCallback(
+        [logError("my message")],
+        async function test() {
+          await Promise.resolve();
+          throw 42;
+        },
+      );
+
+      // Act
+      try {
+        await testFn();
+      } catch {
+        // Do nothing
+      }
+
+      // Assert
+      expect(subscriber.event).toHaveBeenCalledTimes(1);
+      expect(subscriber.event).toHaveBeenCalledWith({
+        isEvent: true,
+        level: Level.ERROR,
+        message: "my message",
         fields: {
           error: 42,
         },

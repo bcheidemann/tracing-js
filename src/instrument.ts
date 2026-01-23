@@ -2069,7 +2069,7 @@ function instrumentCallbackImpl<
                   const message = typeof logError.message === "function"
                     ? logError.message(args)
                     : logError.message;
-                  event(logError.level ?? Level.ERROR, message);
+                  event(logError.level ?? Level.ERROR, message, { error });
                 } else {
                   event(
                     logError.level ?? Level.ERROR,
@@ -2145,7 +2145,7 @@ function instrumentCallbackImpl<
             const message = typeof logError.message === "function"
               ? logError.message(args)
               : logError.message;
-            event(logError.level ?? Level.ERROR, message);
+            event(logError.level ?? Level.ERROR, message, { error });
           } else {
             event(logError.level ?? Level.ERROR, `Error in ${fmtTarget}`, {
               error,
