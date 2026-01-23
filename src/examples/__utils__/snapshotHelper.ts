@@ -1,3 +1,4 @@
+// deno-lint-ignore no-import-prefix
 import { FakeTime } from "jsr:@std/testing@^0.225.2/time";
 
 if (Deno.env.get("IS_SNAPSHOT_RUN") === "true") {
