@@ -291,4 +291,54 @@ describe("JsonSubscriber", () => {
       timestamp: "1970-01-01T00:00:00.000Z",
     });
   });
+
+  it("should correctly handle objects with circular references", () => {
+    // Arrange
+    using _time = new FakeTime(new Date(0));
+    JsonSubscriber.setGlobalDefault();
+    const circularArray: unknown[] = [];
+    circularArray.push("non-circular");
+    circularArray.push(circularArray);
+    const objWithCircularReferences: {
+      key1: string;
+      key2: Record<string, unknown>;
+      circularArray: unknown[];
+      circularReference?: unknown;
+    } = { key1: "value", key2: {}, circularArray };
+    objWithCircularReferences.circularReference = objWithCircularReferences;
+    objWithCircularReferences.key2.circularReference =
+      objWithCircularReferences;
+
+    // Act
+    event(Level.INFO, "test", { objWithCircularReferences });
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    const loggedValue = JSON.parse(log.mock.calls[0][0]);
+    expect(loggedValue).toEqual({
+      fields: {
+        objWithCircularReferences: {
+          circularArray: [
+            "non-circular",
+            {
+              $ref: '$["fields"]["objWithCircularReferences"]["circularArray"]',
+            },
+          ],
+          circularReference: {
+            $ref: '$["fields"]["objWithCircularReferences"]',
+          },
+          key1: "value",
+          key2: {
+            circularReference: {
+              $ref: '$["fields"]["objWithCircularReferences"]',
+            },
+          },
+        },
+      },
+      level: "INFO",
+      message: "test",
+      spans: [],
+      timestamp: "1970-01-01T00:00:00.000Z",
+    });
+  });
 });

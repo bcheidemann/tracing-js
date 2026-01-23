@@ -5,6 +5,7 @@ import {
 import type { Event } from "../event.ts";
 import { Level } from "../level.ts";
 import type { SpanAttributes } from "../span.ts";
+import { decycle } from "../vendor/cycle.js";
 import { ManagedSubscriber } from "./ManagedSubscriber.ts";
 
 const levelToString: Record<Level, string> = {
@@ -89,47 +90,23 @@ export class JsonSubscriber extends ManagedSubscriber {
   }
 
   private displayMessage(event: Event, spans: SpanAttributes[]) {
-    return JSON.stringify({
+    return JSON.stringify(decycle({
       ...(this.options.timestamp === false ? {} : {
         timestamp: this.timestamp,
       }),
       level: this.displayLevel(event.level),
       message: event.message,
-      fields: this.formatFields(event.fields),
+      fields: event.fields,
       spans: spans.map(this.displaySpan.bind(this)),
-    });
+    }, errorReplacer));
   }
 
   private displaySpan(span: SpanAttributes) {
     return {
       level: this.displayLevel(span.level),
       message: span.message,
-      fields: this.formatFields(span.fields),
+      fields: span.fields,
     };
-  }
-
-  private formatFields(fields?: Record<string | number | symbol, unknown>) {
-    if (fields === undefined) {
-      return;
-    }
-    for (const key of Object.keys(fields)) {
-      const value = fields[key];
-      if (typeof value === "object" && value !== null) {
-        if (value instanceof Error) {
-          const newValue: { name: string; message: string; stack?: string } = {
-            name: value.name,
-            message: value.message,
-          };
-          if (typeof value.stack === "string") {
-            newValue.stack = value.stack;
-          }
-          fields[key] = newValue;
-        } else {
-          this.formatFields(value as Record<string | number | symbol, unknown>);
-        }
-      }
-    }
-    return fields;
   }
 
   private displayLevel(level: Level) {
@@ -139,4 +116,24 @@ export class JsonSubscriber extends ManagedSubscriber {
   private get timestamp() {
     return new Date().toISOString();
   }
+}
+
+function errorReplacer(value: unknown) {
+  if (value instanceof Error) {
+    if (typeof value.stack === "string") {
+      return {
+        ...value,
+        name: value.name,
+        message: value.message,
+        stack: value.stack,
+      };
+    } else {
+      return {
+        ...value,
+        name: value.name,
+        message: value.message,
+      };
+    }
+  }
+  return value;
 }
