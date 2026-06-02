@@ -90,15 +90,20 @@ export class JsonSubscriber extends ManagedSubscriber {
   }
 
   private displayMessage(event: Event, spans: SpanAttributes[]) {
-    return JSON.stringify(decycle({
-      ...(this.options.timestamp === false ? {} : {
-        timestamp: this.timestamp,
-      }),
-      level: this.displayLevel(event.level),
-      message: event.message,
-      fields: event.fields,
-      spans: spans.map(this.displaySpan.bind(this)),
-    }, errorReplacer));
+    return JSON.stringify(
+      decycle(
+        {
+          ...(this.options.timestamp === false ? {} : {
+            timestamp: this.timestamp,
+          }),
+          level: this.displayLevel(event.level),
+          message: event.message,
+          fields: event.fields,
+          spans: spans.map(this.displaySpan.bind(this)),
+        },
+        errorReplacer,
+      ),
+    );
   }
 
   private displaySpan(span: SpanAttributes) {
@@ -120,20 +125,21 @@ export class JsonSubscriber extends ManagedSubscriber {
 
 function errorReplacer(value: unknown) {
   if (value instanceof Error) {
+    const newValue: Record<string, unknown> = {
+      ...value,
+      name: value.name,
+      message: value.message,
+    };
+
     if (typeof value.stack === "string") {
-      return {
-        ...value,
-        name: value.name,
-        message: value.message,
-        stack: value.stack,
-      };
-    } else {
-      return {
-        ...value,
-        name: value.name,
-        message: value.message,
-      };
+      newValue.stack = value.stack;
     }
+
+    if (typeof value.cause !== "undefined") {
+      newValue.cause = value.cause;
+    }
+
+    return newValue;
   }
   return value;
 }

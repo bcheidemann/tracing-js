@@ -341,4 +341,27 @@ describe("JsonSubscriber", () => {
       timestamp: "1970-01-01T00:00:00.000Z",
     });
   });
+
+  it("should correctly log error causes", () => {
+    // Arrange
+    using _time = new FakeTime(new Date(0));
+    JsonSubscriber.setGlobalDefault();
+    const innerError = new Error("inner error");
+    innerError.stack = "<inner error stack>";
+    const middleError = new Error("middle error", { cause: innerError });
+    middleError.stack = "<middle error stack>";
+    const outerError = new Error("outer error", { cause: middleError });
+    outerError.stack = "<outer error stack>";
+
+    // Act
+    event(Level.INFO, "test", {
+      error: outerError,
+    });
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith(
+      '{"timestamp":"1970-01-01T00:00:00.000Z","level":"INFO","message":"test","fields":{"error":{"name":"Error","message":"outer error","stack":"<outer error stack>","cause":{"name":"Error","message":"middle error","stack":"<middle error stack>","cause":{"name":"Error","message":"inner error","stack":"<inner error stack>"}}}},"spans":[]}',
+    );
+  });
 });
