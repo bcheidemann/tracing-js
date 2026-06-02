@@ -224,80 +224,86 @@ export class OpenTelemetrySubscriber implements ISubscriber<symbol> {
         return;
       }
 
-      console.warn([
-        "[WARNING] (OpenTelemetrySubscriber) A span was exited before its child.",
-        "",
-        "          [EXITED]",
-        `          name = ${exitedNode.attributes.message}`,
-        `          level = ${exitedNode.attributes.level}`,
-        "",
-        "          [ORPHANS]",
-        ...orphanSpanNodes.flatMap((orphanNode, idx) => [
-          `          ${idx}: name = ${orphanNode.attributes.message}`,
-          `             level = ${orphanNode.attributes.level}`,
-        ]),
-        "",
-        "          This probably means that a function was called asynchronously",
-        "          but was not properly instrumented.",
-        "",
-        "          To fix this error, ensure that asynchronously executed",
-        "          functions are properly instrumented.",
-        "",
-        "          For example:",
-        "",
-        "          setTimeout(instrumentCallback(() => { ... }));",
-        "                     +++++++++++++++++++             +",
-        "",
-        "          const myFunc = instrumentCallback(async function myFync() { ... });",
-        "          ++++++++++++++++++++++++++++++++++                               ++",
-        "",
-        "          class Example {",
-        "            @instrument()",
-        "            +++++++++++++",
-        "            myMethod() { ... }",
-        "          }",
-        "",
-      ].join("\n"));
+      console.warn(
+        [
+          "[WARNING] (OpenTelemetrySubscriber) A span was exited before its child.",
+          "",
+          "          [EXITED]",
+          `          name = ${exitedNode.attributes.message}`,
+          `          level = ${exitedNode.attributes.level}`,
+          "",
+          "          [ORPHANS]",
+          ...orphanSpanNodes.flatMap((orphanNode, idx) => [
+            `          ${idx}: name = ${orphanNode.attributes.message}`,
+            `             level = ${orphanNode.attributes.level}`,
+          ]),
+          "",
+          "          This probably means that a function was called asynchronously",
+          "          but was not properly instrumented.",
+          "",
+          "          To fix this error, ensure that asynchronously executed",
+          "          functions are properly instrumented.",
+          "",
+          "          For example:",
+          "",
+          "          setTimeout(instrumentCallback(() => { ... }));",
+          "                     +++++++++++++++++++             +",
+          "",
+          "          const myFunc = instrumentCallback(async function myFync() { ... });",
+          "          ++++++++++++++++++++++++++++++++++                               ++",
+          "",
+          "          class Example {",
+          "            @instrument()",
+          "            +++++++++++++",
+          "            myMethod() { ... }",
+          "          }",
+          "",
+        ].join("\n"),
+      );
     }
 
     function logNoSuchSpanInStackWarning(
       exitedNode: PendingSpanNode | EnteredSpanNode | undefined,
     ) {
       if (exitedNode) {
-        console.warn([
-          "[WARNING] (OpenTelemetrySubscriber) A span was exited which does not",
-          "          belong to the current subscribers stack. This probably means",
-          "          that one of the following happened:",
-          "",
-          "          [1] An ancestor of this span was exited prematurely. If this",
-          "              is the case, you should see a previous warning about a",
-          "              span having been exited before its child. Parent spans",
-          "              are permitted to exit before their children, but the",
-          "              child span must be created in a new asynchronous context.",
-          "              This can be done by instrumenting asynchronously executed",
-          "              functions. For more information, see the previous",
-          "              warning.",
-          "",
-          "          [2] The spans exit method was called more than once.",
-          "",
-          "          [EXITED]",
-          `          name = ${exitedNode.attributes.message}`,
-          `          level = ${exitedNode.attributes.level}`,
-          "",
-        ].join("\n"));
+        console.warn(
+          [
+            "[WARNING] (OpenTelemetrySubscriber) A span was exited which does not",
+            "          belong to the current subscribers stack. This probably means",
+            "          that one of the following happened:",
+            "",
+            "          [1] An ancestor of this span was exited prematurely. If this",
+            "              is the case, you should see a previous warning about a",
+            "              span having been exited before its child. Parent spans",
+            "              are permitted to exit before their children, but the",
+            "              child span must be created in a new asynchronous context.",
+            "              This can be done by instrumenting asynchronously executed",
+            "              functions. For more information, see the previous",
+            "              warning.",
+            "",
+            "          [2] The spans exit method was called more than once.",
+            "",
+            "          [EXITED]",
+            `          name = ${exitedNode.attributes.message}`,
+            `          level = ${exitedNode.attributes.level}`,
+            "",
+          ].join("\n"),
+        );
       } else {
-        console.warn([
-          "[WARNING] (OpenTelemetrySubscriber) A span was exited which does not",
-          "          belong to the current subscribers context. This probably means",
-          "          that one of the following happened:",
-          "",
-          "          [1] The spans _id property was mutated. This is an invalid",
-          "              operation.",
-          "",
-          "          [2] The OpenTelemetrySubscriber.exit method was called",
-          "              manually with an invalid span ID.",
-          "",
-        ].join("\n"));
+        console.warn(
+          [
+            "[WARNING] (OpenTelemetrySubscriber) A span was exited which does not",
+            "          belong to the current subscribers context. This probably means",
+            "          that one of the following happened:",
+            "",
+            "          [1] The spans _id property was mutated. This is an invalid",
+            "              operation.",
+            "",
+            "          [2] The OpenTelemetrySubscriber.exit method was called",
+            "              manually with an invalid span ID.",
+            "",
+          ].join("\n"),
+        );
       }
     }
 
@@ -361,12 +367,7 @@ export class OpenTelemetrySubscriber implements ISubscriber<symbol> {
     thisArg: TThis,
     args: TArgs,
   ): TReturn {
-    return context.with(
-      this.#otelContext(),
-      callback,
-      thisArg,
-      ...args,
-    );
+    return context.with(this.#otelContext(), callback, thisArg, ...args);
   }
 
   // ============================= Private Methods =============================
@@ -411,47 +412,55 @@ export class OpenTelemetrySubscriber implements ISubscriber<symbol> {
       }
     }
 
-    const attributesEntries = attributes
-      .flatMap(([outerKey, value]): [string, AttributeValue][] => {
-        if (Array.isArray(value)) {
-          return [[
-            buildKey(outerKey),
-            this.#preprocessArrayAttributeValue(value),
-          ]];
-        } else if (typeof value === "object" && value !== null) {
-          const entries = this.#preprocessAttributeEntries(
-            Object.entries(value),
-            buildKey(outerKey),
-          );
-          if (value instanceof Error) {
-            entries.push(
-              [buildKey(outerKey, "name"), value.name],
-              [buildKey(outerKey, "message"), value.message],
-            );
-            if (typeof value.stack === "string") {
-              entries.push(
-                [buildKey(outerKey, "stack"), value.stack],
-              );
-            }
-          } else if (value instanceof Date) {
-            entries.push([buildKey(outerKey), value.toISOString()]);
-          } else if (
-            "constructor" in value && value.constructor.name !== "Object"
-          ) {
-            entries.push([
-              buildKey(outerKey),
-              value.constructor.name,
-            ]);
-          }
-          return entries;
-        } else {
-          return [[buildKey(outerKey), this.#preprocessAttributeValue(value)]];
-        }
-      });
+    const attributesEntries = attributes.flatMap(
+      ([outerKey, value]): [string, AttributeValue][] =>
+        this.#preprocessAttributeEntry(buildKey(outerKey), value),
+    );
 
     return attributesEntries;
   }
 
+  #preprocessAttributeEntry(
+    key: string,
+    value: unknown,
+  ): [string, AttributeValue][] {
+    function buildKey(nestedKey: string) {
+      return `${key}.${nestedKey}`;
+    }
+
+    if (Array.isArray(value)) {
+      return [[key, this.#preprocessArrayAttributeValue(value)]];
+    } else if (typeof value === "object" && value !== null) {
+      const entries = this.#preprocessAttributeEntries(
+        Object.entries(value),
+        key,
+      );
+      if (value instanceof Error) {
+        entries.push(
+          [buildKey("name"), value.name],
+          [buildKey("message"), value.message],
+        );
+        if (typeof value.stack === "string") {
+          entries.push([buildKey("stack"), value.stack]);
+        }
+        if (typeof value.cause !== "undefined") {
+          entries.push(
+            ...this.#preprocessAttributeEntry(buildKey("cause"), value.cause),
+          );
+        }
+      } else if (value instanceof Date) {
+        entries.push([key, value.toISOString()]);
+      } else if (
+        "constructor" in value &&
+        value.constructor.name !== "Object"
+      ) {
+        entries.push([key, value.constructor.name]);
+      }
+      return entries;
+    } else {
+      return [[key, this.#preprocessAttributeValue(value)]];
+    }
+  }
   #preprocessAttributeValue(value: unknown): AttributeValue {
     switch (typeof value) {
       case "string":
@@ -483,14 +492,16 @@ export class OpenTelemetrySubscriber implements ISubscriber<symbol> {
   }
 
   #isNumberArrayAttributeValue(value: Array<unknown>) {
-    return value.every((key) =>
-      typeof key === "number" || typeof key === "undefined" || key === null
+    return value.every(
+      (key) =>
+        typeof key === "number" || typeof key === "undefined" || key === null,
     );
   }
 
   #isBooleanArrayAttributeValue(value: Array<unknown>) {
-    return value.every((key) =>
-      typeof key === "boolean" || typeof key === "undefined" || key === null
+    return value.every(
+      (key) =>
+        typeof key === "boolean" || typeof key === "undefined" || key === null,
     );
   }
 }

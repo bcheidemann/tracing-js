@@ -493,4 +493,59 @@ describe("OpenTelemetrySubscriber", () => {
     expect(spans[0].kind).toEqual(SpanKind.SERVER);
     expect(spans[0].events).toHaveLength(0);
   });
+  it("should correctly record error causes", () => {
+    // Arrange
+    OpenTelemetrySubscriber.setGlobalDefault({ tracer });
+    const innerError = new Error("inner error");
+    innerError.stack = "<inner error stack>";
+    const middleError = new Error("middle error", { cause: innerError });
+    middleError.stack = "<middle error stack>";
+    const outerError = new Error("outer error", { cause: middleError });
+    outerError.stack = "<outer error stack>";
+
+    // Act
+    const guard = span(Level.INFO, "test span").enter();
+    event(Level.INFO, "test event", {
+      error: outerError,
+    });
+    guard.exit();
+
+    // Assert
+    const spans = spanProcessor.getFinishedSpans();
+    expect(spans).toHaveLength(1);
+    expect(spans[0].name).toEqual("test span");
+    expect(spans[0].events).toHaveLength(1);
+    expect(spans[0].events[0].name).toEqual("test event");
+
+    // Outer error
+    expect(spans[0].events[0].attributes?.["error.message"]).toEqual(
+      "outer error",
+    );
+    expect(spans[0].events[0].attributes?.["error.name"]).toEqual("Error");
+    expect(spans[0].events[0].attributes?.["error.stack"]).toEqual(
+      "<outer error stack>",
+    );
+
+    // Middle error
+    expect(spans[0].events[0].attributes?.["error.cause.message"]).toEqual(
+      "middle error",
+    );
+    expect(spans[0].events[0].attributes?.["error.cause.name"]).toEqual(
+      "Error",
+    );
+    expect(spans[0].events[0].attributes?.["error.cause.stack"]).toEqual(
+      "<middle error stack>",
+    );
+
+    // Inner error
+    expect(
+      spans[0].events[0].attributes?.["error.cause.cause.message"],
+    ).toEqual("inner error");
+    expect(spans[0].events[0].attributes?.["error.cause.cause.name"]).toEqual(
+      "Error",
+    );
+    expect(spans[0].events[0].attributes?.["error.cause.cause.stack"]).toEqual(
+      "<inner error stack>",
+    );
+  });
 });
