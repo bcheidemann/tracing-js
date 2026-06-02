@@ -7,6 +7,7 @@ import {
   setDefaultGlobalSubscriber,
 } from "../../context.ts";
 import { assertLess } from "@std/assert";
+import { TestOptions } from "../mod.ts";
 
 // Some of the aspects of this test are informed by the "Memory leak regression
 // testing with V8/Node.js" article series by Joyee Cheung.
@@ -99,6 +100,7 @@ isolatedTestCase(
     denoFlags: [
       "--v8-flags=-expose-gc,-predictable,-predictable-gc-schedule,-gc-global,-no-concurrent-marking,-no-incremental-marking,-single-threaded,-single-threaded-gc",
     ],
+    ignore: TestOptions.fast,
   },
 );
 
