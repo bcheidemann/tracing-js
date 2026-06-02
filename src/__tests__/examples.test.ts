@@ -22,6 +22,7 @@ function example(name: string) {
       const cache = await new Deno.Command("deno", {
         cwd: `src/examples/${name}`,
         args: ["cache", "main.ts"],
+        clearEnv: true,
       }).output();
       assert(
         cache.success,
@@ -39,6 +40,7 @@ function example(name: string) {
           "--allow-env=IS_SNAPSHOT_RUN",
           `src/examples/${name}/main.ts`,
         ],
+        clearEnv: true,
         env: {
           IS_SNAPSHOT_RUN: "true",
           NO_COLOR: "true",
