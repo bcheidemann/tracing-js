@@ -5,6 +5,7 @@
     "checks": "deno task test && deno lint && deno fmt --check && deno task check && deno task example:all-features && deno task example:basic && deno task example:basic-json && deno task example:api-class-instrumentation",
     "check": "deno check src/mod.ts",
     "test": "deno test --allow-read=. --allow-run=deno --allow-env --allow-sys=cpus --allow-net --allow-write=src/__tests__/__snapshots__ --allow-write=src/__tests__/subscribers/__snapshots__",
+    "test:fast": "deno task test -- --fast",
     "test:coverage": "IS_COVERAGE_RUN=true deno task test --coverage --clean",
     "test:update": "deno task test -- --update",
     "lgtm:run": "pwd && ./scripts/lgtm_run.sh",
@@ -28,7 +29,7 @@
   },
   "imports": {
     "@bcheidemann/tracing": "./src/mod.ts",
-    "@bcheidemann/deno-isolated-test-case": "jsr:@bcheidemann/deno-isolated-test-case@^0.3.0",
+    "@bcheidemann/deno-isolated-test-case": "jsr:@bcheidemann/deno-isolated-test-case@^0.4.0",
     "@bcheidemann/parse-params": "jsr:@bcheidemann/parse-params@^0.5.1",
     "@deno/dnt": "jsr:@deno/dnt@^0.42.1",
     "@opentelemetry/api": "npm:@opentelemetry/api@^1.9.0",
