@@ -60,9 +60,9 @@ describe("OpenTelemetrySubscriber", () => {
       classAttr: class ExampleClass {},
       dateAttr: new Date(0),
       errorAttr: new Error("example error"),
-      instanceAttr: new class ExampleClass {
+      instanceAttr: new (class ExampleClass {
         public message = "Hello World!";
-      }(),
+      })(),
       objectAttr: {
         title: "Greeting",
         message: "Hello World!",
@@ -170,9 +170,9 @@ describe("OpenTelemetrySubscriber", () => {
       classAttr: class ExampleClass {},
       dateAttr: new Date(0),
       errorAttr: new Error("example error"),
-      instanceAttr: new class ExampleClass {
+      instanceAttr: new (class ExampleClass {
         public message = "Hello World!";
-      }(),
+      })(),
       objectAttr: {
         title: "Greeting",
         message: "Hello World!",
@@ -389,11 +389,7 @@ describe("OpenTelemetrySubscriber", () => {
 
     const main = instrumentCallback(function main() {
       const clonedSubscriberCtx = getSubscriberContextOrThrow().clone();
-      setTimeout(() =>
-        context.run(
-          clonedSubscriberCtx,
-          delayedFn,
-        ), 10);
+      setTimeout(() => context.run(clonedSubscriberCtx, delayedFn), 10);
     });
 
     // Act
@@ -458,11 +454,16 @@ describe("OpenTelemetrySubscriber", () => {
     OpenTelemetrySubscriber.setGlobalDefault({ tracer });
 
     // Act
-    const guard = span(Level.INFO, "test span", {}, {
-      otel: {
-        kind: SpanKind.SERVER,
+    const guard = span(
+      Level.INFO,
+      "test span",
+      {},
+      {
+        otel: {
+          kind: SpanKind.SERVER,
+        },
       },
-    }).enter();
+    ).enter();
     guard.exit();
 
     // Assert
@@ -493,6 +494,7 @@ describe("OpenTelemetrySubscriber", () => {
     expect(spans[0].kind).toEqual(SpanKind.SERVER);
     expect(spans[0].events).toHaveLength(0);
   });
+
   it("should correctly record error causes", () => {
     // Arrange
     OpenTelemetrySubscriber.setGlobalDefault({ tracer });

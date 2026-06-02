@@ -42,9 +42,7 @@ describe("FmtSubscriber", () => {
 
     // Assert
     expect(log).toHaveBeenCalled();
-    expect(log).toHaveBeenCalledWith(
-      "[INFO] test",
-    );
+    expect(log).toHaveBeenCalledWith("[INFO] test");
   });
 
   for (
@@ -57,23 +55,20 @@ describe("FmtSubscriber", () => {
       [Level.CRITICAL, "error"],
     ] satisfies [Level, keyof typeof console][]
   ) {
-    it(
-      "should log the message to the console for level %s with console.%s",
-      () => {
-        // Arrange
-        const spy = spyOn(console, log).mockImplementation(() => {});
-        FmtSubscriber.setGlobalDefault({
-          level: Level.TRACE,
-          color: false,
-        });
+    it("should log the message to the console for level %s with console.%s", () => {
+      // Arrange
+      const spy = spyOn(console, log).mockImplementation(() => {});
+      FmtSubscriber.setGlobalDefault({
+        level: Level.TRACE,
+        color: false,
+      });
 
-        // Act
-        event(level, "test");
+      // Act
+      event(level, "test");
 
-        // Assert
-        expect(spy).toHaveBeenCalled();
-      },
-    );
+      // Assert
+      expect(spy).toHaveBeenCalled();
+    });
   }
 
   it("should log the message to the console with a field", () => {
@@ -316,6 +311,7 @@ describe("FmtSubscriber", () => {
       '[1970-01-01T00:00:00.000Z] [INFO] test (objWithCircularReferences.key1=value, objWithCircularReferences.key2.circularReference=(Circular $["objWithCircularReferences"]), objWithCircularReferences.circularArray.0=non-circular, objWithCircularReferences.circularArray.1=(Circular $["objWithCircularReferences"]["circularArray"]), objWithCircularReferences.circularReference=(Circular $["objWithCircularReferences"]))',
     );
   });
+
   it("should correctly log error causes", () => {
     // Arrange
     using _time = new FakeTime(new Date(0));
