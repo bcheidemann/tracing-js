@@ -86,7 +86,7 @@ isolatedTestCase(
     const deltaPerLeakInvocation =
       (includedSamples.at(-1)! - includedSamples.at(0)!) /
       (includedSamples.length * ITERATIONS_PER_SAMPLE);
-    console.log(`deltaPerLeakInvocation = ${deltaPerLeakInvocation}`);
+    console.log(`deltaPerLeakInvocation = ${deltaPerLeakInvocation} bytes`);
 
     // The v8 GC is not deterministic, however with enough allocations the heap
     // usage should stabalise. We allow a 5 byte tollerance. At 18 characters
