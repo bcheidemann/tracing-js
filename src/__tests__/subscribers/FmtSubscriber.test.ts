@@ -316,4 +316,26 @@ describe("FmtSubscriber", () => {
       '[1970-01-01T00:00:00.000Z] [INFO] test (objWithCircularReferences.key1=value, objWithCircularReferences.key2.circularReference=(Circular $["objWithCircularReferences"]), objWithCircularReferences.circularArray.0=non-circular, objWithCircularReferences.circularArray.1=(Circular $["objWithCircularReferences"]["circularArray"]), objWithCircularReferences.circularReference=(Circular $["objWithCircularReferences"]))',
     );
   });
+  it("should correctly log error causes", () => {
+    // Arrange
+    using _time = new FakeTime(new Date(0));
+    FmtSubscriber.setGlobalDefault({ color: false });
+    const innerError = new Error("inner error");
+    innerError.stack = "<inner error stack>";
+    const middleError = new Error("middle error", { cause: innerError });
+    middleError.stack = "<middle error stack>";
+    const outerError = new Error("outer error", { cause: middleError });
+    outerError.stack = "<outer error stack>";
+
+    // Act
+    event(Level.INFO, "test", {
+      error: outerError,
+    });
+
+    // Assert
+    expect(log).toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith(
+      "[1970-01-01T00:00:00.000Z] [INFO] test (error.name=Error, error.message=outer error, error.stack=<outer error stack>, error.cause.name=Error, error.cause.message=middle error, error.cause.stack=<middle error stack>, error.cause.cause.name=Error, error.cause.cause.message=inner error, error.cause.cause.stack=<inner error stack>)",
+    );
+  });
 });

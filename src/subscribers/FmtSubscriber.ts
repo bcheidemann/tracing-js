@@ -231,9 +231,7 @@ export class FmtSubscriber extends ManagedSubscriber {
         );
         if (value instanceof Date) {
           entries.push([`${outerKey}`, value.toISOString()]);
-        } else if (
-          !entries.length && "constructor" in value
-        ) {
+        } else if (!entries.length && "constructor" in value) {
           entries.push([
             `${outerKey}`,
             value.constructor.name === "Object"
@@ -289,20 +287,21 @@ export class FmtSubscriber extends ManagedSubscriber {
 
 function errorReplacer(value: unknown) {
   if (value instanceof Error) {
+    const newValue: Record<string, unknown> = {
+      ...value,
+      name: value.name,
+      message: value.message,
+    };
+
     if (typeof value.stack === "string") {
-      return {
-        ...value,
-        name: value.name,
-        message: value.message,
-        stack: value.stack,
-      };
-    } else {
-      return {
-        ...value,
-        name: value.name,
-        message: value.message,
-      };
+      newValue.stack = value.stack;
     }
+
+    if (typeof value.cause !== "undefined") {
+      newValue.cause = value.cause;
+    }
+
+    return newValue;
   }
   return value;
 }
