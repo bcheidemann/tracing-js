@@ -19,10 +19,22 @@ if (Deno.env.get("IS_COVERAGE_RUN") === undefined) {
 function example(name: string) {
   describe(`${name} example`, () => {
     it("should match the snapshot", async (context) => {
+      // Windows requires access to SYSTEMROOT and WINDIR, otherwise TCP
+      // connections in the child process will fail with error 10106.
+      const windowsSystemEnv = Deno.build.os === "windows"
+        ? Object.fromEntries(
+          ["SYSTEMROOT"].flatMap((key) => {
+            const val = Deno.env.get(key);
+            return val !== undefined ? [[key, val]] : [];
+          }),
+        )
+        : {};
+
       const cache = await new Deno.Command("deno", {
         cwd: `src/examples/${name}`,
         args: ["cache", "main.ts"],
         clearEnv: true,
+        env: windowsSystemEnv,
       }).output();
       assert(
         cache.success,
@@ -42,6 +54,7 @@ function example(name: string) {
         ],
         clearEnv: true,
         env: {
+          ...windowsSystemEnv,
           IS_SNAPSHOT_RUN: "true",
           NO_COLOR: "true",
         },
