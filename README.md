@@ -328,48 +328,48 @@ const example = instumentCallback(
 
 The following attributes can be applied:
 
-| Attribute      | Example                                               | Description                                                                                                                 |
-| -------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| message        | `message("new message")`                              | Changes the instrumented spans message.                                                                                     |
-| target         | `target("functionName")`                              | Changes the instrumented spans target field to the provided function name.                                                  |
-|                | `target("ClassName", "methodName")`                   | Changes the instrumented spans target field to the provided method name.                                                    |
-| level          | `level(Level.TRACE)`                                  | Changes the instrumented spans level.                                                                                       |
-| skip           | `skip("paramName")`                                   | Omits the named parameter from the instrumented spans `args` field.                                                         |
-|                | `skip(0)`                                             | Omits the indexed parameter from the instrumented spans `args` field.                                                       |
-|                | `skip(true, false)`                                   | Applies a positional mask to the parameters to omit from the instrumented spans `args` field.                               |
-| skipAll        | `skipAll`                                             | Omits all parameters from the instrumented spans `args` field.                                                              |
-| redact         | `redact("paramName")`                                 | Replaces the named parameter with "[REDACTED]" in the instrumented spans `args` field.                                      |
-|                | `redact(0)`                                           | Replaces the indexed parameter with "[REDACTED]" in the instrumented spans `args` field.                                    |
-|                | `redact("param", param => param.field)`               | Replaces a field on the named parameter with "[REDACTED]" in the instrumented spans `args` field.                           |
-|                | `redact(0, param => param.field)`                     | Replaces a field on the indexed parameter with "[REDACTED]" in the instrumented spans `args` field.                         |
-|                | `redact("param", param => [param.a, param.b])`        | Replaces multiple fields on the named parameter with "[REDACTED]" in the instrumented spans `args` field.                   |
-|                | `redact(0, param => [param.a, param.b])`              | Replaces multiple fields on the indexed parameter with "[REDACTED]" in the instrumented spans `args` field.                 |
-| field          | `field("key", "value")`                               | Adds the specified key and value to the instrumented spans fields.                                                          |
-|                | `field("key", func)`                                  | Adds the specified field to the instrumented spans fields. The provided func will map the arguments to the field value.     |
-| logEnter       | `logEnter()`                                          | Logs an event when the function or method is entered.                                                                       |
-|                | `logEnter("message")`                                 | Logs an event with the provided message when the function or method is entered.                                             |
-|                | `logEnter(args => args[0])`                           | Logs an event with a message produced from args when the function or method is entered.                                     |
-|                | `logEnter(Level.TRACE)`                               | Logs an event at the provided level when the function or method is entered.                                                 |
-|                | `logEnter(Level.TRACE, "message")`                    | Logs an event with the provided message at the provided level when the function or method is entered.                       |
-|                | `logEnter(Level.TRACE, args => args[0])`              | Logs an event with a message produced from args at the provided level when the function or method is entered.               |
-| logExit        | `logExit()`                                           | Logs an event when the function or method returns. Does not log an event if the function throws an error.                   |
-|                | `logExit("message")`                                  | Logs an event with the provided message when the function or method returns.                                                |
-|                | `logExit(args => args[0])`                            | Logs an event with a message produced from args when the function or method returns.                                        |
-|                | `logExit(Level.TRACE)`                                | Logs an event at the provided level when the function or method returns.                                                    |
-|                | `logExit(Level.TRACE, "message")`                     | Logs an event with the provided message at the provided level when the function or method returns.                          |
-|                | `logExit(Level.TRACE, args => args[0])`               | Logs an event with a message produced from args at the provided level when the function or method returns.                  |
-| logError       | `logError()`                                          | Logs an event when the function or method throws an error.                                                                  |
-|                | `logError("message")`                                 | Logs an event with the provided message when the function or method throws an error.                                        |
-|                | `logError(args => args[0])`                           | Logs an event with a message produced from args when the function or method throws an error.                                |
-|                | `logError(Level.TRACE)`                               | Logs an event at the provided level when the function or method throws an error.                                            |
-|                | `logError(Level.TRACE, "message")`                    | Logs an event with the provided message at the provided level when the function or method throws an error.                  |
-|                | `logError(Level.TRACE, args => args[0])`              | Logs an event with a message produced from args at the provided level when the function or method throws an error.          |
-| log            | `log()`                                               | Shorthand for `logEnter`, `logExit`, and `logError`. Logs an event when the function or method is entered, exist or throws. |
-|                | `log(Level.TRACE)`                                    | Logs an event at the provided level when the function or method is entered or exist. Logs at error level on throw.          |
-| logReturnValue | `logReturnValue()`                                    | Appends the `returnValue` field to the logged exit event.                                                                   |
-|                | `logReturnValue((val, args) => val.toString())`       | Appends the mapped `returnValue` field to the logged exit event.                                                            |
-| subscriberData | `subscriberData({ otel: { kind: SpanKind.SERVER } })` | Adds the specified subscriber specific data to the instrumented spans subscriber data.                                      |
-| otel           | `otel({ kind: SpanKind.SERVER })`                     | Wrapper for `subscriberData({ otel: { ... } })`.                                                                            |
+| Attribute      | Example                                               | Description                                                                                                                             |
+| -------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| message        | `message("new message")`                              | Changes the instrumented spans message.                                                                                                 |
+| target         | `target("functionName")`                              | Changes the instrumented spans target field to the provided function name.                                                              |
+|                | `target("ClassName", "methodName")`                   | Changes the instrumented spans target field to the provided method name.                                                                |
+| level          | `level(Level.TRACE)`                                  | Changes the instrumented spans level.                                                                                                   |
+| skip           | `skip("paramName")`                                   | Omits the named parameter from the instrumented spans `args` field. See documentation on Minifiers & Manglers below.                    |
+|                | `skip(0)`                                             | Omits the indexed parameter from the instrumented spans `args` field.                                                                   |
+|                | `skip(true, false)`                                   | Applies a positional mask to the parameters to omit from the instrumented spans `args` field.                                           |
+| skipAll        | `skipAll`                                             | Omits all parameters from the instrumented spans `args` field.                                                                          |
+| redact         | `redact("paramName")`                                 | Replaces the named parameter with "[REDACTED]" in the instrumented spans `args` field. See documentation on Minifiers & Manglers below. |
+|                | `redact(0)`                                           | Replaces the indexed parameter with "[REDACTED]" in the instrumented spans `args` field.                                                |
+|                | `redact("param", param => param.field)`               | Replaces a field on the named parameter with "[REDACTED]" in the instrumented spans `args` field.                                       |
+|                | `redact(0, param => param.field)`                     | Replaces a field on the indexed parameter with "[REDACTED]" in the instrumented spans `args` field.                                     |
+|                | `redact("param", param => [param.a, param.b])`        | Replaces multiple fields on the named parameter with "[REDACTED]" in the instrumented spans `args` field.                               |
+|                | `redact(0, param => [param.a, param.b])`              | Replaces multiple fields on the indexed parameter with "[REDACTED]" in the instrumented spans `args` field.                             |
+| field          | `field("key", "value")`                               | Adds the specified key and value to the instrumented spans fields.                                                                      |
+|                | `field("key", func)`                                  | Adds the specified field to the instrumented spans fields. The provided func will map the arguments to the field value.                 |
+| logEnter       | `logEnter()`                                          | Logs an event when the function or method is entered.                                                                                   |
+|                | `logEnter("message")`                                 | Logs an event with the provided message when the function or method is entered.                                                         |
+|                | `logEnter(args => args[0])`                           | Logs an event with a message produced from args when the function or method is entered.                                                 |
+|                | `logEnter(Level.TRACE)`                               | Logs an event at the provided level when the function or method is entered.                                                             |
+|                | `logEnter(Level.TRACE, "message")`                    | Logs an event with the provided message at the provided level when the function or method is entered.                                   |
+|                | `logEnter(Level.TRACE, args => args[0])`              | Logs an event with a message produced from args at the provided level when the function or method is entered.                           |
+| logExit        | `logExit()`                                           | Logs an event when the function or method returns. Does not log an event if the function throws an error.                               |
+|                | `logExit("message")`                                  | Logs an event with the provided message when the function or method returns.                                                            |
+|                | `logExit(args => args[0])`                            | Logs an event with a message produced from args when the function or method returns.                                                    |
+|                | `logExit(Level.TRACE)`                                | Logs an event at the provided level when the function or method returns.                                                                |
+|                | `logExit(Level.TRACE, "message")`                     | Logs an event with the provided message at the provided level when the function or method returns.                                      |
+|                | `logExit(Level.TRACE, args => args[0])`               | Logs an event with a message produced from args at the provided level when the function or method returns.                              |
+| logError       | `logError()`                                          | Logs an event when the function or method throws an error.                                                                              |
+|                | `logError("message")`                                 | Logs an event with the provided message when the function or method throws an error.                                                    |
+|                | `logError(args => args[0])`                           | Logs an event with a message produced from args when the function or method throws an error.                                            |
+|                | `logError(Level.TRACE)`                               | Logs an event at the provided level when the function or method throws an error.                                                        |
+|                | `logError(Level.TRACE, "message")`                    | Logs an event with the provided message at the provided level when the function or method throws an error.                              |
+|                | `logError(Level.TRACE, args => args[0])`              | Logs an event with a message produced from args at the provided level when the function or method throws an error.                      |
+| log            | `log()`                                               | Shorthand for `logEnter`, `logExit`, and `logError`. Logs an event when the function or method is entered, exist or throws.             |
+|                | `log(Level.TRACE)`                                    | Logs an event at the provided level when the function or method is entered or exist. Logs at error level on throw.                      |
+| logReturnValue | `logReturnValue()`                                    | Appends the `returnValue` field to the logged exit event.                                                                               |
+|                | `logReturnValue((val, args) => val.toString())`       | Appends the mapped `returnValue` field to the logged exit event.                                                                        |
+| subscriberData | `subscriberData({ otel: { kind: SpanKind.SERVER } })` | Adds the specified subscriber specific data to the instrumented spans subscriber data.                                                  |
+| otel           | `otel({ kind: SpanKind.SERVER })`                     | Wrapper for `subscriberData({ otel: { ... } })`.                                                                                        |
 
 ### Subscribers
 
@@ -560,12 +560,30 @@ instrumented function or method will always clone the context on entry, even if
 it is not necessary. Particularly in methods which are called often, this will
 create a significant amount of garbage which needs to be collected.
 
-### Minifiers
+### Minifiers & Manglers
 
 When using the `skip` attribute when instrumenting functions or methods, be
-aware that skipping attributes by name is not supported when using a minifier.
-Instead, skip function parameters by index, using the skip by mask
-(`skip(true, false)`), or skip by index (`skip(0)`) syntax.
+aware that skipping attributes by name may not be supported when using a
+minifier. This is because minifiers often change the names of function
+arguments, so the name passed to `skip` will no longer match the runtime value:
+
+```ts
+// Before minifier
+const myFunc = instrumentCallback(
+  [skip("arg1")],
+  //     └────────┬─[ Both names match ✓ ]
+  function myFunc(arg1) {}
+)
+
+// After minifier
+const myFunc=instrumentCallback([skip("arg1")],function n(n){});
+//                                     └─┬────────────────┘
+//                                       └─[ Names don't match! ✗ ]
+```
+
+Some minifiers (e.g. SWC) can be configured not to mangle argument names. If you
+cannot rely on argument names not to be mangled, then skip function parameters
+by index (`skip(0)`), or by mask (`skip(true, false)`).
 
 ### Bundler Support
 
